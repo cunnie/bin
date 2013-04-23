@@ -29,10 +29,10 @@ DISPLAY=:0
 # try for 20 seconds to test to see if the Xserver is up
 # before starting the VNC server.
 function start_x11vnc() {
-  local COUNT LIMIT
+  local COUNT LIMIT XAUTHORITY
   COUNT=0
   LIMIT=20
-
+  
   while :; do
     if xrdb -query -display $DISPLAY > /dev/null 2>&1; then
       log_daemon_msg "Start x11vnc: X is running"
@@ -48,6 +48,7 @@ function start_x11vnc() {
       fi
       log_daemon_msg "Start x11vnc: X isn't up yet; waited $COUNT seconds"
       sleep 1
+      cp /home/$DAEMON_USER/.Xauthority ~ || true
     fi
   done
 }

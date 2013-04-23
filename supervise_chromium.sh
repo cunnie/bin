@@ -2,6 +2,6 @@
 while :; do
   /usr/bin/chromium --kiosk
   RC=$?
-  sleep 10
+  sleep 30
   logger "Restarting Chromium, exited with $RC"
 done

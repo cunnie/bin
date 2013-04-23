@@ -21,6 +21,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/x11vnc
 DAEMON_ARGS="-forever -display :0"
 DAEMON_USER=pi
+eval DAEMON_HOME=~$DAEMON_USER
 DISPLAY=:0
 
 . /lib/lsb/init-functions
@@ -48,7 +49,7 @@ function start_x11vnc() {
       fi
       log_daemon_msg "Start x11vnc: X isn't up yet; waited $COUNT seconds"
       sleep 1
-      cp /home/$DAEMON_USER/.Xauthority ~ || true
+      cp $DAEMON_HOME/.Xauthority ~ || true
     fi
   done
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 #
 # backup vCenter's Postgres database
 # copyright (c) 2014 Pivotal Labs

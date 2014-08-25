@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# backup vCenter's Postgres 
+# backup vCenter's Postgres
 # and inventory services databases
 #
 # copyright (c) 2014 Pivotal Labs
@@ -31,10 +31,10 @@ service vmware-vpxd start > /dev/null 2>&1
 
 # stop the vmware-inventoryservice for as briefly as possible, backup up DB
 # http://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=2062682
-service vmware-inventoryservice stop
+service vmware-inventoryservice stop > /dev/null 2>&1
 cd /usr/lib/vmware-vpx/inventoryservice/scripts/
-./backup.sh -file /tmp/$IS_BKUP_FILE.DB
-service vmware-inventoryservice start
+./backup.sh -file /tmp/$IS_BKUP_FILE.DB > /dev/null 2>&1
+service vmware-inventoryservice start > /dev/null 2>&1
 
 # zip 'em up
 gzip /tmp/$PG_BKUP_FILE.sql

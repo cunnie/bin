@@ -3,15 +3,27 @@
 # backup vCenter's Postgres
 # and inventory services databases
 #
+# vcenter_db_bkup.sh S3_bucket_name
+#
+# Intended use: to be executed by an entry in /etc/crontab. For
+# example, the following entry would kick off a backup at at 10:25 a.m.
+# UTC (i.e. 3:25 a.m. PDT)
+#
+#   25 10 * * *   root  /usr/local/sbin/vcenter_db_bkup.sh S3_bucket_name
+#
 # copyright (c) 2014 Pivotal Labs
 #
 # License: unlicense http://unlicense.org/
 #
 # Successful operation is silent so as to not generate emails that
-# clutter root's mailbox.
+# clutter root's mailbox with cron email.
 
 # Make sure you set your S3 bucket name!
 S3_BUCKET_NAME=PLACEHOLDER_FOR_S3_BUCKET_NAME
+
+if [ $# -eq 1 ]; then
+  S3_BUCKET_NAME=$1
+fi
 
 DATE=$(date +%Y-%m-%d-%H:%M)
 PG_BKUP_FILE=postgres_$DATE

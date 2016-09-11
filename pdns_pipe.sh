@@ -98,7 +98,6 @@ XIP_DOMAIN_PATTERN="(^|\.)${XIP_DOMAIN//./\.}\$"
 NS_SUBDOMAIN_PATTERN="^ns-([0-9]+)\$"
 IP_SUBDOMAIN_PATTERN="(^|\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\$"
 DASHED_IP_SUBDOMAIN_PATTERN="(^|-|\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)-){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\$"
-BASE36_SUBDOMAIN_PATTERN="(^|\.)([a-z0-9]{1,7})\$"
 
 qtype_is() {
   [ "$QTYPE" = "$1" ] || [ "$QTYPE" = "ANY" ]
@@ -129,10 +128,6 @@ subdomain_is_dashed_ip() {
   [[ "$SUBDOMAIN" =~ $DASHED_IP_SUBDOMAIN_PATTERN ]]
 }
 
-subdomain_is_base36() {
-  [[ "$SUBDOMAIN" =~ $BASE36_SUBDOMAIN_PATTERN ]]
-}
-
 resolve_ns_subdomain() {
   local index="${SUBDOMAIN:3}"
   echo "${XIP_NS_ADDRESSES[$index-1]}"
@@ -146,12 +141,6 @@ resolve_ip_subdomain() {
 resolve_dashed_ip_subdomain() {
   [[ "$SUBDOMAIN" =~ $DASHED_IP_SUBDOMAIN_PATTERN ]] || true
   echo "${BASH_REMATCH[2]//-/.}"
-}
-
-resolve_base36_subdomain() {
-  [[ "$SUBDOMAIN" =~ $BASE36_SUBDOMAIN_PATTERN ]] || true
-  local ip=$(( 36#${BASH_REMATCH[2]} ))
-  printf "%d.%d.%d.%d" $(( ip&0xFF )) $(( (ip>>8)&0xFF )) $(( (ip>>16)&0xFF )) $(( (ip>>24)&0xFF ))
 }
 
 answer_soa_query() {
@@ -229,9 +218,6 @@ while read_query; do
 
       elif subdomain_is_ip; then
         answer_subdomain_a_query_for ip
-
-      elif subdomain_is_base36; then
-        answer_subdomain_a_query_for base36
       fi
     fi
   fi

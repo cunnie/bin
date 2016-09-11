@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#
+# Originally written by Sam Stephenson for xip.io
 set -e
 shopt -s nocasematch
 

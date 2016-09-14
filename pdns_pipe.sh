@@ -19,13 +19,6 @@ XIP_DOMAIN="sslip.io"
 # CHANGEME: change this to your domain's webserver's address
 XIP_ROOT_ADDRESSES=( "52.0.56.137" )
 
-# The public IP addresses on which this xip-pdns server will run.
-# `NS` queries for the top-level domain will return this list of addresses.
-# Each entry maps to a 1-based subdomain of the format `ns-1`, `ns-2`, etc.
-# `A` queries for these subdomains map to the corresponding addresses here.
-# CHANGEME: change this to match your NS records; one of these IP addresses
-# should match the jobs(xip).networks.static_ips listed above
-XIP_NS_ADDRESSES=( "52.0.56.137" "78.47.249.19" )
 XIP_NS=( "ns-aws.nono.io" "ns-gce.nono.io" "ns-he.nono.io" )
 
 # These are the MX records for your domain.  IF YOU'RE NOT SURE,
@@ -191,38 +184,22 @@ send_cmd "OK" "xip.io PowerDNS pipe backend (protocol version 1)"
 while read_query; do
   log "Query: type=$TYPE qname=$QNAME qclass=$QCLASS qtype=$QTYPE id=$ID ip=$IP"
 
-  if qname_matches_domain; then
-    if qname_is_root_domain; then
       if qtype_is "SOA"; then
         answer_soa_query
-      fi
-
-      if qtype_is "NS"; then
+      elif qtype_is "NS"; then
         answer_ns_query
-      fi
-
-      if qtype_is "A"; then
+      elif qtype_is "A"; then
         answer_root_a_query
-      fi
-
-      if qtype_is "MX"; then
+      elif qtype_is "MX"; then
         answer_mx_query
+      elif qtype_is "A"; then
+        extract_subdomain_from_qname
+        if subdomain_is_dashed_ip; then
+          answer_subdomain_a_query_for dashed_ip
+        elif subdomain_is_ip; then
+          answer_subdomain_a_query_for ip
+        fi
       fi
-
-    elif qtype_is "A"; then
-      extract_subdomain_from_qname
-
-      if subdomain_is_ns; then
-        answer_subdomain_a_query_for ns
-
-      elif subdomain_is_dashed_ip; then
-        answer_subdomain_a_query_for dashed_ip
-
-      elif subdomain_is_ip; then
-        answer_subdomain_a_query_for ip
-      fi
-    fi
-  fi
 
   send_cmd "END"
 done

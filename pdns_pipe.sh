@@ -35,37 +35,7 @@ XIP_DOMAIN="xip.test"
 XIP_MX_RECORDS=( )
 XIP_TTL=300
 
-# test
-test_me() {
-  TEST_INPUT_FD=/tmp/input.$$
-  TEST_OUTPUT_FD=/tmp/output.$$
-  mkfifo $TEST_INPUT_FD $TEST_OUTPUT_FD
-  $0      < $TEST_OUTPUT_FD > $TEST_INPUT_FD &
-  PDNS_PID=$!
-  exec -- > $TEST_OUTPUT_FD < $TEST_INPUT_FD
-
-  >&2 echo It responds to our 'HELO 1' with 'OK'
-  printf "HELO\t1\n"
-  read -ra RESP
-
-  if [ ${RESP[0]} == "OK" ]; then
-    >&2 echo "PASS: received expected '${RESP[0]}'"
-  else
-    >&2 echo "FAIL: received unexpected '${RESP[0]}'"
-  fi
-  >&2 echo $RESP
-
-  # clean-up: kill the process under test, remove fifos
-  kill $PDNS_PID
-  rm $TEST_INPUT_FD $TEST_OUTPUT_FD
-  >&2 echo END testing of $0
-}
-
-if [ "$1" == "-test" ]; then
-  >&2 echo BEGIN testing of $0
-  test_me
-  exit 0
-elif [ -a "$1" ]; then
+if [ -a "$1" ]; then
   source "$1"
 fi
 

@@ -48,6 +48,29 @@ test_me() {
   fi
   read -r RESP # clear out 'END'
 
+  # NS api.system.10.10.1.80.sslip.io
+  QTYPE=NS QNAME=api.system.10.10.1.80.sslip.io
+  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-aws.nono.io" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-gce.nono.io" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-he.nono.io" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP # clear out 'END'
 
   # clean-up: kill the process under test, remove fifos
   kill $PDNS_PID 2> /dev/null

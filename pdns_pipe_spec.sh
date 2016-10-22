@@ -29,7 +29,7 @@ test_me() {
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
   read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		admin.xip.test ns-1.xip.test 2016091100 300 300 300 300" ]; then
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		admin.sslip.io ns-1.sslip.io 2016102202 300 300 300 300" ]; then
     >&2 echo "PASS: received expected '${RESP}'"
   else
     >&2 echo "FAIL: received unexpected '${RESP}'"
@@ -41,7 +41,7 @@ test_me() {
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
   read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		admin.xip.test ns-1.xip.test 2016091100 300 300 300 300" ]; then
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		admin.sslip.io ns-1.sslip.io 2016102202 300 300 300 300" ]; then
     >&2 echo "PASS: received expected '${RESP}'"
   else
     >&2 echo "FAIL: received unexpected '${RESP}'"
@@ -59,6 +59,12 @@ test_me() {
     >&2 echo "FAIL: received unexpected '${RESP}'"
   fi
   read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-azure.nono.io" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-gce.nono.io" ]; then
     >&2 echo "PASS: received expected '${RESP}'"
   else
@@ -66,6 +72,30 @@ test_me() {
   fi
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-he.nono.io" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP # clear out 'END'
+
+  # A api.system.10.10.1.80.sslip.io
+  QTYPE=A QNAME=api.system.10.10.1.80.sslip.io
+  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		10.10.1.80" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP # clear out 'END'
+
+  # A sslip.io
+  QTYPE=A QNAME=sslip.io
+  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		52.0.56.137" ]; then
     >&2 echo "PASS: received expected '${RESP}'"
   else
     >&2 echo "FAIL: received unexpected '${RESP}'"

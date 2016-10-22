@@ -37,8 +37,6 @@ XIP_NS=(           "ns-aws.nono.io" "ns-azure.nono.io" "ns-gce.nono.io" "ns-he.n
 # )
 
 # How long responses should be cached, in seconds.
-XIP_TTL=300
-XIP_DOMAIN="xip.test"
 XIP_MX_RECORDS=( )
 XIP_TTL=300
 
@@ -190,22 +188,24 @@ send_cmd "OK" "xip.io PowerDNS pipe backend (protocol version 1)"
 while read_query; do
   log "Query: type=$TYPE qname=$QNAME qclass=$QCLASS qtype=$QTYPE id=$ID ip=$IP"
 
-      if qtype_is "SOA"; then
-        answer_soa_query
-      elif qtype_is "NS"; then
-        answer_ns_query
-      elif qtype_is "A"; then
-        answer_root_a_query
-      elif qtype_is "MX"; then
-        answer_mx_query
-      elif qtype_is "A"; then
-        extract_subdomain_from_qname
-        if subdomain_is_dashed_ip; then
-          answer_subdomain_a_query_for dashed_ip
-        elif subdomain_is_ip; then
-          answer_subdomain_a_query_for ip
-        fi
+  if qtype_is "SOA"; then
+    answer_soa_query
+  elif qtype_is "NS"; then
+    answer_ns_query
+  elif qtype_is "MX"; then
+    answer_mx_query
+  elif qtype_is "A"; then
+    if [ $QNAME == $XIP_DOMAIN ]; then
+      answer_root_a_query
+    else
+      extract_subdomain_from_qname
+      if subdomain_is_dashed_ip; then
+        answer_subdomain_a_query_for dashed_ip
+      elif subdomain_is_ip; then
+        answer_subdomain_a_query_for ip
       fi
+    fi
+  fi
 
   send_cmd "END"
 done

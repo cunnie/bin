@@ -5,7 +5,7 @@
 #  - assume `pdns_pip.sh` is in same directory
 #  - assume current directory is writable (fifos/named pipes)
 
-test_me() {
+set_up() {
   TEST_INPUT_FD=/tmp/input.$$
   TEST_OUTPUT_FD=/tmp/output.$$
   mkfifo $TEST_INPUT_FD $TEST_OUTPUT_FD
@@ -23,85 +23,94 @@ test_me() {
   else
     >&2 echo "FAIL: received unexpected '${RESP[0]}'"
   fi
+}
 
+pass() {
+    >&2 echo "PASS: received expected '$1'"
+}
+
+fail() {
+    >&2 echo "FAIL: received unexpected '$1'"
+    exit 1
+}
+
+# PowerDNS response ends with 'END'
+test_end() {
+  read -r RESP
+  if [ "${RESP}" == "END" ]; then
+    pass "${RESP}"
+  else
+    fail "${RESP}"
+  fi
+}
+
+test_soa_resp() {
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED_SOA}" ]; then
+    pass "${RESP}"
+  else
+    fail "${RESP}"
+  fi
+}
+
+test_soa() {
   EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2016102202 300 300 300 300"
-  # SOA
-  QTYPE=SOA QNAME=sslip.io
+  QTYPE=SOA QNAME=$1
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED_SOA}" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
-  else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
-  fi
-  read -r RESP # clear out 'END'
+  test_soa_resp
+}
 
-  # SOA api.system.10.10.1.80.sslip.io
-  QTYPE=SOA QNAME=api.system.10.10.1.80.sslip.io
-  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
-  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED_SOA}" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
-  else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
-  fi
-  read -r RESP # clear out 'END'
-
-  # NS api.system.10.10.1.80.sslip.io
-  QTYPE=NS QNAME=api.system.10.10.1.80.sslip.io
-  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
-  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+test_ns_resp() {
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-aws.nono.io" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
+    pass "${RESP}"
   else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+    fail "${RESP}"
   fi
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-azure.nono.io" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
+    pass "${RESP}"
   else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+    fail "${RESP}"
   fi
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-gce.nono.io" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
+    pass "${RESP}"
   else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+    fail "${RESP}"
   fi
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-he.nono.io" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
+    pass "${RESP}"
   else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+    fail "${RESP}"
   fi
-  read -r RESP # clear out 'END'
+}
 
-  # A api.system.10.10.1.80.sslip.io
-  QTYPE=A QNAME=api.system.10.10.1.80.sslip.io
+test_ns() {
+  QTYPE=NS QNAME=$1
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		10.10.1.80" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
-  else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
-  fi
-  read -r RESP # clear out 'END'
+  test_ns_resp
+}
 
-  # A api.system-10-10-1-80.sslip.io
-  QTYPE=A QNAME=api.system.10-11-1-80.sslip.io
+test_a() {
+  QTYPE=A QNAME=$1 EXPECTED=$2
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		10.11.1.80" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
-  else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+  if [ "${EXPECTED}" == "" ]; then
+    return
   fi
-  read -r RESP # clear out 'END'
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED}" ]; then
+    pass "${RESP}"
+  else
+    fail "${RESP}"
+  fi
+}
+
+junk() {
 
   # A api.system-10-10-1-80.nonesuch
   QTYPE=A QNAME=api.system.10-11-1-80.nonesuch
@@ -144,5 +153,39 @@ test_me() {
 }
 
 >&2 echo BEGIN testing of $0
-test_me
+set_up
+
+test_soa sslip.io
+test_end
+
+test_soa api.system.10.10.1.80.sslip.io
+test_end
+
+test_ns sslip.io
+test_end
+
+test_ns api.system.10.10.1.80.sslip.io
+test_end
+
+test_ns api.system.10.10.1.80.sslip.io
+test_end
+
+test_a sslip.io 52.0.56.137
+test_end
+
+test_a api.system.192.168.168.168.sslip.io 192.168.168.168
+test_end
+
+test_a api.system.192-168-168-168.sslip.io 192.168.168.168
+test_end
+
+test_a api.system.255-255-255-255.sslip.io 255.255.255.255
+test_end
+
+test_a api.system.255-255-255-256.sslip.io ""
+test_end
+
+test_a nonesuch.sslip.io ""
+test_end
+
 >&2 echo END testing of $0

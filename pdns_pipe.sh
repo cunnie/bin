@@ -177,11 +177,14 @@ while read_query; do
 
   if qtype_is "SOA"; then
     answer_soa_query
-  elif qtype_is "NS"; then
+  fi
+  if qtype_is "NS"; then
     answer_ns_query
-  elif qtype_is "MX"; then
+  fi
+  if qtype_is "MX"; then
     answer_mx_query
-  elif qtype_is "A"; then
+  fi
+  if qtype_is "A"; then
     if [ $QNAME == $XIP_DOMAIN ]; then
       answer_root_a_query
     else

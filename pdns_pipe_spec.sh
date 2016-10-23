@@ -95,13 +95,7 @@ test_ns() {
   test_ns_resp
 }
 
-test_a() {
-  QTYPE=A QNAME=$1 EXPECTED=$2
-  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
-  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  if [ "${EXPECTED}" == "" ]; then
-    return
-  fi
+test_a_resp() {
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED}" ]; then
     pass "${RESP}"
@@ -110,46 +104,28 @@ test_a() {
   fi
 }
 
-junk() {
-
-  # A api.system-10-10-1-80.nonesuch
-  QTYPE=A QNAME=api.system.10-11-1-80.nonesuch
+test_a() {
+  QTYPE=A QNAME=$1 EXPECTED=$2
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		10.11.1.80" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
+  if [ "${EXPECTED}" == "" ]; then
+    return
   else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+    test_a_resp
   fi
-  read -r RESP # clear out 'END'
+}
 
-  # A sslip.io
-  QTYPE=A QNAME=sslip.io
+test_any() {
+  QTYPE=ANY QNAME=$1 EXPECTED=$2
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		52.0.56.137" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
+  QTYPE=SOA test_soa_resp
+  QTYPE=NS test_ns_resp
+  if [ "${EXPECTED}" == "" ]; then
+    return
   else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
+    QTYPE=A test_a_resp
   fi
-  read -r RESP # clear out 'END'
-
-  # A nonesuch.sslip.io
-  QTYPE=A QNAME=nonesuch.sslip.io
-  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
-  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
-  read -r RESP
-  if [ "${RESP}" == "END" ]; then
-    >&2 echo "PASS: received expected '${RESP}'"
-  else
-    >&2 echo "FAIL: received unexpected '${RESP}'"
-  fi
-
-  # clean-up: kill the process under test, remove fifos
-  kill $PDNS_PID 2> /dev/null
-  rm $TEST_INPUT_FD $TEST_OUTPUT_FD
 }
 
 >&2 echo BEGIN testing of $0
@@ -182,10 +158,22 @@ test_end
 test_a api.system.255-255-255-255.sslip.io 255.255.255.255
 test_end
 
+test_a api.system.255.255.255.256.sslip.io ""
+test_end
+
 test_a api.system.255-255-255-256.sslip.io ""
 test_end
 
 test_a nonesuch.sslip.io ""
 test_end
 
+test_any api.system.255-255-255-255.sslip.io 255.255.255.255
+test_end
+
+test_any api.system.255.255.255.256.sslip.io ""
+test_end
+
 >&2 echo END testing of $0
+# clean-up: kill the process under test, remove fifos
+kill $PDNS_PID 2> /dev/null
+rm $TEST_INPUT_FD $TEST_OUTPUT_FD

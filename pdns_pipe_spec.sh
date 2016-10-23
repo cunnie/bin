@@ -102,6 +102,18 @@ test_me() {
   fi
   read -r RESP # clear out 'END'
 
+  # A api.system-10-10-1-80.nonesuch
+  QTYPE=A QNAME=api.system.10-11-1-80.nonesuch
+  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		10.11.1.80" ]; then
+    >&2 echo "PASS: received expected '${RESP}'"
+  else
+    >&2 echo "FAIL: received unexpected '${RESP}'"
+  fi
+  read -r RESP # clear out 'END'
+
   # A sslip.io
   QTYPE=A QNAME=sslip.io
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
@@ -114,7 +126,7 @@ test_me() {
   fi
   read -r RESP # clear out 'END'
 
-  # A sslip.io
+  # A nonesuch.sslip.io
   QTYPE=A QNAME=nonesuch.sslip.io
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"

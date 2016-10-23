@@ -24,12 +24,13 @@ test_me() {
     >&2 echo "FAIL: received unexpected '${RESP[0]}'"
   fi
 
+  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2016102202 300 300 300 300"
   # SOA
   QTYPE=SOA QNAME=sslip.io
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
   read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		admin.sslip.io ns-1.sslip.io 2016102202 300 300 300 300" ]; then
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED_SOA}" ]; then
     >&2 echo "PASS: received expected '${RESP}'"
   else
     >&2 echo "FAIL: received unexpected '${RESP}'"
@@ -41,7 +42,7 @@ test_me() {
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
   read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		admin.sslip.io ns-1.sslip.io 2016102202 300 300 300 300" ]; then
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED_SOA}" ]; then
     >&2 echo "PASS: received expected '${RESP}'"
   else
     >&2 echo "FAIL: received unexpected '${RESP}'"

@@ -1,0 +1,116 @@
+# $Id: config 3387 2016-06-09 14:18:35Z cunnie $
+
+# My co-worker has too much time on his hands
+ServerAliveInterval 60
+TCPKeepAlive yes
+StrictHostKeyChecking no
+
+Host 10.* 172.* 192.168.*
+	UserKnownHostsFile /dev/null
+
+# personal
+Host nono.com nono.io
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
+
+Host bitbucket.org
+	User git
+	IdentityFile ~/.ssh/id_github
+
+Host bosh-aws
+	HostName  bosh-aws.nono.io
+	User vcap
+	IdentityFile ~/.ssh/aws_nono.pem
+	ForwardAgent yes
+
+Host bosh-azure
+	HostName  bosh-azure.nono.io
+	User vcap
+	IdentityFile ~/.ssh/google
+	ForwardAgent yes
+
+Host bosh-gce
+	HostName  bosh-gce.nono.io
+	User jumpbox
+	IdentityFile ~/.ssh/google
+	ForwardAgent yes
+
+Host diarizer
+	HostName  diarizer.com
+	Port 22
+	IdentityFile ~/.ssh/id_nono
+
+Host esxi
+	HostName esxi.nono.io
+	User root
+	IdentityFile ~/.ssh/id_nono
+
+Host fedora
+	HostName fedora.nono.io
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
+
+Host gist.github.com
+	User git
+	IdentityFile ~/.ssh/id_github
+
+Host github.com
+	User git
+	IdentityFile ~/.ssh/id_github
+
+Host melody
+	HostName melody.nono.io
+	User ubuntu
+	IdentityFile ~/.ssh/aws_nono.pem
+
+Host nas nas.nono.io
+	HostName nas.nono.io
+	User root
+	IdentityFile ~/.ssh/id_nono
+
+Host ns-aws ns-aws.nono.io ns-aws.nono.com
+	HostName ns-aws.nono.io
+	User vcap
+	IdentityFile ~/.ssh/aws_nono.pem
+	UserKnownHostsFile /dev/null
+
+Host ns-azure ns-azure.nono.io ns-azure.nono.com
+	HostName ns-azure.nono.io
+	User vcap
+	IdentityFile ~/.ssh/google
+	UserKnownHostsFile /dev/null
+
+Host ns-gce ns-gce.nono.io ns-gce.nono.com
+	HostName ns-gce.nono.io
+	User vcap
+	IdentityFile ~/.ssh/google
+	UserKnownHostsFile /dev/null
+
+Host opsmgr opsmgr.cf.nono.io
+	HostName opsmgr.cf.nono.io
+	User tempest
+	IdentityFile ~/.ssh/id_nono
+
+Host shay
+	HostName shay.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
+
+Host test test.diarizer.com
+  Hostname test.diarizer.com
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
+
+Host test-old test-old.diarizer.com
+  Hostname test-old.diarizer.com
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+
+# wildcards at bottom, otherwise they trump
+Host *.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes

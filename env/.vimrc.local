@@ -1,0 +1,8 @@
+" This file gets loaded after all of the other vim configuration.
+" You can put machine-specific overrides here.
+
+" set guifont=Source\ Code\ Pro:h18
+
+set background=light
+let g:solarized_termcolors=256
+colorscheme solarized

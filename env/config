@@ -59,6 +59,13 @@ Host github.com
 	User git
 	IdentityFile ~/.ssh/id_github
 
+Host home
+	HostName  home.nono.io
+	Port 2222
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
+
 Host melody
 	HostName melody.nono.io
 	User ubuntu

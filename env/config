@@ -18,23 +18,33 @@ Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/id_github
 
-Host bosh-aws
+Host bosh-aws ns-aws
 	HostName  bosh-aws.nono.io
 	User vcap
-	IdentityFile ~/.ssh/aws_nono.pem
+	IdentityFile ~/.ssh/google
 	ForwardAgent yes
+	UserKnownHostsFile /dev/null
 
-Host bosh-azure
+Host bosh-azure ns-azure
 	HostName  bosh-azure.nono.io
 	User vcap
 	IdentityFile ~/.ssh/google
 	ForwardAgent yes
+	UserKnownHostsFile /dev/null
 
 Host bosh-gce
 	HostName  bosh-gce.nono.io
-	User jumpbox
+	User vcap
 	IdentityFile ~/.ssh/google
 	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
+Host ns-gce
+	HostName ns-gce.nono.io
+	User vcap
+	IdentityFile ~/.ssh/google
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
 
 Host diarizer
 	HostName  diarizer.com
@@ -75,24 +85,6 @@ Host nas nas.nono.io
 	HostName nas.nono.io
 	User root
 	IdentityFile ~/.ssh/id_nono
-
-Host ns-aws ns-aws.nono.io ns-aws.nono.com
-	HostName ns-aws.nono.io
-	User vcap
-	IdentityFile ~/.ssh/aws_nono.pem
-	UserKnownHostsFile /dev/null
-
-Host ns-azure ns-azure.nono.io ns-azure.nono.com
-	HostName ns-azure.nono.io
-	User vcap
-	IdentityFile ~/.ssh/google
-	UserKnownHostsFile /dev/null
-
-Host ns-gce ns-gce.nono.io ns-gce.nono.com
-	HostName ns-gce.nono.io
-	User vcap
-	IdentityFile ~/.ssh/google
-	UserKnownHostsFile /dev/null
 
 Host opsmgr opsmgr.cf.nono.io
 	HostName opsmgr.cf.nono.io

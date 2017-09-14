@@ -98,14 +98,19 @@ Host shay
 	ForwardAgent yes
 
 Host test test.diarizer.com
-  Hostname test.diarizer.com
+	Hostname test.diarizer.com
 	User cunnie
 	IdentityFile ~/.ssh/id_nono
 	ForwardAgent yes
 
 Host test-old test-old.diarizer.com
-  Hostname test-old.diarizer.com
+	Hostname test-old.diarizer.com
 	User cunnie
+	IdentityFile ~/.ssh/id_nono
+
+Host vcenter vcenter.nono.io
+	Hostname vcenter.nono.io
+	User root
 	IdentityFile ~/.ssh/id_nono
 
 # wildcards at bottom, otherwise they trump

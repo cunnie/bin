@@ -21,7 +21,7 @@ Host bitbucket.org
 Host bosh-aws ns-aws
 	HostName  bosh-aws.nono.io
 	User vcap
-	IdentityFile ~/.ssh/google
+	IdentityFile ~/.ssh/bosh_deployment_no_ecdsa
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
@@ -34,8 +34,8 @@ Host bosh-azure ns-azure
 
 Host bosh-gce
 	HostName  bosh-gce.nono.io
-	User vcap
-	IdentityFile ~/.ssh/google
+	User jumpbox
+	IdentityFile ~/.ssh/bosh_deployment
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 

@@ -51,8 +51,13 @@ Host diarizer
 	Port 22
 	IdentityFile ~/.ssh/id_nono
 
-Host esxi
-	HostName esxi.nono.io
+Host esxi-0
+	HostName esxi-0.nono.io
+	User root
+	IdentityFile ~/.ssh/id_nono
+
+Host esxi-1
+	HostName esxi-1.nono.io
 	User root
 	IdentityFile ~/.ssh/id_nono
 

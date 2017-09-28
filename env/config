@@ -42,7 +42,7 @@ Host bosh-gce
 Host ns-gce
 	HostName ns-gce.nono.io
 	User vcap
-	IdentityFile ~/.ssh/google
+	IdentityFile ~/.ssh/bosh_deployment
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 

@@ -27,8 +27,8 @@ Host bosh-aws ns-aws
 
 Host bosh-azure ns-azure
 	HostName  bosh-azure.nono.io
-	User vcap
-	IdentityFile ~/.ssh/google
+	User jumpbox
+	IdentityFile ~/.ssh/bosh_deployment
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
@@ -49,6 +49,7 @@ Host ns-gce
 Host diarizer
 	HostName  diarizer.com
 	Port 22
+	ForwardAgent yes
 	IdentityFile ~/.ssh/id_nono
 
 Host esxi-0
@@ -112,6 +113,12 @@ Host test-old test-old.diarizer.com
 	Hostname test-old.diarizer.com
 	User cunnie
 	IdentityFile ~/.ssh/id_nono
+
+Host vain
+	HostName vain.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
 
 Host vcenter vcenter.nono.io
 	Hostname vcenter.nono.io

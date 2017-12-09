@@ -143,8 +143,14 @@ test_any() {
   QTYPE=NS test_ns_resp
   if [ "${EXPECTED}" == "" ]; then
     return
-  else
+  fi
+  if [[ "${EXPECTED}" =~ \. ]]; then
     QTYPE=A test_a_resp
+    return
+  fi
+  if [[ "${EXPECTED}" =~ : ]]; then
+    QTYPE=AAAA test_aaaa_resp
+    return
   fi
 }
 
@@ -187,13 +193,40 @@ test_end
 test_a nonesuch.sslip.io ""
 test_end
 
+test_aaaa sslip.io 2a01:4f8:c17:b8f::2
+test_end
+
+test_aaaa --.sslip.io ::
+test_end
+
+test_aaaa api.--.sslip.io ::
+test_end
+
+test_aaaa --1.sslip.io ::1
+test_end
+
+test_aaaa 2a01-4f8-c17-b8f--2.sslip.io 2a01:4f8:c17:b8f::2
+test_end
+
+test_aaaa fe80--10cc-ddb8-cbad-bdf1.sslip.io fe80::10cc:ddb8:cbad:bdf1
+test_end
+
+test_aaaa 2a01-4f8-c17-b8f--2.sslip.io 2a01:4f8:c17:b8f::2
+test_end
+
+test_aaaa api.system.2a01-4f8-c17-b8f--2.sslip.io 2a01:4f8:c17:b8f::2
+test_end
+
+test_aaaa api.system.2a01-4f8-c17-b8f--xxxx.sslip.io ""
+test_end
+
 test_any api.system.255-255-255-255.sslip.io 255.255.255.255
 test_end
 
 test_any api.system.255.255.255.256.sslip.io ""
 test_end
 
-test_aaaa sslip.io 2a01:4f8:c17:b8f::2
+test_any api.system.2a01-4f8-c17-b8f--2.sslip.io 2a01:4f8:c17:b8f::2
 test_end
 
 >&2 echo END testing of $0

@@ -98,6 +98,10 @@ log() {
 #
 IP_PATTERN="(^|\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))($|\.)"
 DASHED_IP_PATTERN="(^|-|\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)-){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))($|-|\.)"
+# https://stackoverflow.com/questions/53497/regular-expression-that-matches-valid-ipv6-addresses
+# We don't use "dotted" IPv6 because DNS doesn't allow two dots next to each other
+#   e.g. "::1" -> "1..sslip.io" isn't allowed (dig error: `is not a legal name (empty label)`)
+DASHED_IPV6_PATTERN="(^|\.)(([0-9a-fA-F]{1,4}-){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}-){1,7}-|([0-9a-fA-F]{1,4}-){1,6}-[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}-){1,5}(-[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}-){1,4}(-[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}-){1,3}(-[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}-){1,2}(-[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}-((-[0-9a-fA-F]{1,4}){1,6})|-((-[0-9a-fA-F]{1,4}){1,7}|-))(\.|$)"
 
 qtype_is() {
   [ "$QTYPE" = "$1" ] || [ "$QTYPE" = "ANY" ]
@@ -115,6 +119,10 @@ subdomain_is_dashed_ip() {
   [[ "$QNAME" =~ $DASHED_IP_PATTERN ]]
 }
 
+subdomain_is_dashed_ipv6() {
+  [[ "$QNAME" =~ $DASHED_IPV6_PATTERN ]]
+}
+
 resolve_ns_subdomain() {
   local index="${SUBDOMAIN:3}"
   echo "${XIP_NS_ADDRESSES[$index-1]}"
@@ -128,6 +136,11 @@ resolve_ip_subdomain() {
 resolve_dashed_ip_subdomain() {
   [[ "$QNAME" =~ $DASHED_IP_PATTERN ]] || true
   echo "${BASH_REMATCH[2]//-/.}"
+}
+
+resolve_dashed_ipv6_subdomain() {
+  [[ "$QNAME" =~ $DASHED_IPV6_PATTERN ]] || true
+  echo "${BASH_REMATCH[2]//-/:}"
 }
 
 answer_soa_query() {
@@ -172,6 +185,14 @@ answer_subdomain_a_query_for() {
   fi
 }
 
+answer_subdomain_aaaa_query_for() {
+  local type="$1"
+  local address="$(resolve_${type}_subdomain)"
+  if [ -n "$address" ]; then
+    send_answer "AAAA" "$address"
+  fi
+}
+
 
 #
 # PowerDNS pipe backend implementation
@@ -207,6 +228,10 @@ while read_query; do
   if qtype_is "AAAA"; then
     if [ $QNAME == $XIP_DOMAIN ]; then
       answer_root_aaaa_query
+    else
+      if subdomain_is_dashed_ipv6; then
+        answer_subdomain_aaaa_query_for dashed_ipv6
+      fi
     fi
   fi
 

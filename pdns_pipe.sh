@@ -23,6 +23,7 @@ XIP_SOA="briancunnie.gmail.com ns-he.nono.io $XIP_TIMESTAMP $XIP_TTL $XIP_TTL $X
 # `A` queries for the top-level domain will return this list of addresses.
 # CHANGEME: change this to your domain's webserver's address
 XIP_ROOT_ADDRESSES=( "52.0.56.137" )
+XIP_ROOT_ADDRESSES_AAAA=( "2a01:4f8:c17:b8f::2" )
 
 # The public IP addresses on which this xip-pdns server will run.
 # `NS` queries for the top-level domain will return this list of addresses.
@@ -148,6 +149,13 @@ answer_root_a_query() {
   done
 }
 
+answer_root_aaaa_query() {
+  local address
+  for address in "${XIP_ROOT_ADDRESSES_AAAA[@]}"; do
+    send_answer "AAAA" "$address"
+  done
+}
+
 answer_mx_query() {
   set -- "${XIP_MX_RECORDS[@]}"
   while [ $# -gt 1 ]; do
@@ -193,6 +201,12 @@ while read_query; do
       elif subdomain_is_ip; then
         answer_subdomain_a_query_for ip
       fi
+    fi
+  fi
+
+  if qtype_is "AAAA"; then
+    if [ $QNAME == $XIP_DOMAIN ]; then
+      answer_root_aaaa_query
     fi
   fi
 

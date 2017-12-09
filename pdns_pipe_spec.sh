@@ -115,6 +115,26 @@ test_a() {
   fi
 }
 
+test_aaaa_resp() {
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		${EXPECTED}" ]; then
+    pass "${RESP}"
+  else
+    fail "${RESP}"
+  fi
+}
+
+test_aaaa() {
+  QTYPE=AAAA QNAME=$1 EXPECTED=$2
+  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  if [ "${EXPECTED}" == "" ]; then
+    return
+  else
+    test_aaaa_resp
+  fi
+}
+
 test_any() {
   QTYPE=ANY QNAME=$1 EXPECTED=$2
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
@@ -171,6 +191,9 @@ test_any api.system.255-255-255-255.sslip.io 255.255.255.255
 test_end
 
 test_any api.system.255.255.255.256.sslip.io ""
+test_end
+
+test_aaaa sslip.io 2a01:4f8:c17:b8f::2
 test_end
 
 >&2 echo END testing of $0

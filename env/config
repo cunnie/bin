@@ -92,9 +92,9 @@ Host nas nas.nono.io
 	User root
 	IdentityFile ~/.ssh/id_nono
 
-Host opsmgr opsmgr.cf.nono.io
-	HostName opsmgr.cf.nono.io
-	User tempest
+Host om om.nono.io
+	HostName om.nono.io
+	User ubuntu
 	IdentityFile ~/.ssh/id_nono
 
 Host shay

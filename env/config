@@ -53,6 +53,11 @@ Host ns-gce
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
+Host ns-vultr
+	HostName ns-vultr.nono.io
+	IdentityFile ~/.ssh/id_nono
+	ForwardAgent yes
+
 Host diarizer
 	HostName  diarizer.com
 	Port 22

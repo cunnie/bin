@@ -214,7 +214,8 @@ while read_query; do
     answer_mx_query
   fi
   if qtype_is "A"; then
-    if [ $QNAME == $XIP_DOMAIN ]; then
+    LC_QNAME=$(echo $QNAME | tr 'A-Z' 'a-z')
+    if [ $LC_QNAME == $XIP_DOMAIN ]; then
       answer_root_a_query
     else
       if subdomain_is_dashed_ip; then
@@ -226,7 +227,8 @@ while read_query; do
   fi
 
   if qtype_is "AAAA"; then
-    if [ $QNAME == $XIP_DOMAIN ]; then
+    LC_QNAME=$(echo $QNAME | tr 'A-Z' 'a-z')
+    if [ $LC_QNAME == $XIP_DOMAIN ]; then
       answer_root_aaaa_query
     else
       if subdomain_is_dashed_ipv6; then
@@ -237,4 +239,3 @@ while read_query; do
 
   send_cmd "END"
 done
-

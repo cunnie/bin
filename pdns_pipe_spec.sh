@@ -4,6 +4,7 @@
 #  - doesn't take arguments
 #  - assume `pdns_pip.sh` is in same directory
 #  - assume current directory is writable (fifos/named pipes)
+#  bosh int --path /pdns_pipe ~/workspace/sslip.io/conf/sslip.io+nono.io.yml > ~/bin/pdns_pipe.sh
 
 set_up() {
   TEST_INPUT_FD=/tmp/input.$$

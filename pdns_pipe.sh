@@ -7,7 +7,7 @@ shopt -s nocasematch
 # Configuration
 #
 # Increment this timestamp when the contents of the file change.
-XIP_TIMESTAMP="2016102202"
+XIP_TIMESTAMP="2018030100"
 
 # The top-level domain for which the name server is authoritative.
 # CHANGEME: change "sslip.io" to your domain
@@ -22,7 +22,7 @@ XIP_SOA="briancunnie.gmail.com ns-he.nono.io $XIP_TIMESTAMP $XIP_TTL $XIP_TTL $X
 # The public IP addresses (e.g. for the web site) of the top-level domain.
 # `A` queries for the top-level domain will return this list of addresses.
 # CHANGEME: change this to your domain's webserver's address
-XIP_ROOT_ADDRESSES=( "52.0.56.137" )
+XIP_ROOT_ADDRESSES=( "78.46.204.247" )
 XIP_ROOT_ADDRESSES_AAAA=( "2a01:4f8:c17:b8f::2" )
 
 # The public IP addresses on which this xip-pdns server will run.
@@ -237,3 +237,4 @@ while read_query; do
 
   send_cmd "END"
 done
+

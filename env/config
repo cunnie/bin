@@ -16,7 +16,7 @@ Host nono.com nono.io
 
 Host bitbucket.org
 	User git
-	IdentityFile ~/.ssh/id_github
+	IdentityFile ~/.ssh/github
 
 Host bosh-aws ns-aws
 	HostName  bosh-aws.nono.io
@@ -81,11 +81,11 @@ Host fedora
 
 Host gist.github.com
 	User git
-	IdentityFile ~/.ssh/id_github
+	IdentityFile ~/.ssh/github
 
 Host github.com
 	User git
-	IdentityFile ~/.ssh/id_github
+	IdentityFile ~/.ssh/github
 
 Host home
 	HostName  home.nono.io

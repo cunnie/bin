@@ -11,7 +11,7 @@ Host 10.* 172.* 192.168.*
 # personal
 Host nono.com nono.io
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host bitbucket.org
@@ -55,28 +55,28 @@ Host ns-gce
 
 Host ns-vultr
 	HostName ns-vultr.nono.io
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host diarizer
 	HostName  diarizer.com
 	Port 22
 	ForwardAgent yes
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 Host esxi-0
 	HostName esxi-0.nono.io
 	User root
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 Host esxi-1
 	HostName esxi-1.nono.io
 	User root
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 Host fedora
 	HostName fedora.nono.io
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host gist.github.com
@@ -91,7 +91,7 @@ Host home
 	HostName  home.nono.io
 	Port 2222
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host melody
@@ -102,43 +102,43 @@ Host melody
 Host nas nas.nono.io
 	HostName nas.nono.io
 	User root
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 Host om om.nono.io
 	HostName om.nono.io
 	User ubuntu
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 Host shay
 	HostName shay.nono.io
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host test test.diarizer.com
 	Hostname test.diarizer.com
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host test-old test-old.diarizer.com
 	Hostname test-old.diarizer.com
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 Host vain
 	HostName vain.nono.io
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
 Host vcenter vcenter.nono.io
 	Hostname vcenter.nono.io
 	User root
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 
 # wildcards at bottom, otherwise they trump
 Host *.nono.io
 	User cunnie
-	IdentityFile ~/.ssh/id_nono
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

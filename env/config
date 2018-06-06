@@ -20,36 +20,29 @@ Host bitbucket.org
 
 Host bosh-aws ns-aws
 	HostName  bosh-aws.nono.io
-	User vcap
-	IdentityFile ~/.ssh/bosh_deployment_no_ecdsa
+	User jumpbox
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host bosh-azure ns-azure
 	HostName  bosh-azure.nono.io
 	User jumpbox
-	IdentityFile ~/.ssh/bosh_deployment
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host bosh-gce
 	HostName  bosh-gce.nono.io
 	User jumpbox
-	IdentityFile ~/.ssh/bosh_deployment
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host bosh-lite
 	HostName  bosh-lite.nono.io
 	User jumpbox
-	IdentityFile ~/.ssh/bosh_deployment
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
-Host ns-gce
-	HostName ns-gce.nono.io
-	User vcap
-	IdentityFile ~/.ssh/bosh_deployment
+	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
@@ -58,7 +51,7 @@ Host ns-vultr
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host diarizer
+Host diarizer diarizer.com
 	HostName  diarizer.com
 	Port 22
 	ForwardAgent yes
@@ -94,11 +87,6 @@ Host home
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host melody
-	HostName melody.nono.io
-	User ubuntu
-	IdentityFile ~/.ssh/aws_nono.pem
-
 Host nas nas.nono.io
 	HostName nas.nono.io
 	User root
@@ -120,11 +108,6 @@ Host test test.diarizer.com
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-
-Host test-old test-old.diarizer.com
-	Hostname test-old.diarizer.com
-	User cunnie
-	IdentityFile ~/.ssh/nono
 
 Host vain
 	HostName vain.nono.io

@@ -5,7 +5,7 @@ ServerAliveInterval 60
 TCPKeepAlive yes
 StrictHostKeyChecking no
 
-Host 10.* 172.* 192.168.*
+Host 10.* 172.* 192.168.* ci.nono.io
 	UserKnownHostsFile /dev/null
 
 # personal

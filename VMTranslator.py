@@ -3,11 +3,14 @@ import sys
 
 
 class Cmd_arithmetic:
+    counter = -1
+
     def __init__(self, code):
         self.code = code
 
     def generate(self):
-        return self.code
+        Cmd_arithmetic.counter += 1
+        return self.code.replace('%d', str(Cmd_arithmetic.counter))
 
 
 class Cmd_push:
@@ -47,9 +50,12 @@ cmd_sub = Cmd_arithmetic(
 
 cmd_neg = Cmd_arithmetic(
     """    @SP
+    M=M-1
     A=M
     D=-M    // D is value at top of the stack
     M=D
+    @SP
+    M=M+1
 """
 )
 
@@ -60,8 +66,22 @@ cmd_eq = Cmd_arithmetic(
     D=M     // D is value at top of the stack
     @SP
     A=M-1   // Point to next highest on stack
+    D=D-M   // Sub that guy from D
+    @EQ_DONE_%d
+    D;JEQ   // D is set to true (0) & will be pushed to the stack
+(EQ_NOT_EQUALS_%d)
+    @0
+    D=A-1   // D is set to false (-1)
+    @EQ_DONE_%d
+    0;JMP
+(EQ_DONE_%d)
+    @SP
+    M=M-1
     A=M
-    D;JEQ
+    M=D
+    @SP
+    M=M+1
+    A=M
 """
 )
 

@@ -1,30 +1,48 @@
 #!/usr/local/bin/python2.7
 import sys
 
-t_cmd = [
-    'push',
-    'pop',
-    'add',
-    'sub',
-    'neg',
-    'eq',
-    'gt',
-    'lt',
-    'and',
-    'or',
-    'not'
-]
 
-t_segment = [
-    'argument',
-    'local',
-    'static',
-    'constant',
-    'this',
-    'that',
-    'pointer',
-    'temp',
-]
+class Cmd_arithmetic:
+    def __init__(self, code):
+        self.code = code
+
+    def generate(self):
+        return self.code
+
+
+class Cmd_push:
+    def __init__(self, code):
+        self.code = code
+        self.segment = 'constant'
+        self.index = 0
+
+    def generate(self):
+        code = self.code
+        if self.segment == 'constant':
+            code = '@' + str(self.index) + '\n' + self.code
+        return code
+
+
+cmd_add = Cmd_arithmetic(
+    """@SP
+M=M-1
+A=M
+D=M	// D is value at top of the stack
+@SP
+A=M-1	// Point to next highest on stack
+M=D+M  // Add D to that guy
+"""
+)
+
+cmd_push = Cmd_push(
+    """D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+"""
+)
 
 
 def parse(line):
@@ -32,13 +50,7 @@ def parse(line):
     no_comments = line.split('#', 1)[0]
     no_comments = no_comments.split('//', 1)[0]
     tokens = no_comments.split()
-    parsed_tokens = tokens
-    if len(parsed_tokens) > 0:
-        parsed_tokens[0] = t_cmd.index(tokens[0])
-    if len(parsed_tokens) > 1:
-        parsed_tokens[1] = t_segment.index(tokens[1])
-    # parsed_tokens[2] is already set
-    return parsed_tokens
+    return (tokens)
 
 
 def writecode(tokens):
@@ -48,23 +60,13 @@ def writecode(tokens):
     for token in tokens:
         asm_file.write(' ' + str(token))
     asm_file.write('\n')
-    if t_cmd[tokens[0]] == 'add':
-        asm_file.write('@SP\n')
-        asm_file.write('M=M-1\n')
-        asm_file.write('A=M\n')
-        asm_file.write('D=M	// D is value at top of the stack\n')
-        asm_file.write('@SP\n')
-        asm_file.write('A=M-1	// Point to next highest on stack\n')
-        asm_file.write('M=D+M	// Add D to that guy\n')
-    if t_cmd[tokens[0]] == 'push':
-        if t_segment[tokens[1]] == 'constant':
-            asm_file.write('@' + tokens[2] + '\n')
-            asm_file.write('D=A\n')
-            asm_file.write('@SP\n')
-            asm_file.write('A=M\n')
-            asm_file.write('M=D\n')
-            asm_file.write('@SP\n')
-            asm_file.write('M=M+1\n')
+    if tokens[0] == 'add':
+        asm_file.write(cmd_add.generate())
+    if tokens[0] == 'push':
+        cmd_push.segment = tokens[1]
+        cmd_push.index = tokens[2]
+        asm_file.write(cmd_push.generate())
+
 
 cmd_name = sys.argv[0].split('/')[-1]
 

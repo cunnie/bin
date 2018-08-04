@@ -19,31 +19,61 @@ class Cmd_push:
     def generate(self):
         code = self.code
         if self.segment == 'constant':
-            code = '@' + str(self.index) + '\n' + self.code
+            code = '    @' + str(self.index) + '\n' + self.code
         return code
 
 
 cmd_add = Cmd_arithmetic(
-    """@SP
-M=M-1
-A=M
-D=M	// D is value at top of the stack
-@SP
-A=M-1	// Point to next highest on stack
-M=D+M  // Add D to that guy
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    M=D+M   // Add D to that guy
+"""
+)
+
+cmd_sub = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    M=D-M   // Sub that guy from D
+"""
+)
+
+cmd_neg = Cmd_arithmetic(
+    """    @SP
+    A=M
+    D=-M    // D is value at top of the stack
+    M=D
+"""
+)
+
+cmd_eq = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    A=M
+    D;JEQ
 """
 )
 
 cmd_push = Cmd_push(
-    """D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
+    """    D=A
+    @SP
+    A=M
+    M=D
+    @SP
+    M=M+1
 """
 )
-
 
 def parse(line):
     # strip comments
@@ -62,6 +92,12 @@ def writecode(tokens):
     asm_file.write('\n')
     if tokens[0] == 'add':
         asm_file.write(cmd_add.generate())
+    if tokens[0] == 'sub':
+        asm_file.write(cmd_sub.generate())
+    if tokens[0] == 'neg':
+        asm_file.write(cmd_neg.generate())
+    if tokens[0] == 'eq':
+        asm_file.write(cmd_eq.generate())
     if tokens[0] == 'push':
         cmd_push.segment = tokens[1]
         cmd_push.index = tokens[2]

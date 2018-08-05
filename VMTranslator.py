@@ -13,17 +13,50 @@ class Cmd_arithmetic:
         return self.code.replace('%d', str(self.counter))
 
 
-class Cmd_push_pop:
+class Cmd_push:
+    def __init__(self):
+        self.segment = 'constant'
+        self.index = '0'
+        self.indirect = 'M'
+
+    def generate(self):
+        self.code = cmd_push_asm
+        if self.segment == 'local':
+            self.segment = 'LCL'
+        if self.segment == 'argument':
+            self.segment = 'ARG'
+        if self.segment == 'this':
+            self.segment = 'THIS'
+        if self.segment == 'that':
+            self.segment = 'THAT'
+        if self.segment == 'temp':
+            self.indirect = 'A'
+            self.segment = '5'
+        if self.segment == 'constant':
+            self.code = cmd_push_asm_constant
+        return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
+
+
+class Cmd_pop:
     def __init__(self, code):
         self.code = code
         self.segment = 'constant'
-        self.index = 0
+        self.index = '0'
+        self.indirect = 'M'
 
     def generate(self):
-        code = self.code
-        if self.segment == 'constant':
-            code = '    @' + str(self.index) + '\n' + self.code
-        return code
+        if self.segment == 'local':
+            self.segment = 'LCL'
+        if self.segment == 'argument':
+            self.segment = 'ARG'
+        if self.segment == 'this':
+            self.segment = 'THIS'
+        if self.segment == 'that':
+            self.segment = 'THAT'
+        if self.segment == 'temp':
+            self.indirect = 'A'
+            self.segment = '5'
+        return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
 
 
 cmd_add = Cmd_arithmetic(
@@ -175,26 +208,44 @@ cmd_not = Cmd_arithmetic(
 """
 )
 
-cmd_push = Cmd_push_pop(
-    """    D=A
+cmd_push_asm = """    @%s     // segment
+    D=%i
+    @%d     // index
+    A=D+A   // D holds the address to pull from
+    D=M     // D holds the value we're gonna push onto SP
     @SP
     A=M
     M=D
     @SP     // increment SP
     M=M+1
 """
-)
 
-cmd_pop = Cmd_push_pop(
-    """    @LCL
-    A=M
+cmd_push_asm_constant = """    @%d
+    D=A
     @SP
-    M=M-1   // decrement SP
-    A=M
-    D=M     // D holds our "precious"
-    @LCL
     A=M
     M=D
+    @SP     // increment SP
+    M=M+1
+"""
+
+cmd_pop = Cmd_pop(
+    """    @%s     // segment
+    D=%i
+    @%d     // index
+    D=D+A   // D holds the address to which to pop
+    @SP
+    A=M
+    M=D     // top of the stack has the address to which to pop
+    @SP
+    A=M-1
+    D=M     // D holds the value we're going to pop
+    @SP
+    A=M
+    A=M     // climbing the indirections
+    M=D     // Done!
+    @SP     // decrement SP
+    M=M-1
 """
 )
 
@@ -204,7 +255,7 @@ def parse(line):
     no_comments = line.split('#', 1)[0]
     no_comments = no_comments.split('//', 1)[0]
     tokens = no_comments.split()
-    return (tokens)
+    return tokens
 
 
 def writecode(tokens):
@@ -233,18 +284,18 @@ def writecode(tokens):
     if tokens[0] == 'not':
         asm_file.write(cmd_not.generate())
     if tokens[0] == 'push':
+        cmd_push = Cmd_push()
         cmd_push.segment = tokens[1]
         cmd_push.index = tokens[2]
         asm_file.write(cmd_push.generate())
+    if tokens[0] == 'pop':
+        cmd_pop.segment = tokens[1]
+        cmd_pop.index = tokens[2]
+        asm_file.write(cmd_pop.generate())
 
 
 def banner():
-    asm_file.write(
-"""
-//
-// Brian Cunnie's output for Nand to Tetris
-//
-""")
+    asm_file.write("//\n// Brian Cunnie's output for Nand to Tetris\n//\n")
 
 
 cmd_name = sys.argv[0].split('/')[-1]

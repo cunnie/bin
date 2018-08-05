@@ -13,7 +13,7 @@ class Cmd_arithmetic:
         return self.code.replace('%d', str(self.counter))
 
 
-class Cmd_push:
+class Cmd_push_pop:
     def __init__(self, code):
         self.code = code
         self.segment = 'constant'
@@ -175,13 +175,26 @@ cmd_not = Cmd_arithmetic(
 """
 )
 
-cmd_push = Cmd_push(
+cmd_push = Cmd_push_pop(
     """    D=A
     @SP
     A=M
     M=D
-    @SP
+    @SP     // increment SP
     M=M+1
+"""
+)
+
+cmd_pop = Cmd_push_pop(
+    """    @LCL
+    A=M
+    @SP
+    M=M-1   // decrement SP
+    A=M
+    D=M     // D holds our "precious"
+    @LCL
+    A=M
+    M=D
 """
 )
 

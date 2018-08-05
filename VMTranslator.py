@@ -3,14 +3,14 @@ import sys
 
 
 class Cmd_arithmetic:
-    counter = -1
 
     def __init__(self, code):
         self.code = code
+        self.counter = -1
 
     def generate(self):
-        Cmd_arithmetic.counter += 1
-        return self.code.replace('%d', str(Cmd_arithmetic.counter))
+        self.counter += 1
+        return self.code.replace('%d', str(self.counter))
 
 
 class Cmd_push:
@@ -68,10 +68,10 @@ cmd_eq = Cmd_arithmetic(
     A=M-1   // Point to next highest on stack
     D=D-M   // Sub that guy from D
     @EQ_DONE_%d
-    D;JEQ   // D is set to true (0) & will be pushed to the stack
-(EQ_NOT_EQUALS_%d)
+    D;JNE   // D is set to false (0) & will be pushed to the stack
+(EQ_NOT_EQ_%d)
     @0
-    D=A-1   // D is set to false (-1)
+    D=A-1   // D is set to true (-1)
     @EQ_DONE_%d
     0;JMP
 (EQ_DONE_%d)
@@ -82,6 +82,91 @@ cmd_eq = Cmd_arithmetic(
     @SP
     M=M+1
     A=M
+"""
+)
+
+cmd_lt = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    D=D-M   // Sub that guy from D
+    @LT_DONE_%d
+    D;JGE   // D is set to false (0) & will be pushed to the stack
+(LT_NOT_LT_%d)
+    @0
+    D=A-1   // D is set to true (-1)
+    @LT_DONE_%d
+    0;JMP
+(LT_DONE_%d)
+    @SP
+    M=M-1
+    A=M
+    M=D
+    @SP
+    M=M+1
+    A=M
+"""
+)
+
+cmd_gt = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    D=D-M   // Sub that guy from D
+    @GT_DONE_%d
+    D;JLE   // D is set to false (0) & will be pushed to the stack
+(GT_NOT_GT_%d)
+    @0
+    D=A-1   // D is set to true (-1)
+    @GT_DONE_%d
+    0;JMP
+(GT_DONE_%d)
+    @SP
+    M=M-1
+    A=M
+    M=D
+    @SP
+    M=M+1
+    A=M
+"""
+)
+
+cmd_and = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    M=D&M   // Add D to that guy
+"""
+)
+
+cmd_or = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=M     // D is value at top of the stack
+    @SP
+    A=M-1   // Point to next highest on stack
+    M=D|M   // Add D to that guy
+"""
+)
+
+cmd_not = Cmd_arithmetic(
+    """    @SP
+    M=M-1
+    A=M
+    D=!M    // D is value at top of the stack
+    M=D
+    @SP
+    M=M+1
 """
 )
 
@@ -118,11 +203,28 @@ def writecode(tokens):
         asm_file.write(cmd_neg.generate())
     if tokens[0] == 'eq':
         asm_file.write(cmd_eq.generate())
+    if tokens[0] == 'lt':
+        asm_file.write(cmd_lt.generate())
+    if tokens[0] == 'gt':
+        asm_file.write(cmd_gt.generate())
+    if tokens[0] == 'and':
+        asm_file.write(cmd_and.generate())
+    if tokens[0] == 'or':
+        asm_file.write(cmd_or.generate())
+    if tokens[0] == 'not':
+        asm_file.write(cmd_not.generate())
     if tokens[0] == 'push':
         cmd_push.segment = tokens[1]
         cmd_push.index = tokens[2]
         asm_file.write(cmd_push.generate())
 
+def banner():
+    asm_file.write(
+"""
+//
+// Brian Cunnie's output for Nand to Tetris
+//
+""")
 
 cmd_name = sys.argv[0].split('/')[-1]
 
@@ -146,6 +248,7 @@ try:
 except:
     sys.exit(cmd_name + " error. I couldn't open " + asm_filename + " for writing!")
 
+banner()
 for line in intermediate_code:
     x = parse(line)
     writecode(x)

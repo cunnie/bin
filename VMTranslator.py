@@ -32,6 +32,9 @@ class Cmd_push:
         if self.segment == 'temp':
             self.indirect = 'A'
             self.segment = '5'
+        if self.segment == 'pointer':
+            self.indirect = 'A'
+            self.segment = '13'
         if self.segment == 'constant':
             self.code = cmd_push_asm_constant
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
@@ -56,6 +59,9 @@ class Cmd_pop:
         if self.segment == 'temp':
             self.indirect = 'A'
             self.segment = '5'
+        if self.segment == 'pointer':
+            self.indirect = 'A'
+            self.segment = '13'
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
 
 

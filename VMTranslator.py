@@ -17,10 +17,10 @@ class Cmd_push:
     def __init__(self):
         self.segment = 'constant'
         self.index = '0'
-        self.indirect = 'M'
 
     def generate(self):
         self.code = cmd_push_asm
+        self.indirect = 'M'
         if self.segment == 'local':
             self.segment = 'LCL'
         if self.segment == 'argument':
@@ -35,6 +35,8 @@ class Cmd_push:
         if self.segment == 'pointer':
             self.indirect = 'A'
             self.segment = '13'
+        if self.segment == 'static':
+            self.segment = '15'
         if self.segment == 'constant':
             self.code = cmd_push_asm_constant
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
@@ -45,9 +47,9 @@ class Cmd_pop:
         self.code = code
         self.segment = 'constant'
         self.index = '0'
-        self.indirect = 'M'
 
     def generate(self):
+        self.indirect = 'M'
         if self.segment == 'local':
             self.segment = 'LCL'
         if self.segment == 'argument':
@@ -62,6 +64,8 @@ class Cmd_pop:
         if self.segment == 'pointer':
             self.indirect = 'A'
             self.segment = '13'
+        if self.segment == 'static':
+            self.segment = '15'
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
 
 

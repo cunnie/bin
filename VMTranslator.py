@@ -33,7 +33,7 @@ cmd_add = Cmd_arithmetic(
     D=M     // D is value at top of the stack
     @SP
     A=M-1   // Point to next highest on stack
-    M=D+M   // Add D to that guy
+    M=M+D   // Add that guy to D
 """
 )
 
@@ -44,7 +44,7 @@ cmd_sub = Cmd_arithmetic(
     D=M     // D is value at top of the stack
     @SP
     A=M-1   // Point to next highest on stack
-    M=D-M   // Sub that guy from D
+    M=M-D   // Sub D from that guy
 """
 )
 
@@ -63,17 +63,19 @@ cmd_eq = Cmd_arithmetic(
     """    @SP
     M=M-1
     A=M
-    D=M     // D is value at top of the stack
+    D=M        // D is value at top of the stack
     @SP
-    A=M-1   // Point to next highest on stack
-    D=D-M   // Sub that guy from D
-    @EQ_DONE_%d
-    D;JNE   // D is set to false (0) & will be pushed to the stack
-(EQ_NOT_EQ_%d)
+    A=M-1      // Point to next highest on stack
+    D=M-D      // Sub D from that guy
+    @EQ_TRUE_%d
+    D;JEQ
+(EQ_FALSE_%d)   // NOT eq, set D to false (0)
     @0
-    D=A-1   // D is set to true (-1)
+    D=A
     @EQ_DONE_%d
     0;JMP
+(EQ_TRUE_%d)    // eq, set D to true (-1)
+    D=D-1      // D is 0, set D to true (-1)
 (EQ_DONE_%d)
     @SP
     M=M-1
@@ -81,7 +83,6 @@ cmd_eq = Cmd_arithmetic(
     M=D
     @SP
     M=M+1
-    A=M
 """
 )
 
@@ -89,17 +90,20 @@ cmd_lt = Cmd_arithmetic(
     """    @SP
     M=M-1
     A=M
-    D=M     // D is value at top of the stack
+    D=M        // D is value at top of the stack
     @SP
-    A=M-1   // Point to next highest on stack
-    D=D-M   // Sub that guy from D
-    @LT_DONE_%d
-    D;JGE   // D is set to false (0) & will be pushed to the stack
-(LT_NOT_LT_%d)
+    A=M-1      // Point to next highest on stack
+    D=M-D      // Sub D from that guy
+    @LT_TRUE_%d
+    D;JLT
+(LT_FALSE_%d)   // NOT lt, set D to false (0)
     @0
-    D=A-1   // D is set to true (-1)
+    D=A
     @LT_DONE_%d
     0;JMP
+(LT_TRUE_%d)    // lt, set D to true (-1)
+    @0
+    D=A-1      // set D to true (-1)
 (LT_DONE_%d)
     @SP
     M=M-1
@@ -107,7 +111,6 @@ cmd_lt = Cmd_arithmetic(
     M=D
     @SP
     M=M+1
-    A=M
 """
 )
 
@@ -115,17 +118,20 @@ cmd_gt = Cmd_arithmetic(
     """    @SP
     M=M-1
     A=M
-    D=M     // D is value at top of the stack
+    D=M        // D is value at top of the stack
     @SP
-    A=M-1   // Point to next highest on stack
-    D=D-M   // Sub that guy from D
-    @GT_DONE_%d
-    D;JLE   // D is set to false (0) & will be pushed to the stack
-(GT_NOT_GT_%d)
+    A=M-1      // Point to next highest on stack
+    D=M-D      // Sub D from that guy
+    @GT_TRUE_%d
+    D;JGT
+(GT_FALSE_%d)   // NOT gt, set D to false (0)
     @0
-    D=A-1   // D is set to true (-1)
+    D=A
     @GT_DONE_%d
     0;JMP
+(GT_TRUE_%d)    // gt, set D to true (-1)
+    @0
+    D=A-1      // set D to true (-1)
 (GT_DONE_%d)
     @SP
     M=M-1
@@ -133,7 +139,6 @@ cmd_gt = Cmd_arithmetic(
     M=D
     @SP
     M=M+1
-    A=M
 """
 )
 
@@ -180,6 +185,7 @@ cmd_push = Cmd_push(
 """
 )
 
+
 def parse(line):
     # strip comments
     no_comments = line.split('#', 1)[0]
@@ -218,6 +224,7 @@ def writecode(tokens):
         cmd_push.index = tokens[2]
         asm_file.write(cmd_push.generate())
 
+
 def banner():
     asm_file.write(
 """
@@ -225,6 +232,7 @@ def banner():
 // Brian Cunnie's output for Nand to Tetris
 //
 """)
+
 
 cmd_name = sys.argv[0].split('/')[-1]
 

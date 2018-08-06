@@ -34,7 +34,7 @@ class Cmd_push:
             self.segment = '5'
         if self.segment == 'pointer':
             self.indirect = 'A'
-            self.segment = '13'
+            self.segment = '3'
         if self.segment == 'static':
             self.segment = '15'
         if self.segment == 'constant':
@@ -63,7 +63,7 @@ class Cmd_pop:
             self.segment = '5'
         if self.segment == 'pointer':
             self.indirect = 'A'
-            self.segment = '13'
+            self.segment = '3'
         if self.segment == 'static':
             self.segment = '15'
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)

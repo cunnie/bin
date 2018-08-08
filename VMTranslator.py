@@ -70,6 +70,15 @@ class Cmd_pop:
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
 
 
+class Cmd_goto:
+    def __init__(self, code):
+        self.code = code
+        self.label = "BRIAN_YOUR_CODE_HAS_A_MISTAKE"
+
+    def generate(self):
+        return self.code.replace('%s', self.label)
+
+
 cmd_add = Cmd_arithmetic(
     """    @SP
     M=M-1
@@ -260,6 +269,23 @@ cmd_pop = Cmd_pop(
 """
 )
 
+cmd_goto = Cmd_goto(
+    """    @%s
+    0;JMP
+"""
+)
+
+cmd_if_goto = Cmd_goto(
+    """    @SP
+    @SP
+    M=M-1
+    A=M
+    D=M     // D holds the value we've popped
+    @%s
+    D;JNE
+"""
+)
+
 
 def parse(line):
     # strip comments
@@ -278,31 +304,41 @@ def writecode(tokens):
     asm_file.write('\n')
     if tokens[0] == 'add':
         asm_file.write(cmd_add.generate())
-    if tokens[0] == 'sub':
+    elif tokens[0] == 'sub':
         asm_file.write(cmd_sub.generate())
-    if tokens[0] == 'neg':
+    elif tokens[0] == 'neg':
         asm_file.write(cmd_neg.generate())
-    if tokens[0] == 'eq':
+    elif tokens[0] == 'eq':
         asm_file.write(cmd_eq.generate())
-    if tokens[0] == 'lt':
+    elif tokens[0] == 'lt':
         asm_file.write(cmd_lt.generate())
-    if tokens[0] == 'gt':
+    elif tokens[0] == 'gt':
         asm_file.write(cmd_gt.generate())
-    if tokens[0] == 'and':
+    elif tokens[0] == 'and':
         asm_file.write(cmd_and.generate())
-    if tokens[0] == 'or':
+    elif tokens[0] == 'or':
         asm_file.write(cmd_or.generate())
-    if tokens[0] == 'not':
+    elif tokens[0] == 'not':
         asm_file.write(cmd_not.generate())
-    if tokens[0] == 'push':
+    elif tokens[0] == 'push':
         cmd_push = Cmd_push()
         cmd_push.segment = tokens[1]
         cmd_push.index = tokens[2]
         asm_file.write(cmd_push.generate())
-    if tokens[0] == 'pop':
+    elif tokens[0] == 'pop':
         cmd_pop.segment = tokens[1]
         cmd_pop.index = tokens[2]
         asm_file.write(cmd_pop.generate())
+    elif tokens[0] == 'label':
+        asm_file.write("(" + tokens[1] + ")\n")
+    elif tokens[0] == 'goto':
+        cmd_goto.label = tokens[1]
+        asm_file.write(cmd_goto.generate())
+    elif tokens[0] == 'if-goto':
+        cmd_if_goto.label = tokens[1]
+        asm_file.write(cmd_if_goto.generate())
+    else:
+        sys.exit(cmd_name + " I can't recognize these tokens: " + tokens)
 
 
 def banner():

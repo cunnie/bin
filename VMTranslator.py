@@ -338,7 +338,7 @@ def writecode(tokens):
         cmd_if_goto.label = tokens[1]
         asm_file.write(cmd_if_goto.generate())
     else:
-        sys.exit(cmd_name + " I can't recognize these tokens: " + tokens)
+        sys.exit(cmd_name + " I can't recognize these tokens: " + '[%s]' % ', '.join(map(str, tokens)))
 
 
 def banner():

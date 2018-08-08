@@ -79,6 +79,24 @@ class Cmd_goto:
         return self.code.replace('%s', self.label)
 
 
+class Cmd_function:
+    def __init__(self, code):
+        self.code = code
+        self.name = "BRIAN_YOUR_CODE_HAS_A_MISTAKE"
+        self.args = []
+
+    def generate(self):
+        return self.code
+
+
+class Cmd_return:
+    def __init__(self, code):
+        self.code = code
+
+    def generate(self):
+        return self.code
+
+
 cmd_add = Cmd_arithmetic(
     """    @SP
     M=M-1
@@ -286,6 +304,16 @@ cmd_if_goto = Cmd_goto(
 """
 )
 
+cmd_function = Cmd_function(
+    """    @SP
+"""
+)
+
+cmd_return = Cmd_return(
+    """    @SP
+"""
+)
+
 
 def parse(line):
     # strip comments
@@ -337,6 +365,12 @@ def writecode(tokens):
     elif tokens[0] == 'if-goto':
         cmd_if_goto.label = tokens[1]
         asm_file.write(cmd_if_goto.generate())
+    elif tokens[0] == 'function':
+        cmd_function.name = tokens[1]
+        cmd_function.args = tokens[2:]
+        asm_file.write(cmd_function.generate())
+    elif tokens[0] == 'return':
+        asm_file.write(cmd_return.generate())
     else:
         sys.exit(cmd_name + " I can't recognize these tokens: " + '[%s]' % ', '.join(map(str, tokens)))
 

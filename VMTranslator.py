@@ -1,5 +1,6 @@
 #!/usr/local/bin/python2.7
 import sys
+import datetime
 
 
 class Cmd_arithmetic:
@@ -305,7 +306,8 @@ def writecode(tokens):
 
 
 def banner():
-    asm_file.write("//\n// Brian Cunnie's output for Nand to Tetris\n//\n")
+    asm_file.write("// Brian Cunnie's output for Nand to Tetris\n")
+    asm_file.write(datetime.datetime.now().strftime("// Compiled: %Y-%m-%d %H:%M\n\n"))
 
 
 cmd_name = sys.argv[0].split('/')[-1]

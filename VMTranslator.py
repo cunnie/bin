@@ -4,7 +4,6 @@ import datetime
 
 
 class Cmd_arithmetic:
-
     def __init__(self, code):
         self.code = code
         self.counter = -1
@@ -15,90 +14,128 @@ class Cmd_arithmetic:
 
 
 class Cmd_push:
-    def __init__(self):
-        self.segment = 'constant'
-        self.index = '0'
+    cmd_push_asm = """    @%s     // segment
+        D=%i
+        @%d     // index
+        A=D+A   // D holds the address to pull from
+        D=M     // D holds the value we're gonna push onto SP
+        @SP
+        A=M
+        M=D
+        @SP     // increment SP
+        M=M+1
+    """
 
-    def generate(self):
-        self.code = cmd_push_asm
+    cmd_push_asm_constant = """    @%d
+        D=A
+        @SP
+        A=M
+        M=D
+        @SP     // increment SP
+        M=M+1
+    """
+
+    def __init__(self, segment='constant', index='0'):
+        self.code = self.cmd_push_asm
+        self.segment = segment
+        self.index = index
         self.indirect = 'M'
         if self.segment == 'local':
             self.segment = 'LCL'
-        if self.segment == 'argument':
+        elif self.segment == 'argument':
             self.segment = 'ARG'
-        if self.segment == 'this':
+        elif self.segment == 'this':
             self.segment = 'THIS'
-        if self.segment == 'that':
+        elif self.segment == 'that':
             self.segment = 'THAT'
-        if self.segment == 'temp':
+        elif self.segment == 'temp':
             self.indirect = 'A'
             self.segment = '5'
-        if self.segment == 'pointer':
+        elif self.segment == 'pointer':
             self.indirect = 'A'
             self.segment = '3'
-        if self.segment == 'static':
+        elif self.segment == 'static':
             self.segment = '15'
-        if self.segment == 'constant':
-            self.code = cmd_push_asm_constant
+        elif self.segment == 'constant':
+            self.code = self.cmd_push_asm_constant
+
+    def generate(self):
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
 
 
 class Cmd_pop:
-    def __init__(self, code):
-        self.code = code
-        self.segment = 'constant'
-        self.index = '0'
+    cmd_pop = """    @%s     // segment
+        D=%i
+        @%d     // index
+        D=D+A   // D holds the address to which to pop
+        @SP
+        A=M
+        M=D     // top of the stack has the address to which to pop
+        @SP
+        A=M-1
+        D=M     // D holds the value we're going to pop
+        @SP
+        A=M
+        A=M     // climbing the indirections
+        M=D     // Done!
+        @SP     // decrement SP
+        M=M-1
+    """
 
-    def generate(self):
+    def __init__(self, segment='constant', index='0'):
+        self.code = self.cmd_pop
+        self.segment = segment
+        self.index = index
         self.indirect = 'M'
         if self.segment == 'local':
             self.segment = 'LCL'
-        if self.segment == 'argument':
+        elif self.segment == 'argument':
             self.segment = 'ARG'
-        if self.segment == 'this':
+        elif self.segment == 'this':
             self.segment = 'THIS'
-        if self.segment == 'that':
+        elif self.segment == 'that':
             self.segment = 'THAT'
-        if self.segment == 'temp':
+        elif self.segment == 'temp':
             self.indirect = 'A'
             self.segment = '5'
-        if self.segment == 'pointer':
+        elif self.segment == 'pointer':
             self.indirect = 'A'
             self.segment = '3'
-        if self.segment == 'static':
+        elif self.segment == 'static':
             self.segment = '15'
+
+    def generate(self):
         return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
 
 
 class Cmd_goto:
-    def __init__(self, code):
+    def __init__(self, code, label="BRIAN_YOUR_CODE_HAS_A_MISTAKE"):
         self.code = code
-        self.label = "BRIAN_YOUR_CODE_HAS_A_MISTAKE"
+        self.label = label
 
     def generate(self):
         return self.code.replace('%s', self.label)
 
 
 class Cmd_function:
-    def __init__(self, code):
-        self.code = code
-        self.name = "BRIAN_YOUR_CODE_HAS_A_MISTAKE"
-        self.args = []
+    def __init__(self, name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", args=[]):
+        self.name = name
+        self.args = args
+        self.code = "placeholder"
 
     def generate(self):
         return self.code
 
 
 class Cmd_return:
-    def __init__(self, code):
-        self.code = code
+    def __init__(self):
+        self.code = "placeholder"
 
     def generate(self):
         return self.code
 
 
-cmd_add = Cmd_arithmetic(
-    """    @SP
+cmd_add = """    @SP
     M=M-1
     A=M
     D=M     // D is value at top of the stack
@@ -106,10 +143,8 @@ cmd_add = Cmd_arithmetic(
     A=M-1   // Point to next highest on stack
     M=M+D   // Add that guy to D
 """
-)
 
-cmd_sub = Cmd_arithmetic(
-    """    @SP
+cmd_sub = """    @SP
     M=M-1
     A=M
     D=M     // D is value at top of the stack
@@ -117,10 +152,8 @@ cmd_sub = Cmd_arithmetic(
     A=M-1   // Point to next highest on stack
     M=M-D   // Sub D from that guy
 """
-)
 
-cmd_neg = Cmd_arithmetic(
-    """    @SP
+cmd_neg = """    @SP
     M=M-1
     A=M
     D=-M    // D is value at top of the stack
@@ -128,10 +161,8 @@ cmd_neg = Cmd_arithmetic(
     @SP
     M=M+1
 """
-)
 
-cmd_eq = Cmd_arithmetic(
-    """    @SP
+cmd_eq = """    @SP
     M=M-1
     A=M
     D=M        // D is value at top of the stack
@@ -155,10 +186,8 @@ cmd_eq = Cmd_arithmetic(
     @SP
     M=M+1
 """
-)
 
-cmd_lt = Cmd_arithmetic(
-    """    @SP
+cmd_lt = """    @SP
     M=M-1
     A=M
     D=M        // D is value at top of the stack
@@ -183,10 +212,8 @@ cmd_lt = Cmd_arithmetic(
     @SP
     M=M+1
 """
-)
 
-cmd_gt = Cmd_arithmetic(
-    """    @SP
+cmd_gt = """    @SP
     M=M-1
     A=M
     D=M        // D is value at top of the stack
@@ -211,10 +238,8 @@ cmd_gt = Cmd_arithmetic(
     @SP
     M=M+1
 """
-)
 
-cmd_and = Cmd_arithmetic(
-    """    @SP
+cmd_and = """    @SP
     M=M-1
     A=M
     D=M     // D is value at top of the stack
@@ -222,10 +247,8 @@ cmd_and = Cmd_arithmetic(
     A=M-1   // Point to next highest on stack
     M=D&M   // Add D to that guy
 """
-)
 
-cmd_or = Cmd_arithmetic(
-    """    @SP
+cmd_or = """    @SP
     M=M-1
     A=M
     D=M     // D is value at top of the stack
@@ -233,10 +256,8 @@ cmd_or = Cmd_arithmetic(
     A=M-1   // Point to next highest on stack
     M=D|M   // Add D to that guy
 """
-)
 
-cmd_not = Cmd_arithmetic(
-    """    @SP
+cmd_not = """    @SP
     M=M-1
     A=M
     D=!M    // D is value at top of the stack
@@ -244,57 +265,12 @@ cmd_not = Cmd_arithmetic(
     @SP
     M=M+1
 """
-)
 
-cmd_push_asm = """    @%s     // segment
-    D=%i
-    @%d     // index
-    A=D+A   // D holds the address to pull from
-    D=M     // D holds the value we're gonna push onto SP
-    @SP
-    A=M
-    M=D
-    @SP     // increment SP
-    M=M+1
-"""
-
-cmd_push_asm_constant = """    @%d
-    D=A
-    @SP
-    A=M
-    M=D
-    @SP     // increment SP
-    M=M+1
-"""
-
-cmd_pop = Cmd_pop(
-    """    @%s     // segment
-    D=%i
-    @%d     // index
-    D=D+A   // D holds the address to which to pop
-    @SP
-    A=M
-    M=D     // top of the stack has the address to which to pop
-    @SP
-    A=M-1
-    D=M     // D holds the value we're going to pop
-    @SP
-    A=M
-    A=M     // climbing the indirections
-    M=D     // Done!
-    @SP     // decrement SP
-    M=M-1
-"""
-)
-
-cmd_goto = Cmd_goto(
-    """    @%s
+cmd_goto = """    @%s
     0;JMP
 """
-)
 
-cmd_if_goto = Cmd_goto(
-    """    @SP
+cmd_if_goto = """    @SP
     @SP
     M=M-1
     A=M
@@ -302,17 +278,6 @@ cmd_if_goto = Cmd_goto(
     @%s
     D;JNE
 """
-)
-
-cmd_function = Cmd_function(
-    """    @SP
-"""
-)
-
-cmd_return = Cmd_return(
-    """    @SP
-"""
-)
 
 
 def parse(line):
@@ -331,46 +296,37 @@ def writecode(tokens):
         asm_file.write(' ' + str(token))
     asm_file.write('\n')
     if tokens[0] == 'add':
-        asm_file.write(cmd_add.generate())
+        asm_file.write(Cmd_arithmetic(cmd_add).generate())
     elif tokens[0] == 'sub':
-        asm_file.write(cmd_sub.generate())
+        asm_file.write(Cmd_arithmetic(cmd_sub).generate())
     elif tokens[0] == 'neg':
-        asm_file.write(cmd_neg.generate())
+        asm_file.write(Cmd_arithmetic(cmd_neg).generate())
     elif tokens[0] == 'eq':
-        asm_file.write(cmd_eq.generate())
+        asm_file.write(Cmd_arithmetic(cmd_eq).generate())
     elif tokens[0] == 'lt':
-        asm_file.write(cmd_lt.generate())
+        asm_file.write(Cmd_arithmetic(cmd_lt).generate())
     elif tokens[0] == 'gt':
-        asm_file.write(cmd_gt.generate())
+        asm_file.write(Cmd_arithmetic(cmd_gt).generate())
     elif tokens[0] == 'and':
-        asm_file.write(cmd_and.generate())
+        asm_file.write(Cmd_arithmetic(cmd_and).generate())
     elif tokens[0] == 'or':
-        asm_file.write(cmd_or.generate())
+        asm_file.write(Cmd_arithmetic(cmd_or).generate())
     elif tokens[0] == 'not':
-        asm_file.write(cmd_not.generate())
+        asm_file.write(Cmd_arithmetic(cmd_not).generate())
     elif tokens[0] == 'push':
-        cmd_push = Cmd_push()
-        cmd_push.segment = tokens[1]
-        cmd_push.index = tokens[2]
-        asm_file.write(cmd_push.generate())
+        asm_file.write(Cmd_push(segment=tokens[1], index=tokens[2]).generate())
     elif tokens[0] == 'pop':
-        cmd_pop.segment = tokens[1]
-        cmd_pop.index = tokens[2]
-        asm_file.write(cmd_pop.generate())
+        asm_file.write(Cmd_pop(segment=tokens[1], index=tokens[2]).generate())
     elif tokens[0] == 'label':
         asm_file.write("(" + tokens[1] + ")\n")
     elif tokens[0] == 'goto':
-        cmd_goto.label = tokens[1]
-        asm_file.write(cmd_goto.generate())
+        asm_file.write(Cmd_goto(cmd_goto, label=tokens[1]).generate())
     elif tokens[0] == 'if-goto':
-        cmd_if_goto.label = tokens[1]
-        asm_file.write(cmd_if_goto.generate())
+        asm_file.write(Cmd_goto(cmd_if_goto, label=tokens[1]).generate())
     elif tokens[0] == 'function':
-        cmd_function.name = tokens[1]
-        cmd_function.args = tokens[2:]
-        asm_file.write(cmd_function.generate())
+        asm_file.write(Cmd_function(name=tokens[1], args=tokens[2:]).generate())
     elif tokens[0] == 'return':
-        asm_file.write(cmd_return.generate())
+        asm_file.write(Cmd_return().generate())
     else:
         sys.exit(cmd_name + " I can't recognize these tokens: " + '[%s]' % ', '.join(map(str, tokens)))
 

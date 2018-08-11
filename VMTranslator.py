@@ -201,15 +201,55 @@ class Cmd_return:
     def generate(self):
         return Cmd_return.code
 
+
 class Cmd_call:
-    code = """    //
-    """
+    nonce = 0
+
+    code = """    @{function_name}.{nonce}    // push return-address
+    {push_on_stack}
+    @LCL    // push LCL
+    {push_on_stack}
+    @ARG    // push ARG
+    {push_on_stack}
+    @THIS   // push THIS
+    {push_on_stack}
+    @THAT   // push THAT
+    {push_on_stack}
+    @SP     // ARG = SP-n-5
+    D=M
+    @{num_args}
+    D=D-A
+    @5
+    D=D-A
+    @ARG
+    M=D
+    @SP     // LCL = SP
+    D=M
+    @LCL
+    M=D
+({function_name}.{nonce})
+"""
+
+    push_on_stack = """D=A
+    @SP
+    A=M
+    M=D      // *(SP) = D
+    @SP
+    M=M+1    // SP++"""
+
     def __init__(self, function_name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", num_args=0):
         self.function_name = function_name
         self.num_args = num_args
+        self.named_placeholders = {
+            'push_on_stack': Cmd_call.push_on_stack,
+            'function_name': self.function_name,
+            'num_args': self.num_args,
+            'nonce': Cmd_call.nonce,
+        }
+        Cmd_call.nonce += 1
 
     def generate(self):
-        return Cmd_return.code
+        return Cmd_call.code.format(**self.named_placeholders)
 
 
 cmd_add = """    @SP

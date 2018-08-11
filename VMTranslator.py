@@ -64,9 +64,9 @@ class Cmd_push:
 
 
 class Cmd_pop:
-    cmd_pop = """    @%s     // segment
-    D=%i
-    @%d     // index
+    code = """    @{segment}     // segment
+    D={a_or_m}
+    @{index}     // index
     D=D+A   // D holds the address to which to pop
     @SP
     A=M
@@ -83,29 +83,31 @@ class Cmd_pop:
 """
 
     def __init__(self, segment='constant', index='0'):
-        self.code = self.cmd_pop
-        self.segment = segment
-        self.index = index
-        self.indirect = 'M'
-        if self.segment == 'local':
-            self.segment = 'LCL'
-        elif self.segment == 'argument':
-            self.segment = 'ARG'
-        elif self.segment == 'this':
-            self.segment = 'THIS'
-        elif self.segment == 'that':
-            self.segment = 'THAT'
-        elif self.segment == 'temp':
-            self.indirect = 'A'
-            self.segment = '5'
-        elif self.segment == 'pointer':
-            self.indirect = 'A'
-            self.segment = '3'
-        elif self.segment == 'static':
-            self.segment = '15'
+        a_or_m = 'M'
+        if segment == 'local':
+            segment = 'LCL'
+        elif segment == 'argument':
+            segment = 'ARG'
+        elif segment == 'this':
+            segment = 'THIS'
+        elif segment == 'that':
+            segment = 'THAT'
+        elif segment == 'temp':
+            a_or_m = 'A'
+            segment = '5'
+        elif segment == 'pointer':
+            a_or_m = 'A'
+            segment = '3'
+        elif segment == 'static':
+            segment = '15'
+        self.named_placeholders = {
+            'segment': segment,
+            'index': index,
+            'a_or_m': a_or_m,
+        }
 
     def generate(self):
-        return self.code.replace('%s', self.segment).replace('%d', self.index).replace('%i', self.indirect)
+        return Cmd_pop.code.format(**self.named_placeholders)
 
 
 class Cmd_goto:
@@ -206,7 +208,12 @@ class Cmd_call:
     nonce = 0
 
     code = """    @{function_name}.{nonce}    // push return-address
-    {push_on_stack}
+    D=A
+    @SP
+    A=M
+    M=D      // *(SP) = D
+    @SP
+    M=M+1    // SP++
     @LCL    // push LCL
     {push_on_stack}
     @ARG    // push ARG
@@ -228,9 +235,10 @@ class Cmd_call:
     @LCL
     M=D
 ({function_name}.{nonce})
+    0;JMP
 """
 
-    push_on_stack = """D=A
+    push_on_stack = """D=M
     @SP
     A=M
     M=D      // *(SP) = D

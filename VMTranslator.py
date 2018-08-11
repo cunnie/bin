@@ -65,22 +65,22 @@ class Cmd_push:
 
 class Cmd_pop:
     cmd_pop = """    @%s     // segment
-        D=%i
-        @%d     // index
-        D=D+A   // D holds the address to which to pop
-        @SP
-        A=M
-        M=D     // top of the stack has the address to which to pop
-        @SP
-        A=M-1
-        D=M     // D holds the value we're going to pop
-        @SP
-        A=M
-        A=M     // climbing the indirections
-        M=D     // Done!
-        @SP     // decrement SP
-        M=M-1
-    """
+    D=%i
+    @%d     // index
+    D=D+A   // D holds the address to which to pop
+    @SP
+    A=M
+    M=D     // top of the stack has the address to which to pop
+    @SP
+    A=M-1
+    D=M     // D holds the value we're going to pop
+    @SP
+    A=M
+    A=M     // climbing the indirections
+    M=D     // Done!
+    @SP     // decrement SP
+    M=M-1
+"""
 
     def __init__(self, segment='constant', index='0'):
         self.code = self.cmd_pop
@@ -128,9 +128,9 @@ class Cmd_function:
     M=M+1   // SP++
 """
 
-    def __init__(self, name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", args=0):
+    def __init__(self, name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", num_args=0):
         self.name = name
-        self.args = args
+        self.args = num_args
 
     def generate(self):
         code = "(%s)\n".replace('%s', self.name)
@@ -197,6 +197,16 @@ class Cmd_return:
 
     def __init__(self):
         return
+
+    def generate(self):
+        return Cmd_return.code
+
+class Cmd_call:
+    code = """    //
+    """
+    def __init__(self, function_name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", num_args=0):
+        self.function_name = function_name
+        self.num_args = num_args
 
     def generate(self):
         return Cmd_return.code
@@ -391,9 +401,11 @@ def writecode(tokens):
     elif tokens[0] == 'if-goto':
         asm_file.write(Cmd_goto(cmd_if_goto, label=tokens[1]).generate())
     elif tokens[0] == 'function':
-        asm_file.write(Cmd_function(name=tokens[1], args=tokens[2]).generate())
+        asm_file.write(Cmd_function(name=tokens[1], num_args=tokens[2]).generate())
     elif tokens[0] == 'return':
         asm_file.write(Cmd_return().generate())
+    elif tokens[0] == 'call':
+        asm_file.write(Cmd_call(function_name=tokens[1], num_args=tokens[2]).generate())
     else:
         sys.exit(cmd_name + " I can't recognize these tokens: " + '[%s]' % ', '.join(map(str, tokens)))
 

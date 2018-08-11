@@ -15,25 +15,25 @@ class Cmd_arithmetic:
 
 class Cmd_push:
     cmd_push_asm = """    @%s     // segment
-        D=%i
-        @%d     // index
-        A=D+A   // D holds the address to pull from
-        D=M     // D holds the value we're gonna push onto SP
-        @SP
-        A=M
-        M=D
-        @SP     // increment SP
-        M=M+1
-    """
+    D=%i
+    @%d     // index
+    A=D+A   // D holds the address to pull from
+    D=M     // D holds the value we're gonna push onto SP
+    @SP
+    A=M
+    M=D
+    @SP     // increment SP
+    M=M+1
+"""
 
     cmd_push_asm_constant = """    @%d
-        D=A
-        @SP
-        A=M
-        M=D
-        @SP     // increment SP
-        M=M+1
-    """
+    D=A
+    @SP
+    A=M
+    M=D
+    @SP     // increment SP
+    M=M+1
+"""
 
     def __init__(self, segment='constant', index='0'):
         self.code = self.cmd_push_asm
@@ -118,21 +118,88 @@ class Cmd_goto:
 
 
 class Cmd_function:
-    def __init__(self, name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", args=[]):
+    # (f) // Declare a label for the function entry
+    #     // repeat k times: k == number of local variables
+    # PUSH 0
+    push_0 = """    @SP
+    D=A     // D is 0, we take advantage of the fact that @SP == 0
+    A=M
+    AM=D    // *SP = 0
+    M=M+1   // SP++
+"""
+
+    def __init__(self, name="BRIAN_YOUR_CODE_HAS_A_MISTAKE", args=0):
         self.name = name
         self.args = args
-        self.code = "placeholder"
 
     def generate(self):
-        return self.code
+        code = "(%s)\n".replace('%s', self.name)
+        for arg in range(0, int(self.args)):
+            code += self.push_0
+        return code
 
 
 class Cmd_return:
+    # R13-R15 "These predefined symbols can be used for any purpose."
+    code = """    // FRAME = LCL
+    @LCL
+    D=M
+    @R13
+    M=D     // FRAME (LCL) is in register 13
+    // RET = *(FRAME-5)
+    @5
+    A=D-A
+    D=M     // D is RET
+    @R14
+    M=D     // RET is in register 14
+    // *ARG = pop()
+    @SP
+    M=M-1   // SP--
+    A=M
+    D=M
+    @ARG
+    A=M
+    M=D
+    // SP = ARG+1
+    @ARG
+    D=M+1
+    @SP
+    M=D
+    // THAT = *(FRAME-1)
+    @R13
+    AM=M-1  // FRAME--
+    D=M
+    @THAT
+    M=D
+    // THIS = *(FRAME-2)
+    @R13
+    AM=M-1  // FRAME--
+    D=M
+    @THIS
+    M=D
+    // ARG = *(FRAME-3)
+    @R13
+    AM=M-1  // FRAME--
+    D=M
+    @ARG
+    M=D
+    // LCL = *(FRAME-4)
+    @R13
+    AM=M-1  // FRAME--
+    D=M
+    @LCL
+    M=D
+    // goto RET
+    @R14
+    A=M
+    0;JMP
+"""
+
     def __init__(self):
-        self.code = "placeholder"
+        return
 
     def generate(self):
-        return self.code
+        return Cmd_return.code
 
 
 cmd_add = """    @SP
@@ -324,7 +391,7 @@ def writecode(tokens):
     elif tokens[0] == 'if-goto':
         asm_file.write(Cmd_goto(cmd_if_goto, label=tokens[1]).generate())
     elif tokens[0] == 'function':
-        asm_file.write(Cmd_function(name=tokens[1], args=tokens[2:]).generate())
+        asm_file.write(Cmd_function(name=tokens[1], args=tokens[2]).generate())
     elif tokens[0] == 'return':
         asm_file.write(Cmd_return().generate())
     else:

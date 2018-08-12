@@ -1,4 +1,7 @@
 #!/usr/local/bin/python2.7
+import fileinput
+import glob
+import os
 import sys
 import datetime
 
@@ -464,29 +467,45 @@ def banner():
     asm_file.write(datetime.datetime.now().strftime("// Compiled: %Y-%m-%d %H:%M\n\n"))
 
 
+def path_debug():
+    sys.stderr.write('\ndirectory: ' + directory +
+                     '\ninput_filenames' + str(input_filenames) +
+                     '\noutput filename: ' + asm_filename + '\n')
+
+
 cmd_name = sys.argv[0].split('/')[-1]
+directory = os.environ['PWD']
+input_filenames = glob.glob('*.vm')
+asm_filename = os.path.join(directory, os.path.basename(os.environ['PWD']) + '.asm')
+path_debug()
 
-if len(sys.argv) != 2:
-    sys.exit(cmd_name + " error: pass me one arg, the name of the file to compile")
+if len(sys.argv) > 2:
+    sys.exit(cmd_name + " error: pass me one arg, the name of the file to compile, or a directory, or no argument")
 
-intermediate_filename = sys.argv[1]
+if len(sys.argv) == 2:
+    file_or_directory = sys.argv[1]
+    if os.path.isfile(file_or_directory):
+        directory = os.path.dirname(file_or_directory)
+        input_filenames = [file_or_directory]
+        asm_filename = file_or_directory.replace('.vm', '.asm')
+    elif os.path.isdir(file_or_directory):
+        directory = file_or_directory
+        input_filenames = glob.glob(os.path.join(directory, '*.vm'))
+        asm_filename = os.path.join(directory, os.path.basename(os.environ['PWD']) + '.asm')
+    else:
+        sys.exit(cmd_name + " error: " + file_or_directory + " isn't a file or directory!")
 
-try:
-    intermediate_code = open(intermediate_filename, "r")
-except:
-    sys.exit(cmd_name + " error. I couldn't open " + intermediate_filename + " for reading!")
-
-asm_filename = intermediate_filename.replace('.vm', '.asm')
-
-if intermediate_filename == asm_filename:
-    asm_filename += ".asm"
-
+path_debug()
 try:
     asm_file = open(asm_filename, "w")
 except:
     sys.exit(cmd_name + " error. I couldn't open " + asm_filename + " for writing!")
 
 banner()
-for line in intermediate_code:
-    x = parse(line)
-    writecode(x)
+
+try:
+    for line in fileinput.input(input_filenames):
+        x = parse(line)
+        writecode(x)
+except:
+    sys.exit(cmd_name + " error. I couldn't open " + str(input_filenames) + " for reading!")

@@ -478,7 +478,6 @@ directory = os.environ['PWD']
 input_filenames = glob.glob('*.vm')
 asm_filename = os.path.join(directory, os.path.basename(os.environ['PWD']) + '.asm')
 sys.stderr.write('\nsys.argv: ' + str(sys.argv))
-path_debug()
 
 if len(sys.argv) > 2:
     sys.exit(cmd_name + " error: pass me one arg, the name of the file to compile, or a directory, or no argument")
@@ -492,7 +491,7 @@ if len(sys.argv) == 2:
     elif os.path.isdir(file_or_directory):
         directory = file_or_directory
         input_filenames = glob.glob(os.path.join(directory, '*.vm'))
-        asm_filename = os.path.join(directory, os.path.basename(os.environ['PWD']) + '.asm')
+        asm_filename = os.path.join(directory, os.path.basename(directory) + '.asm')
     else:
         sys.exit(cmd_name + " error: " + file_or_directory + " isn't a file or directory!")
 

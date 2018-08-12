@@ -489,7 +489,7 @@ if len(sys.argv) == 2:
         input_filenames = [file_or_directory]
         asm_filename = file_or_directory.replace('.vm', '.asm')
     elif os.path.isdir(file_or_directory):
-        directory = file_or_directory
+        directory = file_or_directory.rstrip('/')
         input_filenames = glob.glob(os.path.join(directory, '*.vm'))
         asm_filename = os.path.join(directory, os.path.basename(directory) + '.asm')
     else:
@@ -502,10 +502,15 @@ except:
     sys.exit(cmd_name + " error. I couldn't open " + asm_filename + " for writing!")
 
 banner()
+asm_file.write("""    @256
+    D=A
+    @SP
+    M=D
+""")
+writecode(parse('call Sys.init 0'))
 
 try:
     for line in fileinput.input(input_filenames):
-        x = parse(line)
-        writecode(x)
+        writecode(parse(line))
 except:
     sys.exit(cmd_name + " error. I couldn't open " + str(input_filenames) + " for reading!")

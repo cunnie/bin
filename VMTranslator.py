@@ -234,8 +234,9 @@ class Cmd_call:
     D=M
     @LCL
     M=D
-({function_name}.{nonce})
+    @{function_name}
     0;JMP
+({function_name}.{nonce})
 """
 
     push_on_stack = """D=M

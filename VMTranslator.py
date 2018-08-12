@@ -477,6 +477,7 @@ cmd_name = sys.argv[0].split('/')[-1]
 directory = os.environ['PWD']
 input_filenames = glob.glob('*.vm')
 asm_filename = os.path.join(directory, os.path.basename(os.environ['PWD']) + '.asm')
+sys.stderr.write('\nsys.argv: ' + str(sys.argv))
 path_debug()
 
 if len(sys.argv) > 2:

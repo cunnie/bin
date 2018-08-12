@@ -417,7 +417,7 @@ def parse(line):
     return tokens
 
 
-def writecode(tokens):
+def writecode(asm_file, tokens):
     if not tokens:
         return
     asm_file.write('//')
@@ -462,6 +462,15 @@ def writecode(tokens):
         sys.exit(cmd_name + " I can't recognize these tokens: " + '[%s]' % ', '.join(map(str, tokens)))
 
 
+def writeInit(asm_file):
+    asm_file.write("""    @256
+        D=A
+        @SP
+        M=D
+    """)
+    writecode(asm_file, parse('call Sys.init 0'))
+
+
 def banner():
     asm_file.write("// Brian Cunnie's output for Nand to Tetris\n")
     asm_file.write(datetime.datetime.now().strftime("// Compiled: %Y-%m-%d %H:%M\n\n"))
@@ -502,15 +511,13 @@ except:
     sys.exit(cmd_name + " error. I couldn't open " + asm_filename + " for writing!")
 
 banner()
-asm_file.write("""    @256
-    D=A
-    @SP
-    M=D
-""")
-writecode(parse('call Sys.init 0'))
+
+# If there's only one input file, don't bother writing bootstrap code
+if len(input_filenames) > 1:
+    writeInit(asm_file)
 
 try:
     for line in fileinput.input(input_filenames):
-        writecode(parse(line))
+        writecode(asm_file, parse(line))
 except:
     sys.exit(cmd_name + " error. I couldn't open " + str(input_filenames) + " for reading!")

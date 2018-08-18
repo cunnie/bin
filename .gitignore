@@ -1,1 +1,4 @@
+# JetBrains artifacts
 .idea
+# Vim artifacts
+*.swp

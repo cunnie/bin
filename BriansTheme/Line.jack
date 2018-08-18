@@ -1,5 +1,0 @@
-class Line {
-   function int value() {
-      return 5;
-   }
-}

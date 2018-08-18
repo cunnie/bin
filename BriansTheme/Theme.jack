@@ -1,0 +1,26 @@
+class Theme {
+  function void draw() {
+    var int x1, y1, x2, y2;
+    let x1 = 0;
+    let x2 = 511;
+    let y1 = 0;
+    let y2 = 255;
+    while (y1 < 128) {
+      do Screen.drawLine(x1,y1,x2,y2);
+      do Screen.drawLine(x1,y2,x2,y1);
+      let y1 = y1 + 2;
+      let y2 = y2 - 2;
+    }
+    let x1 = 0;
+    let x2 = 511;
+    let y1 = 0;
+    let y2 = 255;
+    while (x1 < 256) {
+      do Screen.drawLine(x1,y1,x2,y2);
+      do Screen.drawLine(x1,y2,x2,y1);
+      let x1 = x1 + 2;
+      let x2 = x2 - 2;
+    }
+    return;
+  }
+}

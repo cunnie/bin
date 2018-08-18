@@ -4,6 +4,8 @@ class Main {
       /* Prints some text using the standard library. */
       do Theme.draw();
       do Theme.splash();
+      do Keyboard.readChar();
+      do Screen.clearScreen();
       do Sys.halt();
       return;
    }

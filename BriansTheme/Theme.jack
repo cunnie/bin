@@ -1,3 +1,6 @@
+// A re-implementation of a simple Apple II
+// program I remember from '78 called
+// "Brian's Theme".
 class Theme {
   function void draw() {
     var int x1, y1, x2, y2;

@@ -1,0 +1,10 @@
+/** Hello World program. */
+class Main {
+   function void main() {
+      /* Prints some text using the standard library. */
+      var Line a;
+      do Output.printInt(Line.value());
+      do Output.println();      // New line
+      return;
+   }
+}

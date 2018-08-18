@@ -3,6 +3,7 @@ class Main {
    function void main() {
       /* Prints some text using the standard library. */
       do Theme.draw();
+      do Theme.splash();
       do Sys.halt();
       return;
    }

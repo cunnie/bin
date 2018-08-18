@@ -23,4 +23,17 @@ class Theme {
     }
     return;
   }
+  function void splash() {
+    do Output.moveCursor(9,21);
+    do Output.printString("Nand2Tetris Project 09");
+    do Output.moveCursor(10,24);
+    do Output.printString("By Brian Cunnie");
+    do Output.moveCursor(11,18);
+    do Output.printString("Tide Chart for San Francisco");
+    do Output.moveCursor(12,18);
+    do Output.printString("Saturday August 18, 2018 PDT");
+    do Output.moveCursor(14,17);
+    do Output.printString("Press Any Key to Display Chart");
+    return;
+  }
 }

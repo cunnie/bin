@@ -1,6 +1,21 @@
+// Tide calculations are based on this website:
+//
+// http://www.math.stonybrook.edu/~tony/tides/prime_lag.html
+//
+// We are only taking into account the Lunar effects (biggest factor)
+// (IIRC there are ~23 different factors that affect the tide)
+//
+// Assume "moon's orbits
+// were circular and in the same plane, and if the axis of the earth's rotation
+// were perpendicular to that plane."
+//
 class Tide {
   function void drawAxes() {
-    do Screen.drawLine(40,0,40,230);
+    // draw axes & tickmarks
+    do Screen.drawLine(40,0,40,235);
+    do Screen.drawLine(160,230,160,235);
+    do Screen.drawLine(280,230,280,235);
+    do Screen.drawLine(400,230,400,235);
     do Screen.drawLine(40,230,511,230);
     do Tide.horizLineDash(40,511,115);
     do Output.moveCursor(0,0);
@@ -9,6 +24,14 @@ class Tide {
     do Output.printString(" 0FT");
     do Output.moveCursor(20,0);
     do Output.printString("-5FT");
+    do Output.moveCursor(22,3);
+    do Output.printString("00:00");
+    do Output.moveCursor(22,18);
+    do Output.printString("06:00");
+    do Output.moveCursor(22,33);
+    do Output.printString("12:00");
+    do Output.moveCursor(22,48);
+    do Output.printString("18:00");
     return;
   }
   function void horizLineDash(int x1, int x2, int y) {

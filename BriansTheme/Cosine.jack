@@ -1,0 +1,134 @@
+// Cosine
+//
+// Pass in a value (degrees, not radians)
+// Returns the cosine * 100
+//
+// We are at the mercy of not having floating
+// point, so we're forced to use degrees (radians
+// invariably require decimal points) and
+// return the cosine * 100 (because with ints we'd
+// only be able to represent zeroes and ones).
+class Cosine {
+  static Array lookupCosine;
+
+  constructor Cosine new() {
+    // The constructor's only purpose is to populate the lookup table
+    let lookupCosine = Array.new(91);
+    // create the table via python
+    // import math;
+    // for i in range(0,91):
+    //   print "let lookupCosine[" + str(i) + "] = " + str(int(math.cos(math.radians(i))*100)) + ";"
+    let lookupCosine[0] = 100;
+    let lookupCosine[1] = 99;
+    let lookupCosine[2] = 99;
+    let lookupCosine[3] = 99;
+    let lookupCosine[4] = 99;
+    let lookupCosine[5] = 99;
+    let lookupCosine[6] = 99;
+    let lookupCosine[7] = 99;
+    let lookupCosine[8] = 99;
+    let lookupCosine[9] = 98;
+    let lookupCosine[10] = 98;
+    let lookupCosine[11] = 98;
+    let lookupCosine[12] = 97;
+    let lookupCosine[13] = 97;
+    let lookupCosine[14] = 97;
+    let lookupCosine[15] = 96;
+    let lookupCosine[16] = 96;
+    let lookupCosine[17] = 95;
+    let lookupCosine[18] = 95;
+    let lookupCosine[19] = 94;
+    let lookupCosine[20] = 93;
+    let lookupCosine[21] = 93;
+    let lookupCosine[22] = 92;
+    let lookupCosine[23] = 92;
+    let lookupCosine[24] = 91;
+    let lookupCosine[25] = 90;
+    let lookupCosine[26] = 89;
+    let lookupCosine[27] = 89;
+    let lookupCosine[28] = 88;
+    let lookupCosine[29] = 87;
+    let lookupCosine[30] = 86;
+    let lookupCosine[31] = 85;
+    let lookupCosine[32] = 84;
+    let lookupCosine[33] = 83;
+    let lookupCosine[34] = 82;
+    let lookupCosine[35] = 81;
+    let lookupCosine[36] = 80;
+    let lookupCosine[37] = 79;
+    let lookupCosine[38] = 78;
+    let lookupCosine[39] = 77;
+    let lookupCosine[40] = 76;
+    let lookupCosine[41] = 75;
+    let lookupCosine[42] = 74;
+    let lookupCosine[43] = 73;
+    let lookupCosine[44] = 71;
+    let lookupCosine[45] = 70;
+    let lookupCosine[46] = 69;
+    let lookupCosine[47] = 68;
+    let lookupCosine[48] = 66;
+    let lookupCosine[49] = 65;
+    let lookupCosine[50] = 64;
+    let lookupCosine[51] = 62;
+    let lookupCosine[52] = 61;
+    let lookupCosine[53] = 60;
+    let lookupCosine[54] = 58;
+    let lookupCosine[55] = 57;
+    let lookupCosine[56] = 55;
+    let lookupCosine[57] = 54;
+    let lookupCosine[58] = 52;
+    let lookupCosine[59] = 51;
+    let lookupCosine[60] = 50;
+    let lookupCosine[61] = 48;
+    let lookupCosine[62] = 46;
+    let lookupCosine[63] = 45;
+    let lookupCosine[64] = 43;
+    let lookupCosine[65] = 42;
+    let lookupCosine[66] = 40;
+    let lookupCosine[67] = 39;
+    let lookupCosine[68] = 37;
+    let lookupCosine[69] = 35;
+    let lookupCosine[70] = 34;
+    let lookupCosine[71] = 32;
+    let lookupCosine[72] = 30;
+    let lookupCosine[73] = 29;
+    let lookupCosine[74] = 27;
+    let lookupCosine[75] = 25;
+    let lookupCosine[76] = 24;
+    let lookupCosine[77] = 22;
+    let lookupCosine[78] = 20;
+    let lookupCosine[79] = 19;
+    let lookupCosine[80] = 17;
+    let lookupCosine[81] = 15;
+    let lookupCosine[82] = 13;
+    let lookupCosine[83] = 12;
+    let lookupCosine[84] = 10;
+    let lookupCosine[85] = 8;
+    let lookupCosine[86] = 6;
+    let lookupCosine[87] = 5;
+    let lookupCosine[88] = 3;
+    let lookupCosine[89] = 1;
+    let lookupCosine[90] = 0; // 91st entry is inelegant but cleans up a lot of corner cases
+    return this;
+  }
+
+  // Modulus — a fancy name for remainder
+  function int modulus(int x, int y) {
+    return x - ((x/y) * y);
+  }
+
+  // Fancy pants calculation of cosine()
+  // because I don't want a massive array
+  function int cosine(int degrees) {
+    if (degrees > 360) {
+      let degrees = Cosine.modulus(degrees, 360);
+    }
+    if (degrees > 180) {
+      let degrees = 180 - (degrees - 180);
+    }
+    if (degrees > 90) {
+      return -1 * lookupCosine[degrees - 90];
+    }
+    return lookupCosine[degrees];
+  }
+}

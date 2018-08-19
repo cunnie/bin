@@ -1,0 +1,21 @@
+class Tide {
+  function void drawAxes() {
+    do Screen.drawLine(40,0,40,230);
+    do Screen.drawLine(40,230,511,230);
+    do Tide.horizLineDash(40,511,115);
+    do Output.moveCursor(0,0);
+    do Output.printString("+5FT");
+    do Output.moveCursor(10,0);
+    do Output.printString(" 0FT");
+    do Output.moveCursor(20,0);
+    do Output.printString("-5FT");
+    return;
+  }
+  function void horizLineDash(int x1, int x2, int y) {
+    while (x1 < x2) {
+      do Screen.drawPixel(x1,y);
+      let x1 = x1 + 2;
+    }
+    return;
+  }
+}

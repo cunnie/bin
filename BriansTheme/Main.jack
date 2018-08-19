@@ -4,8 +4,9 @@ class Main {
       /* Prints some text using the standard library. */
       do Theme.draw();
       do Theme.splash();
-      do Keyboard.readChar();
+//      do Keyboard.readChar();
       do Screen.clearScreen();
+      do Tide.drawAxes();
       do Sys.halt();
       return;
    }

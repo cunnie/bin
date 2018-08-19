@@ -41,4 +41,20 @@ class Tide {
     }
     return;
   }
+  function void drawTides() {
+    // every 120 pixels is 6 hours
+    // every 480 pixels is 24 hours, which is 360 degrees
+    var int x,y; // pixel location on x-axis
+    var Cosine cos; // object needed to initialize cosine lookup array
+    let x = 40;
+    let cos = Cosine.new();
+    do Screen.setColor(true);
+    while (x < 511) {
+      let y = 115 + cos.cosine(x);
+      // let y = 140;
+      do Screen.drawPixel(x,y);
+      let x = x + 1;
+    }
+    return;
+  }
 }

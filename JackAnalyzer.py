@@ -48,10 +48,24 @@ class JackTokenizer:
                 elif field in JackTokenizer.keywords:
                     xml += '  <keyword>' + field + '</keyword>\n'
                 elif field in JackTokenizer.symbols:
-                    xml += '  <symbol>' + field + '</symbol>\n'
+                    xml += '  <symbol>' + escapeSymbol(field) + '</symbol>\n'
                 else:
                     xml += '  <identifier>' + field + '</identifier>\n'
         return (xml)
+
+
+# Ensure XML-dangerous symbols are properly escaped
+def escapeSymbol(symbol):
+    if symbol == '<':
+        return '&lt;'
+    elif symbol == '>':
+        return '&gt;'
+    elif symbol == '"':
+        return '&quot;'
+    elif symbol == '&':
+        return '&amp;'
+    else:
+        return symbol
 
 
 class CompilationEngine:

@@ -2,6 +2,7 @@
 import fileinput
 import glob
 import os
+import re
 import sys
 import datetime
 
@@ -21,6 +22,15 @@ class JackAnalyzer:
 
 
 class JackTokenizer:
+    keywords = 'class', 'constructor', 'function', 'method', 'field', \
+               'static', 'var', 'int', 'char', 'boolean', 'void', 'true', \
+               'false', 'null', 'this', 'let', 'do', 'if', 'else', 'while', \
+               'return'
+    symbols = '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', \
+              '/', '&', ',', '<', '>', '=', '~'
+    reSymbols = re.compile(r'[{}()\[\],.;+\-*/&<>=~]')
+    reIntegerConstant = re.compile(r'\d+')
+
     def __init__(self):
         return
 
@@ -28,7 +38,12 @@ class JackTokenizer:
         xml = ''
         fields = line.split()
         for field in fields:
-            xml += '  <keyword>' + field + '</keyword>\n'
+            if field in JackTokenizer.keywords:
+                xml += '  <keyword>' + field + '</keyword>\n'
+            elif field in JackTokenizer.symbols:
+                xml += '  <symbol>' + field + '</symbol>\n'
+            else:
+                xml += '  <identifier>' + field + '</identifier>\n'
         return (xml)
 
 

@@ -28,7 +28,7 @@ class JackTokenizer:
                'return'
     symbols = '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', \
               '/', '&', ',', '<', '>', '=', '~'
-    reSymbols = re.compile(r'[{}()\[\],.;+\-*/&<>=~]')
+    reSymbols = re.compile(r'([{\}()\[\],.;+\-*/&<>=~])')
     reIntegerConstant = re.compile(r'\d+')
 
     def __init__(self):
@@ -36,14 +36,21 @@ class JackTokenizer:
 
     def tokenize(self, line):
         xml = ''
-        fields = line.split()
-        for field in fields:
-            if field in JackTokenizer.keywords:
-                xml += '  <keyword>' + field + '</keyword>\n'
-            elif field in JackTokenizer.symbols:
-                xml += '  <symbol>' + field + '</symbol>\n'
-            else:
-                xml += '  <identifier>' + field + '</identifier>\n'
+        bigFields = line.split()
+        for bigField in bigFields:
+            fields = JackTokenizer.reSymbols.split(bigField)
+            for field in fields:
+                # Lame coding alert: I shouldn't have empty strings
+                # and I shouldn't skip them by using `pass`. This
+                # code is double-lame, but I'll never fix it, sorry.
+                if field == '':
+                    pass
+                elif field in JackTokenizer.keywords:
+                    xml += '  <keyword>' + field + '</keyword>\n'
+                elif field in JackTokenizer.symbols:
+                    xml += '  <symbol>' + field + '</symbol>\n'
+                else:
+                    xml += '  <identifier>' + field + '</identifier>\n'
         return (xml)
 
 

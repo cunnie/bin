@@ -56,16 +56,12 @@ class JackTokenizer:
 
 # Ensure XML-dangerous symbols are properly escaped
 def escapeSymbol(symbol):
-    if symbol == '<':
-        return '&lt;'
-    elif symbol == '>':
-        return '&gt;'
-    elif symbol == '"':
-        return '&quot;'
-    elif symbol == '&':
-        return '&amp;'
-    else:
-        return symbol
+    return {
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        '&': '&amp;',
+    }.get(symbol, symbol)
 
 
 class CompilationEngine:

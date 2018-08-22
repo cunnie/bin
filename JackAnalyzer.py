@@ -52,7 +52,7 @@ class JackTokenizer:
                 elif JackTokenizer.reIntegerConstant.match(field):
                     xml += '  <integerConstant>' + escapeSymbol(field) + '</integerConstant>\n'
                 else:
-                    xml += '  <identifier>' + field + '</identifier>\n'
+                    xml += '  <identifier>' + re.sub(r'^"?(.*?)"?$', r'\1', field) + '</identifier>\n'
         return (xml)
 
 

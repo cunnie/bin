@@ -29,7 +29,7 @@ class JackTokenizer:
     symbols = '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', \
               '/', '&', ',', '<', '>', '=', '~'
     reSymbols = re.compile(r'([{\}()\[\],.;+\-*/&<>=~])')
-    reIntegerConstant = re.compile(r'\d+')
+    reIntegerConstant = re.compile(r'^\d+$')
 
     def __init__(self):
         return
@@ -49,6 +49,8 @@ class JackTokenizer:
                     xml += '  <keyword>' + field + '</keyword>\n'
                 elif field in JackTokenizer.symbols:
                     xml += '  <symbol>' + escapeSymbol(field) + '</symbol>\n'
+                elif JackTokenizer.reIntegerConstant.match(field):
+                    xml += '  <integerConstant>' + escapeSymbol(field) + '</integerConstant>\n'
                 else:
                     xml += '  <identifier>' + field + '</identifier>\n'
         return (xml)

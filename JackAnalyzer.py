@@ -79,12 +79,12 @@ class JackTokenizer:
         tokens = []
         input = self.source.read()
         input = re.sub(r'//.*$', '', input, flags=re.MULTILINE)  # strip comments `//`
-        input = re.sub(r'/\*.*?\*/', '', input, flags=re.MULTILINE)  # strip comments `/* */`
+        input = re.sub(r'/\*.*?\*/', '', input, flags=re.MULTILINE | re.DOTALL)  # strip comments `/* */`
         bigFields = input.split()
         for bigField in bigFields:
             fields = JackTokenizer.reSymbols.split(bigField)
             for field in fields:
-                # sys.stderr.write("field: \"" + field + "\"\n")
+                # sys.stderr.write("field: \"" + field + "\"\n") # used for debugging
                 # Lame coding alert: I shouldn't have empty strings
                 # and I shouldn't skip them by using `pass`. This
                 # code is double-lame, but I'll never fix it, sorry.

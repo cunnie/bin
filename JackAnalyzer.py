@@ -39,11 +39,13 @@ class JackTokenizer:
                'false', 'null', 'this', 'let', 'do', 'if', 'else', 'while', \
                'return'
     symbols = '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', \
-              '/', '&', ',', '<', '>', '=', '~'
-    reSymbols = re.compile(r'([{\}()\[\],.;+\-*/&<>=~])')
+              '/', '&', ',', '|', '<', '>', '=', '~'
+    # split() note: "f capturing parentheses are used in pattern, then the text of all groups
+    # in the pattern are also returned as part of the resulting list". We save the symbols
+    # but purposefully lose the whitespace.
+    reSymbols = re.compile(r'([{\}()\[\],.;+\-*/&|<>=~])|\s+')
     reIdentifier = re.compile(r'^[a-zA-Z]{1}[a-zA-Z0-9]*$')
     reIntegerConstant = re.compile(r'^\d+$')
-    reStringConstant = re.compile(r'^".*"$')
 
     def __init__(self, source):
         self.source = source
@@ -77,35 +79,45 @@ class JackTokenizer:
 
     def readAllTokens(self):
         tokens = []
-        input = self.source.read()
-        input = re.sub(r'//.*$', '', input, flags=re.MULTILINE)  # strip comments `//`
-        input = re.sub(r'/\*.*?\*/', '', input, flags=re.MULTILINE | re.DOTALL)  # strip comments `/* */`
-        bigFields = input.split()
-        for bigField in bigFields:
-            fields = JackTokenizer.reSymbols.split(bigField)
-            for field in fields:
-                # sys.stderr.write("field: \"" + field + "\"\n") # used for debugging
+        inputStream = self.source.read()
+        inputStream = re.sub(r'//.*$', '', inputStream, flags=re.MULTILINE)  # strip comments `//`
+        inputStream = re.sub(r'/\*.*?\*/', '', inputStream, flags=re.MULTILINE | re.DOTALL)  # strip comments `/* */`
+        while inputStream:
+            inputStream = inputStream.lstrip()  # strip leading whitespace, if any
+            if re.match(r'"', inputStream):
+                _, field, inputStream = re.split(r'"', inputStream, 2)
+                tokens.append(Token(Token.STRING_CONST, stringVal=field))
+            else:
+                # Hack alert: the split below will sometimes inject None and '' into the array
+                # leaving it with 3 elements & throwing it off. We filter to remove those.
+                # e.g. reSymbolsAndWhitespace.split('x {', 1) = ['x', None, '{']
+                # matches = [x for x in JackTokenizer.reSymbols.split(inputStream, 1) if x is not None]
+                matches = list(filter(None, JackTokenizer.reSymbols.split(inputStream, 1)))
+                if len(matches) == 3:
+                    field = matches[0]
+                    inputStream = matches[1] + matches[2]
+                elif len(matches) == 2:
+                    field, inputStream = matches
+                elif len(matches) == 0:
+                    break
+                else:
+                    sys.stderr.write(str(len(matches)) + ' MATCHES ' + str(matches[:-1]) + '\n')
+                    sys.stderr.write("input: " + inputStream + '\n')
                 # Lame coding alert: I shouldn't have empty strings
                 # and I shouldn't skip them by using `pass`. This
                 # code is double-lame, but I'll never fix it, sorry.
-                if field == '':
-                    pass
-                elif field in JackTokenizer.keywords:
-                    tokens.append(Token(Token.KEYWORD, keyWord=field))  # += '  <keyword>' + field + '</keyword>\n'
+                if field in JackTokenizer.keywords:
+                    tokens.append(Token(Token.KEYWORD, keyWord=field))
                 elif field in JackTokenizer.symbols:
-                    tokens.append(
-                        Token(Token.SYMBOL, symbol=field))  # xml += '  <symbol>' + escapeSymbol(field) + '</symbol>\n'
+                    tokens.append(Token(Token.SYMBOL, symbol=field))
                 elif JackTokenizer.reIdentifier.match(field):
                     tokens.append(Token(Token.IDENTIFIER, identifier=field))
                 elif JackTokenizer.reIntegerConstant.match(field):
-                    tokens.append(Token(Token.INT_CONST, intVal=int(
-                        field)))  # xml += '  <integerConstant>' + escapeSymbol(field) + '</integerConstant>\n'
-                elif JackTokenizer.reStringConstant.match(field):
-                    tokens.append(Token(Token.STRING_CONST, stringVal=re.sub(r'^"?(.*?)"?$', r'\1',
-                                                                             field)))  # xml += '  <identifier>' + re.sub(r'^"?(.*?)"?$', r'\1', field) + '</identifier>\n'
+                    tokens.append(Token(Token.INT_CONST, intVal=int(field)))
                 else:
                     sys.stderr.write("I can't figure out this field: \"" + field + "\"!")
                     sys.exit(1)
+
         return (tokens)
 
 

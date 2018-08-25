@@ -1,10 +1,8 @@
 #!/usr/local/bin/python2.7
-import fileinput
 import glob
 import os
 import re
 import sys
-import datetime
 
 
 class JackAnalyzer:
@@ -138,10 +136,25 @@ class Token:
         self.type = type
         self.keyWord = keyWord
         self.symbol = symbol
-        self.symbol = symbol
         self.identifier = identifier
         self.intVal = intVal
         self.stringVal = stringVal
+
+    def __repr__(self):
+        if self is None:
+            return "Token{None}"
+        elif self.type == Token.KEYWORD:
+            return "Token{keyword: " + self.keyWord + "}"
+        elif self.type == Token.SYMBOL:
+            return "Token(symbol: \"" + self.symbol + "\"}"
+        elif self.type == Token.IDENTIFIER:
+            return "Token{identifier: " + self.identifier + "}"
+        elif self.type == Token.INT_CONST:
+            return "Token{int_const: " + self.intVal + "}"
+        elif self.type == Token.STRING_CONST:
+            return "Token{string_const: \"" + self.stringVal + "\"}"
+        else:
+            return "Token{weird: strange}"
 
     # Token Types
     KEYWORD = 1
@@ -151,36 +164,67 @@ class Token:
     STRING_CONST = 5
 
     # Key Words (for Token Type KEYWORD)
-    CLASS = 10
-    METHOD = 11
-    FUNCTION = 12
-    CONSTRUCTOR = 13
-    INT = 14
-    BOOLEAN = 15
-    CHAR = 16
-    VOID = 17
-    VAR = 18
-    STATIC = 19
-    FIELD = 20
-    LET = 21
-    DO = 22
-    IF = 23
-    ELSE = 24
-    WHILE = 25
-    RETURN = 26
-    TRUE = 27
-    FALSE = 28
-    NULL = 29
-    THIS = 30
+    CLASS = "class"
+    METHOD = "method"
+    FUNCTION = "function"
+    CONSTRUCTOR = "constructor"
+    INT = "int"
+    BOOLEAN = "boolean"
+    CHAR = "char"
+    VOID = "void"
+    VAR = "var"
+    STATIC = "static"
+    FIELD = "field"
+    LET = "let"
+    DO = "do"
+    IF = "if"
+    ELSE = "else"
+    WHILE = "while"
+    RETURN = "return"
+    TRUE = "true"
+    FALSE = "false"
+    NULL = "null"
+    THIS = "this"
 
 
 class CompilationEngine:
+
     def __init__(self, tokenizer, dest):
         self.dest = dest
         self.tokenizer = tokenizer
+        token = self.tokenizer.token
+        if token != None:
+            unexpectedToken(token)
+        self.indent = ''
+        while (self.tokenizer.hasMoreTokens()):
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+            if token.type == Token.KEYWORD and token.keyWord == Token.CLASS:
+                self.CompileClass()
+            else:
+                unexpectedToken(token)
 
     def CompileClass(self):
-        pass
+        self.dest.write(self.indent)
+        self.dest.write("<class>\n")
+        original_indent = self.indent
+        self.indent += '  '
+        self.dest.write(self.indent)
+        self.dest.write("<keyword> class </keyword>\n")
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if token.type != Token.IDENTIFIER:
+            unexpectedToken(token)
+        self.dest.write(self.indent)
+        self.dest.write("<identifier> " + token.identifier + " </identifier>\n")
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if token.type != Token.SYMBOL or token.symbol != '{':
+            unexpectedToken(token)
+        self.dest.write(self.indent)
+        self.dest.write("<symbol> " + token.symbol + " </symbol>\n")
+        self.CompileClassVarDec()
+        self.indent = original_indent
 
     def CompileClassVarDec(self):
         pass
@@ -225,7 +269,11 @@ class CompilationEngine:
         pass
 
 
-# Open the file & Analyze
+def unexpectedToken(token):
+    sys.stderr.write("Unexpected token: " + str(token) + "!\n")
+    sys.stderr.write(token)  # force a stacktrace
+    sys.exit(5)
+
 
 # return a list of filenames to compile
 def jackSourceFilenames():
@@ -256,7 +304,7 @@ for sourceFileName in jackSourceFilenames():
     except:
         sys.exit(cmd_name + " error. I couldn't open " + str(sourceFileName) + " for reading!")
     sys.stderr.write(cmd_name + ": opened " + sourceFileName + " for reading.\n")
-    destFileName = sourceFileName.replace('.jack', 'TT.xml')
+    destFileName = sourceFileName.replace('.jack', 'X.xml')
     try:
         dest = open(destFileName, "w")
     except:

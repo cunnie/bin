@@ -10,27 +10,9 @@ import datetime
 class JackAnalyzer:
     def __init__(self, source, dest):
         self.dest = dest
-        self.tokenizer = JackTokenizer(source)
+        self.tokenizer = JackTokenizer(source, dest)
+        self.compilationEngine = CompilationEngine(self.tokenizer, dest)
         return
-
-    def xml(self):
-        self.dest.write('<tokens>\n')
-        for token in self.tokenizer.tokens:
-            if token.type == Token.KEYWORD:
-                self.dest.write('<keyword> ' + token.keyWord + ' </keyword>')
-            elif token.type == Token.SYMBOL:
-                self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>')
-            elif token.type == Token.IDENTIFIER:
-                self.dest.write('<identifier> ' + token.identifier + ' </identifier>')
-            elif token.type == Token.INT_CONST:
-                self.dest.write('<integerConstant> ' + str(token.intVal) + ' </integerConstant>')
-            elif token.type == Token.STRING_CONST:
-                self.dest.write('<stringConstant> ' + token.stringVal + ' </stringConstant>')
-            else:
-                sys.stderr.write("I know not this token: \"" + token.type + "\"\n")
-                sys.exit(3)
-            self.dest.write('\n')
-        self.dest.write('</tokens>\n')
 
 
 class JackTokenizer:
@@ -47,11 +29,31 @@ class JackTokenizer:
     reIdentifier = re.compile(r'^[a-zA-Z]{1}[a-zA-Z0-9]*$')
     reIntegerConstant = re.compile(r'^\d+$')
 
-    def __init__(self, source):
+    def __init__(self, source, dest):
         self.source = source
+        self.dest = dest
         self.token = None
         self.tokens = self.readAllTokens()
         return
+
+    def xml(self):
+        self.dest.write('<tokens>\n')
+        for token in self.tokens:
+            if token.type == Token.KEYWORD:
+                self.dest.write('<keyword> ' + token.keyWord + ' </keyword>')
+            elif token.type == Token.SYMBOL:
+                self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>')
+            elif token.type == Token.IDENTIFIER:
+                self.dest.write('<identifier> ' + token.identifier + ' </identifier>')
+            elif token.type == Token.INT_CONST:
+                self.dest.write('<integerConstant> ' + str(token.intVal) + ' </integerConstant>')
+            elif token.type == Token.STRING_CONST:
+                self.dest.write('<stringConstant> ' + token.stringVal + ' </stringConstant>')
+            else:
+                sys.stderr.write("I know not this token: \"" + token.type + "\"\n")
+                sys.exit(3)
+            self.dest.write('\n')
+        self.dest.write('</tokens>\n')
 
     def hasMoreTokens(self):
         if len(self.tokens) > 0:
@@ -173,8 +175,54 @@ class Token:
 
 
 class CompilationEngine:
-    def __init__(self):
-        return
+    def __init__(self, tokenizer, dest):
+        self.dest = dest
+        self.tokenizer = tokenizer
+
+    def CompileClass(self):
+        pass
+
+    def CompileClassVarDec(self):
+        pass
+
+    def CompileSubroutine(self):
+        pass
+
+    def compileParameterList(self):
+        pass
+
+    def compileVarDec(self):
+        pass
+
+    def compileStatements(self):
+        pass
+
+    def compileDo(self):
+        pass
+
+    def compileLet(self):
+        pass
+
+    def compileWhile(self):
+        pass
+
+    def compileReturn(self):
+        pass
+
+    def compileIf(self):
+        pass
+
+    def CompileExpression(self):
+        pass
+
+    def CompileTerm(self):
+        pass
+
+    def CompileExpressionList(self):
+        pass
+
+    def xml(self):
+        pass
 
 
 # Open the file & Analyze
@@ -216,4 +264,4 @@ for sourceFileName in jackSourceFilenames():
     sys.stderr.write(cmd_name + ": opened " + destFileName + " for writing.\n")
 
     analyzer = JackAnalyzer(source, dest)
-    analyzer.xml()
+    analyzer.tokenizer.xml()

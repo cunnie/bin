@@ -801,7 +801,7 @@ for sourceFileName in jackSourceFilenames():
     except:
         sys.exit(cmd_name + " error. I couldn't open " + str(sourceFileName) + " for reading!")
     sys.stderr.write(cmd_name + ": opened " + sourceFileName + " for reading.\n")
-    destFileName = sourceFileName.replace('.jack', 'X.xml')
+    destFileName = sourceFileName.replace('.jack', '.xml')
     try:
         dest = open(destFileName, "w")
     except:

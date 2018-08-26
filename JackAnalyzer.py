@@ -241,6 +241,8 @@ class CompilationEngine:
             self.tokenizer.advance()
             token = self.tokenizer.token
 
+        self.dest.write(self.indent)
+        self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n') # {
         self.indent = original_indent
         self.dest.write(self.indent)
         self.dest.write("</class>\n")
@@ -599,6 +601,9 @@ class CompilationEngine:
             self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n')
             self.tokenizer.advance()
             self.compileStatements()
+        else:
+            # shove that token back onto the stack!
+            self.tokenizer.tokens.insert(0, token)
 
         self.indent = original_indent
         self.dest.write(self.indent)
@@ -804,4 +809,3 @@ for sourceFileName in jackSourceFilenames():
     sys.stderr.write(cmd_name + ": opened " + destFileName + " for writing.\n")
 
     analyzer = JackAnalyzer(source, dest)
-    analyzer.tokenizer.xml()

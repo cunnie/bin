@@ -22,6 +22,9 @@ class JackTokenizer:
               '/', '&', ',', '|', '<', '>', '=', '~'
 
     ops = '+', '-', '*', '/', '&', '|', '<', '>', '='
+    unaryOp = '-', '~'
+    KeywordConstant = 'true', 'false', 'null', 'this'
+
     # split() note: "f capturing parentheses are used in pattern, then the text of all groups
     # in the pattern are also returned as part of the resulting list". We save the symbols
     # but purposefully lose the whitespace.
@@ -242,7 +245,7 @@ class CompilationEngine:
             token = self.tokenizer.token
 
         self.dest.write(self.indent)
-        self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n') # {
+        self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n')  # {
         self.indent = original_indent
         self.dest.write(self.indent)
         self.dest.write("</class>\n")
@@ -720,22 +723,55 @@ class CompilationEngine:
             elif token.type == Token.STRING_CONST:
                 self.dest.write(self.indent)
                 self.dest.write('<stringConstant> ' + token.stringVal + ' </stringConstant>\n')
-            elif token.type == Token.KEYWORD:
+            elif token.type == Token.KEYWORD and token.keyword in JackTokenizer.KeywordConstant:
                 self.dest.write(self.indent)
                 self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')
             elif token.type == Token.IDENTIFIER:
                 self.dest.write(self.indent)
                 self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+                self.tokenizer.advance()
+                token = self.tokenizer.token
+                # check if x.y ( expressionlist )
+                if token.type == Token.SYMBOL and token.symbol == '.':
+                    self.dest.write(self.indent)
+                    self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+                    self.tokenizer.advance()
+                    token = self.tokenizer.token
+                    if not (token.type == Token.IDENTIFIER):
+                        unexpectedToken(token)
+                    self.dest.write(self.indent)
+                    self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+                    self.tokenizer.advance()
+                    token = self.tokenizer.token
+                    if not (token.type == Token.SYMBOL and token.symbol == '('):
+                        unexpectedToken(token)
+                    self.dest.write(self.indent)
+                    self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+                    self.tokenizer.advance()
+                    self.CompileExpressionList()
+                    token = self.tokenizer.token  # token has advanced
+                    if not (token.type == Token.SYMBOL and token.symbol == ')'):
+                        unexpectedToken(token)
+                    self.dest.write(self.indent)
+                    self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+                else:
+                    # shove the token back on the stack
+                    self.tokenizer.tokens.insert(0, token)
             elif token.type == Token.SYMBOL and token.symbol == '(':
                 self.dest.write(self.indent)
                 self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n')
                 self.tokenizer.advance()
                 self.CompileExpression()
-                token = self.tokenizer.token # token has advanced!
+                token = self.tokenizer.token  # token has advanced!
                 if not (token.type == Token.SYMBOL and token.symbol == ')'):
                     unexpectedToken(token)
                 self.dest.write(self.indent)
                 self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n')
+            elif token.type == Token.SYMBOL and token.symbol in JackTokenizer.unaryOp:
+                self.dest.write(self.indent)
+                self.dest.write('<symbol> ' + escapeSymbol(token.symbol) + ' </symbol>\n')
+                self.tokenizer.advance()
+                self.CompileTerm()
             else:
                 unexpectedToken(token)
             self.tokenizer.advance()

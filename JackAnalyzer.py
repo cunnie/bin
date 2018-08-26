@@ -20,6 +20,8 @@ class JackTokenizer:
                'return'
     symbols = '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', \
               '/', '&', ',', '|', '<', '>', '=', '~'
+
+    ops = '+', '-', '*', '/', '&', '|', '<', '>', '='
     # split() note: "f capturing parentheses are used in pattern, then the text of all groups
     # in the pattern are also returned as part of the resulting list". We save the symbols
     # but purposefully lose the whitespace.
@@ -575,6 +577,18 @@ class CompilationEngine:
             unexpectedToken(token)
         self.tokenizer.advance()
         token = self.tokenizer.token
+        if token.type == Token.SYMBOL and token.symbol == '.':
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+            if token.type == Token.IDENTIFIER:
+                self.dest.write(self.indent)
+                self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+            else:
+                unexpectedToken(token)
+            self.tokenizer.advance()
+            token = self.tokenizer.token
         if token.type == Token.SYMBOL and token.symbol == '(':
             self.dest.write(self.indent)
             self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
@@ -590,7 +604,7 @@ class CompilationEngine:
         self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  # )
         self.tokenizer.advance()
         token = self.tokenizer.token
-        if not (token.type == Token.SYMBOL and token.symbol == ';'):
+        if not (token.type == Token.SYMBOL):
             unexpectedToken(token)
         self.dest.write(self.indent)
         self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  # ;
@@ -627,8 +641,14 @@ class CompilationEngine:
         self.dest.write("<expression>\n")
         original_indent = self.indent
         self.indent += '  '
-        token = self.tokenizer.token
         self.CompileTerm()
+        token = self.tokenizer.token # token has advanced
+        while token.type == Token.SYMBOL and token.symbol in JackTokenizer.ops:
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+            self.tokenizer.advance()
+            self.CompileTerm()
+            token = self.tokenizer.token # token has advanced
 
         self.indent = original_indent
         self.dest.write(self.indent)
@@ -641,7 +661,7 @@ class CompilationEngine:
         self.indent += '  '
         token = self.tokenizer.token
         # FIXME: complete this
-        while not (token.type == Token.SYMBOL and token.symbol == ';'):
+        while not (token.type == Token.SYMBOL):
             if token.type == Token.INT_CONST:
                 self.dest.write(self.indent)
                 self.dest.write('<integerConstant> ' + token.intVal + ' </integerConstant>\n')
@@ -670,10 +690,14 @@ class CompilationEngine:
         self.indent += '  '
         token = self.tokenizer.token
         while not (token.type == Token.SYMBOL and token.symbol == ')'):
-            # FIXME: flesh this out
-            self.tokenizer.advance()
-            token = self.tokenizer.token
-            self.dest.write(str(token))
+            self.CompileExpression()
+            token = self.tokenizer.token # token has advanced!
+
+            if token.type == Token.SYMBOL and token.symbol == ',':
+                self.dest.write(self.indent)
+                self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+                self.tokenizer.advance()
+                token = self.tokenizer.token
 
         self.indent = original_indent
         self.dest.write(self.indent)

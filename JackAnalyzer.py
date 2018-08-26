@@ -246,8 +246,6 @@ class CompilationEngine:
         original_indent = self.indent
         self.indent += '  '
         token = self.tokenizer.token
-        # if token.type != Token.KEYWORD or (token.keyword != token.STATIC and token.keyword != token.FIELD):
-        #     unexpectedToken(token)
         self.dest.write(self.indent)
         self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')
         self.tokenizer.advance()
@@ -258,14 +256,14 @@ class CompilationEngine:
                 (token.keyword == token.BOOLEAN)):
             self.dest.write(self.indent)
             self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')
-        elif token.type == token.IDENTIFIER:  # class
+        elif token.type == token.IDENTIFIER:
             self.dest.write(self.indent)
             self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
         else:
             unexpectedToken(token)
         self.tokenizer.advance()
         token = self.tokenizer.token
-        if token.type == token.IDENTIFIER:  # class
+        if token.type == token.IDENTIFIER:
             self.dest.write(self.indent)
             self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
         else:
@@ -277,7 +275,7 @@ class CompilationEngine:
             self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
             self.tokenizer.advance()
             token = self.tokenizer.token
-            if token.type == token.IDENTIFIER:  # class
+            if token.type == token.IDENTIFIER:
                 self.dest.write(self.indent)
                 self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
             else:
@@ -295,10 +293,109 @@ class CompilationEngine:
         self.dest.write("</classVarDec>\n")
 
     def CompileSubroutine(self):
-        pass
+        self.dest.write(self.indent)
+        self.dest.write("<subroutineDec>\n")
+        original_indent = self.indent
+        self.indent += '  '
+        token = self.tokenizer.token
+        self.dest.write(self.indent)
+        self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')  # method function constructor
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if token.type == token.KEYWORD and (
+                (token.keyword == token.VOID) or
+                (token.keyword == token.INT) or
+                (token.keyword == token.CHAR) or
+                (token.keyword == token.BOOLEAN)):
+            self.dest.write(self.indent)
+            self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')  # void char int ...
+        elif token.type == token.IDENTIFIER:
+            self.dest.write(self.indent)
+            self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')  # custom class
+        else:
+            unexpectedToken(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if token.type == token.IDENTIFIER:
+            self.dest.write(self.indent)
+            self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')  # subroutineName
+        else:
+            unexpectedToken(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if token.type == token.SYMBOL and token.symbol == '(':
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  #
+        else:
+            unexpectedToken(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if not (token.type == token.SYMBOL and token.symbol == ')'):
+            self.compileParameterList()
+        if token.type == token.SYMBOL and token.symbol == ')':
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  # subroutineName
+        else:
+            unexpectedToken(token)
+        self.indent = original_indent
+        self.dest.write(self.indent)
+        self.dest.write("</subroutineDec>\n")
 
     def compileParameterList(self):
-        pass
+        self.dest.write(self.indent)
+        self.dest.write("<parameterList>\n")
+        original_indent = self.indent
+        self.indent += '  '
+        token = self.tokenizer.token
+        if token.type == token.KEYWORD and (
+                (token.keyword == token.INT) or
+                (token.keyword == token.CHAR) or
+                (token.keyword == token.BOOLEAN)):
+            self.dest.write(self.indent)
+            self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')
+        elif token.type == token.IDENTIFIER:
+            self.dest.write(self.indent)
+            self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+        else:
+            unexpectedToken(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if token.type == token.IDENTIFIER:
+            self.dest.write(self.indent)
+            self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+        else:
+            unexpectedToken(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        while token.type == Token.SYMBOL and token.symbol == ",":
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+            if token.type == token.KEYWORD and (
+                    (token.keyword == token.INT) or
+                    (token.keyword == token.CHAR) or
+                    (token.keyword == token.BOOLEAN)):
+                self.dest.write(self.indent)
+                self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')
+            elif token.type == token.IDENTIFIER:
+                self.dest.write(self.indent)
+                self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+            else:
+                unexpectedToken(token)
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+            if token.type == token.IDENTIFIER:
+                self.dest.write(self.indent)
+                self.dest.write('<identifier> ' + token.identifier + ' </identifier>\n')
+            else:
+                unexpectedToken(token)
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+
+        self.indent = original_indent
+        self.dest.write(self.indent)
+        self.dest.write("</parameterList>\n")
 
     def compileVarDec(self):
         pass

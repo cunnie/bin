@@ -325,18 +325,43 @@ class CompilationEngine:
         token = self.tokenizer.token
         if token.type == token.SYMBOL and token.symbol == '(':
             self.dest.write(self.indent)
-            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  #
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
         else:
             unexpectedToken(token)
         self.tokenizer.advance()
         token = self.tokenizer.token
         if not (token.type == token.SYMBOL and token.symbol == ')'):
             self.compileParameterList()
+            token = self.tokenizer.token  # token has advanced!
         if token.type == token.SYMBOL and token.symbol == ')':
             self.dest.write(self.indent)
-            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  # subroutineName
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
         else:
             unexpectedToken(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        # subroutine body
+        if token.type == token.SYMBOL and token.symbol == '{':
+            self.dest.write(self.indent)
+            self.dest.write("<subroutineBody>\n")
+            original_indent = self.indent
+            self.indent += '  '
+            token = self.tokenizer.token
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+            if token.type == token.keyword and token.keyword == Token.VAR:
+                self.compileVarDec()
+            else:
+                self.compileStatements()
+            token = self.tokenizer.token  # token has advanced!
+        else:
+            unexpectedToken(token)
+
+        if token.type == token.SYMBOL and token.symbol == '}':
+            self.dest.write(self.indent)
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
         self.indent = original_indent
         self.dest.write(self.indent)
         self.dest.write("</subroutineDec>\n")
@@ -348,9 +373,7 @@ class CompilationEngine:
         self.indent += '  '
         token = self.tokenizer.token
         if token.type == token.KEYWORD and (
-                (token.keyword == token.INT) or
-                (token.keyword == token.CHAR) or
-                (token.keyword == token.BOOLEAN)):
+                (token.keyword == token.INT) or (token.keyword == token.CHAR) or (token.keyword == token.BOOLEAN)):
             self.dest.write(self.indent)
             self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')
         elif token.type == token.IDENTIFIER:
@@ -369,7 +392,7 @@ class CompilationEngine:
         token = self.tokenizer.token
         while token.type == Token.SYMBOL and token.symbol == ",":
             self.dest.write(self.indent)
-            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+            self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')  # ','
             self.tokenizer.advance()
             token = self.tokenizer.token
             if token.type == token.KEYWORD and (
@@ -401,21 +424,36 @@ class CompilationEngine:
         pass
 
     def compileStatements(self):
-        pass
-
-    def compileDo(self):
-        pass
+        token = self.tokenizer.token
+        while not (token.type == Token.SYMBOL and token.symbol == "}"):
+            if token.type == Token.KEYWORD and token.keyword == Token.LET:
+                self.compileLet()
+            elif token.type == Token.KEYWORD and token.keyword == Token.IF:
+                self.compileIf()
+            elif token.type == Token.KEYWORD and token.keyword == Token.WHILE:
+                self.compileWhile()
+            elif token.type == Token.KEYWORD and token.keyword == Token.DO:
+                self.compileDo()
+            elif token.type == Token.KEYWORD and token.keyword == Token.RETURN:
+                self.compileReturn()
+            else:
+                unexpectedToken(token)
+            self.tokenizer.advance()
+            token = self.tokenizer.token
 
     def compileLet(self):
+        pass
+
+    def compileIf(self):
         pass
 
     def compileWhile(self):
         pass
 
-    def compileReturn(self):
+    def compileDo(self):
         pass
 
-    def compileIf(self):
+    def compileReturn(self):
         pass
 
     def CompileExpression(self):
@@ -425,9 +463,6 @@ class CompilationEngine:
         pass
 
     def CompileExpressionList(self):
-        pass
-
-    def xml(self):
         pass
 
 

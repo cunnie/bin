@@ -371,7 +371,7 @@ class CompilationEngine:
         self.tokenizer.advance()
         token = self.tokenizer.token
         while not (token.type == Token.SYMBOL and token.symbol == '}'):
-            if token.type == token.keyword and token.keyword == Token.VAR:
+            if token.type == Token.KEYWORD and token.keyword == Token.VAR:
                 self.compileVarDec()
             else:
                 self.compileStatements()
@@ -446,7 +446,11 @@ class CompilationEngine:
         self.indent += '  '
         token = self.tokenizer.token
         self.dest.write(self.indent)
+        if token.keyword != Token.VAR:
+            unexpectedToken(token)
         self.dest.write('<keyword> ' + token.keyword + ' </keyword>\n')  # var
+        self.tokenizer.advance()
+        token = self.tokenizer.token
         if token.type == token.KEYWORD and (
                 (token.keyword == token.INT) or
                 (token.keyword == token.CHAR) or
@@ -492,6 +496,11 @@ class CompilationEngine:
                 unexpectedToken(token)
             self.tokenizer.advance()
             token = self.tokenizer.token
+        if token.symbol != ';':
+            unexpectedToken(token)
+        self.dest.write(self.indent)
+        self.dest.write('<symbol> ' + token.symbol + ' </symbol>\n')
+        self.tokenizer.advance()
 
         self.indent = original_indent
         self.dest.write(self.indent)

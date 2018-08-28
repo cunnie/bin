@@ -626,11 +626,15 @@ class CompilationEngine:
             token = self.tokenizer.advance()
             # Is this a subroutine_call? If the next token
             # is '(' or '.'
-            if token.type == Token.SYMBOL and (token.symbol == '(' or token.symbol == '.'):
-                self.subroutine_call()
-            else:
-                # shove the peek-ahead token back on the stack
-                self.tokenizer.retreat(token)
+            if token.type == Token.SYMBOL:
+                if token.symbol == '(' or token.symbol == '.':
+                    self.subroutine_call()
+                elif token.symbol == '[':
+                    # FIXME: x[y]
+                    unexpected_token(token)
+                else:
+                    # shove the peek-ahead token back on the stack
+                    self.tokenizer.retreat(token)
         elif token.type == Token.SYMBOL and token.symbol == '(':
             self.paren_expression_list_paren()
         elif token.type == Token.SYMBOL and token.symbol in JackTokenizer.unaryOp:
@@ -660,7 +664,6 @@ class CompilationEngine:
         token = self.tokenizer.token  # token has advanced
         if token.symbol != ')':
             unexpected_token(token)
-        self.emit(token)
 
     def paren_expression_list_paren(self):
         # the current token is '('

@@ -198,7 +198,11 @@ class Token:
     NULL = "null"
     THIS = "this"
 
-
+# Ending tokens: the subroutine should leave the token pointing to the
+# next one but not have emitted it
+# for example, let_statement() 'let varName = expression ;'
+# the let_statment is responsible for emitting ';' and advancing the token
+# to whatever comes next
 class CompilationEngine:
 
     def __init__(self, tokenizer, dest):
@@ -523,13 +527,10 @@ class CompilationEngine:
         self.push("<whileStatement>")
         self.emit(self.tokenizer.token)  # while
         token = self.tokenizer.advance()
-        if not (token.type == Token.SYMBOL and token.symbol == '('):
-            unexpected_token(token)
-        self.emit(token)
-        _ = self.tokenizer.advance()
-        self.compile_expression()
-        token = self.tokenizer.token  # token has advanced!
-        if not (token.type == Token.SYMBOL and token.symbol == ')'):
+
+        if token.type == Token.SYMBOL and token.symbol == '(':
+            self.paren_expression_paren()
+        else:
             unexpected_token(token)
         self.emit(token)
         token = self.tokenizer.advance()
@@ -604,7 +605,7 @@ class CompilationEngine:
     def compile_expression(self):
         self.push("<expression>")
         self.compile_term()
-        token = self.tokenizer.token  # token has advanced
+        token = self.tokenizer.token
         while token.type == Token.SYMBOL and token.symbol in JackTokenizer.ops:
             self.emit(token)
             _ = self.tokenizer.advance()
@@ -666,7 +667,7 @@ class CompilationEngine:
             unexpected_token(token)
 
     def paren_expression_list_paren(self):
-        # the current token is '('
+        # the current token is '(' and hasn't been emitted
         token = self.tokenizer.token
         self.emit(token)
         if token.symbol != '(':
@@ -678,9 +679,10 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
+        # the current token is ')' and has been emitted
 
     def paren_expression_paren(self):
-        # the current token is '('
+        # the current token is '(' and hasn't been emitted
         token = self.tokenizer.token
         self.emit(token)
         if token.symbol != '(':
@@ -692,6 +694,7 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
+        # the current token is ')' and has been emitted
 
     def compile_expression_list(self):
         self.push("<expressionList>")

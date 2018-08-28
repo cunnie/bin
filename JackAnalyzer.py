@@ -597,7 +597,51 @@ class CompilationEngine:
         self.dest.write("</ifStatement>\n")
 
     def compileWhile(self):
-        pass
+        self.dest.write(self.indent)
+        self.dest.write("<whileStatement>\n")
+        original_indent = self.indent
+        self.indent += '  '
+        token = self.tokenizer.token
+        self.emit(token)  # while
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if not (token.type == Token.SYMBOL and token.symbol == '('):
+            unexpectedToken(token)
+        self.emit(token)
+        self.tokenizer.advance()
+        self.CompileExpression()
+        token = self.tokenizer.token  # token has advanced!
+        if not (token.type == Token.SYMBOL and token.symbol == ')'):
+            unexpectedToken(token)
+        self.emit(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token
+        if not (token.type == Token.SYMBOL and token.symbol == '{'):
+            unexpectedToken(token)
+        self.emit(token)
+        self.tokenizer.advance()
+        self.compileStatements()
+        token = self.tokenizer.token  # token has advanced!
+        if not (token.type == Token.SYMBOL and token.symbol == '}'):
+            unexpectedToken(token)
+        self.emit(token)
+        self.tokenizer.advance()
+        token = self.tokenizer.token  # token has advanced!
+        if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
+            self.tokenizer.advance()
+            token = self.tokenizer.token
+            if not (token.type == Token.SYMBOL and token.symbol == '{'):
+                unexpectedToken(token)
+            self.emit(token)
+            self.tokenizer.advance()
+            self.compileStatements()
+        else:
+            # shove that token back onto the stack!
+            self.tokenizer.tokens.insert(0, token)
+
+        self.indent = original_indent
+        self.dest.write(self.indent)
+        self.dest.write("</whileStatement>\n")
 
     def compileDo(self):
         self.dest.write(self.indent)

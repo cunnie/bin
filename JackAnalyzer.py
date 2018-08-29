@@ -312,9 +312,9 @@ class CompilationEngine:
             token = self.tokenizer.advance()
             if token.type == token.IDENTIFIER:
                 self.emit(token)
+                token = self.tokenizer.advance()
             else:
                 unexpected_token(token)
-            token = self.tokenizer.advance()
         if token.type == Token.SYMBOL and token.symbol == ";":
             self.emit(token)
         else:
@@ -436,21 +436,11 @@ class CompilationEngine:
         while token.type == Token.SYMBOL and token.symbol == ",":
             self.emit(token)
             token = self.tokenizer.advance()
-            if token.type == token.KEYWORD and (
-                    (token.keyword == token.INT) or
-                    (token.keyword == token.CHAR) or
-                    (token.keyword == token.BOOLEAN)):
-                self.emit(token)
-            elif token.type == token.IDENTIFIER:
-                self.emit(token)
-            else:
-                unexpected_token(token)
-            token = self.tokenizer.advance()
             if token.type == token.IDENTIFIER:
                 self.emit(token)
+                token = self.tokenizer.advance()
             else:
                 unexpected_token(token)
-            token = self.tokenizer.advance()
         if token.symbol != ';':
             unexpected_token(token)
         self.emit(token)

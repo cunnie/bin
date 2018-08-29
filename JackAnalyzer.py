@@ -3,6 +3,7 @@ import glob
 import os
 import re
 import sys
+import traceback
 
 
 class JackAnalyzer:
@@ -38,6 +39,7 @@ class JackTokenizer:
         self.token = None
         self.tokens = self.read_all_tokens()
         self.indent = ''
+        self.token_index = -1
         return
 
     def xml(self):
@@ -60,18 +62,25 @@ class JackTokenizer:
         self.dest.write('</tokens>\n')
 
     def has_more_tokens(self):
-        if len(self.tokens) > 0:
+        if self.token_index < len(self.tokens) - 1:
             return True
         else:
             return False
 
     def advance(self):
-        self.token = self.tokens.pop(0)
+        self.token_index += 1
+        i = self.token_index
+        if i >= len(self.tokens):
+            sys.exit('Out of tokens!')
+        self.token = self.tokens[i]
         return self.token
 
-    def retreat(self, token):
-        self.token = token
-        self.tokens.insert(0, token)
+    def retreat(self):
+        self.token_index -= 1
+        i = self.token_index
+        if i < 0:
+            sys.exit('Negative tokens!')
+        self.token = self.tokens[i]
 
     def token_type(self):
         return self.token.type
@@ -162,7 +171,7 @@ class Token:
         elif self.type == Token.IDENTIFIER:
             return "Token{identifier: " + self.identifier + "}"
         elif self.type == Token.INT_CONST:
-            return "Token{int_const: " + self.intVal + "}"
+            return "Token{int_const: " + str(self.intVal) + "}"
         elif self.type == Token.STRING_CONST:
             return "Token{string_const: \"" + self.stringVal + "\"}"
         else:
@@ -197,6 +206,7 @@ class Token:
     FALSE = "false"
     NULL = "null"
     THIS = "this"
+
 
 # Ending tokens: the subroutine should leave the token pointing to the
 # next one but not have emitted it
@@ -520,7 +530,7 @@ class CompilationEngine:
             self.compile_statements()
         else:
             # shove that token back onto the stack!
-            self.tokenizer.retreat(token)
+            self.tokenizer.retreat()
         self.pop()
 
     def compile_while(self):
@@ -530,10 +540,9 @@ class CompilationEngine:
 
         if token.type == Token.SYMBOL and token.symbol == '(':
             self.paren_expression_paren()
+            token = self.tokenizer.token
         else:
             unexpected_token(token)
-        self.emit(token)
-        token = self.tokenizer.advance()
         if not (token.type == Token.SYMBOL and token.symbol == '{'):
             unexpected_token(token)
         self.emit(token)
@@ -553,7 +562,7 @@ class CompilationEngine:
             self.compile_statements()
         else:
             # shove that token back onto the stack!
-            self.tokenizer.retreat(token)
+            self.tokenizer.retreat()
         self.pop()
 
     def compile_do(self):
@@ -616,16 +625,16 @@ class CompilationEngine:
     def compile_term(self):
         self.push("<term>")
         token = self.tokenizer.token
-        if token.type == Token.INT_CONST:
+        if token.type in (Token.INT_CONST, Token.STRING_CONST):
             self.emit(token)
-        elif token.type == Token.STRING_CONST:
-            self.emit(token)
+            _ = self.tokenizer.advance()
         elif token.type == Token.KEYWORD and token.keyword in JackTokenizer.KeywordConstant:
             self.emit(token)
+            _ = self.tokenizer.advance()
         elif token.type == Token.IDENTIFIER:
             self.emit(token)
             token = self.tokenizer.advance()
-            # Is this a subroutine_call? If the next token
+            # Is this a subroutine_call? Yes if the next token
             # is '(' or '.'
             if token.type == Token.SYMBOL:
                 if token.symbol == '(' or token.symbol == '.':
@@ -634,17 +643,15 @@ class CompilationEngine:
                     # FIXME: x[y]
                     unexpected_token(token)
                 else:
-                    # shove the peek-ahead token back on the stack
-                    self.tokenizer.retreat(token)
+                    pass
         elif token.type == Token.SYMBOL and token.symbol == '(':
-            self.paren_expression_list_paren()
+            self.paren_expression_paren()
         elif token.type == Token.SYMBOL and token.symbol in JackTokenizer.unaryOp:
             self.emit(token)
             _ = self.tokenizer.advance()
             self.compile_term()
         else:
             unexpected_token(token)
-        _ = self.tokenizer.advance()
         self.pop()
 
     def subroutine_call(self):
@@ -662,9 +669,6 @@ class CompilationEngine:
             self.paren_expression_list_paren()
         else:
             unexpected_token(token)
-        token = self.tokenizer.token  # token has advanced
-        if token.symbol != ')':
-            unexpected_token(token)
 
     def paren_expression_list_paren(self):
         # the current token is '(' and hasn't been emitted
@@ -677,9 +681,10 @@ class CompilationEngine:
         token = self.tokenizer.token  # token has advanced!
         if token.symbol == ')':
             self.emit(token)
+            _ = self.tokenizer.advance()
         else:
             unexpected_token(token)
-        # the current token is ')' and has been emitted
+        # ')' has been emitted and the current token is the one after
 
     def paren_expression_paren(self):
         # the current token is '(' and hasn't been emitted
@@ -692,9 +697,10 @@ class CompilationEngine:
         token = self.tokenizer.token  # token has advanced!
         if token.symbol == ')':
             self.emit(token)
+            _ = self.tokenizer.advance()
         else:
             unexpected_token(token)
-        # the current token is ')' and has been emitted
+        # ')' has been emitted and the current token is the one after
 
     def compile_expression_list(self):
         self.push("<expressionList>")
@@ -711,7 +717,7 @@ class CompilationEngine:
 
 def unexpected_token(token):
     sys.stderr.write("Unexpected token: " + str(token) + "!\n")
-    sys.stderr.write(token)  # force a stacktrace
+    traceback.print_stack()
     sys.exit(5)
 
 

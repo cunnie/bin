@@ -452,18 +452,17 @@ class CompilationEngine:
         token = self.tokenizer.token
         while not (token.type == Token.SYMBOL and token.symbol == "}"):
             if token.type == Token.KEYWORD and token.keyword == Token.LET:
-                self.compile_let()
+                token = self.compile_let()
             elif token.type == Token.KEYWORD and token.keyword == Token.IF:
-                self.compile_if()
+                token = self.compile_if()
             elif token.type == Token.KEYWORD and token.keyword == Token.WHILE:
-                self.compile_while()
+                token = self.compile_while()
             elif token.type == Token.KEYWORD and token.keyword == Token.DO:
-                self.compile_do()
+                token = self.compile_do()
             elif token.type == Token.KEYWORD and token.keyword == Token.RETURN:
-                self.compile_return()
+                token = self.compile_return()
             else:
                 unexpected_token(token)
-            token = self.tokenizer.advance()
         self.pop()
 
     def compile_let(self):
@@ -472,94 +471,45 @@ class CompilationEngine:
         token = self.tokenizer.advance()
         if token.type == Token.IDENTIFIER:
             self.emit(token)
+            token = self.tokenizer.advance()
         else:
             unexpected_token(token)
-        token = self.tokenizer.advance()
         if token.type == Token.SYMBOL and token.symbol == '[':
-            self.paren_expression_paren(left='[', right=']')
-            token = self.tokenizer.token  # token has advanced
+            token = self.paren_expression_paren(left='[', right=']')
         if token.type == Token.SYMBOL and token.symbol == '=':
             self.emit(token)
-        elif token.type == Token.SYMBOL and token.symbol == '[':
-            self.paren_expression_paren(left='[', right=']')
+            _ = self.tokenizer.advance()
         else:
             unexpected_token(token)
-        _ = self.tokenizer.advance()
         self.compile_expression()
-        token = self.tokenizer.token
+        token = self.tokenizer.token  # token has advanced
         if not (token.type == Token.SYMBOL and token.symbol == ';'):
             unexpected_token(token)
         self.emit(token)
         self.pop()
+        return self.tokenizer.advance()
 
     def compile_if(self):
         self.push("<ifStatement>")
         self.emit(self.tokenizer.token)
-        token = self.tokenizer.advance()
-        if not (token.type == Token.SYMBOL and token.symbol == '('):
-            unexpected_token(token)
-        self.emit(token)
         _ = self.tokenizer.advance()
-        self.compile_expression()
-        token = self.tokenizer.token  # token has advanced!
-        if not (token.type == Token.SYMBOL and token.symbol == ')'):
-            unexpected_token(token)
-        self.emit(token)
-        token = self.tokenizer.advance()
-        if not (token.type == Token.SYMBOL and token.symbol == '{'):
-            unexpected_token(token)
-        self.emit(token)
-        _ = self.tokenizer.advance()
-        self.compile_statements()
-        token = self.tokenizer.token  # token has advanced!
-        if not (token.type == Token.SYMBOL and token.symbol == '}'):
-            unexpected_token(token)
-        self.emit(token)
-        token = self.tokenizer.advance()
+        _ = self.paren_expression_paren()
+        token = self.brace_statements_brace()
         if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
             self.emit(token)
-            token = self.tokenizer.advance()
-            if not (token.type == Token.SYMBOL and token.symbol == '{'):
-                unexpected_token(token)
-            self.emit(token)
             _ = self.tokenizer.advance()
-            self.compile_statements()
-        else:
-            # shove that token back onto the stack!
-            self.tokenizer.retreat()
+            _ = self.brace_statements_brace()
         self.pop()
+        return self.tokenizer.token
 
     def compile_while(self):
         self.push("<whileStatement>")
         self.emit(self.tokenizer.token)  # while
-        token = self.tokenizer.advance()
-
-        if token.type == Token.SYMBOL and token.symbol == '(':
-            self.paren_expression_paren()
-            token = self.tokenizer.token
-        else:
-            unexpected_token(token)
-        if not (token.type == Token.SYMBOL and token.symbol == '{'):
-            unexpected_token(token)
-        self.emit(token)
         _ = self.tokenizer.advance()
-        self.compile_statements()
-        token = self.tokenizer.token  # token has advanced!
-        if not (token.type == Token.SYMBOL and token.symbol == '}'):
-            unexpected_token(token)
-        self.emit(token)
-        token = self.tokenizer.advance()
-        if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
-            token = self.tokenizer.advance()
-            if not (token.type == Token.SYMBOL and token.symbol == '{'):
-                unexpected_token(token)
-            self.emit(token)
-            _ = self.tokenizer.advance()
-            self.compile_statements()
-        else:
-            # shove that token back onto the stack!
-            self.tokenizer.retreat()
+        _ = self.paren_expression_paren()
+        _ = self.brace_statements_brace()
         self.pop()
+        return self.tokenizer.token
 
     def compile_do(self):
         self.push("<doStatement>")
@@ -569,43 +519,26 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
-        token = self.tokenizer.advance()
-        if token.type == Token.SYMBOL and token.symbol == '.':
-            self.emit(token)
-            token = self.tokenizer.advance()
-            if token.type == Token.IDENTIFIER:
-                self.emit(token)
-            else:
-                unexpected_token(token)
-            token = self.tokenizer.advance()
-        if token.type == Token.SYMBOL and token.symbol == '(':
-            self.emit(token)
-        else:
-            unexpected_token(token)
         _ = self.tokenizer.advance()
-        self.compile_expression_list()
-        token = self.tokenizer.token
-        if not (token.type == Token.SYMBOL and token.symbol == ')'):
-            unexpected_token(token)
-        self.emit(token)
-        token = self.tokenizer.advance()
-        if not (token.type == Token.SYMBOL):
+        token = self.subroutine_call()
+        if not (token.type == Token.SYMBOL and token.symbol == ';'):
             unexpected_token(token)
         self.emit(token)
         self.pop()
+        return self.tokenizer.advance()
 
     def compile_return(self):
         self.push("<returnStatement>")
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
         if not (token.type == Token.SYMBOL and token.symbol == ';'):
-            self.compile_expression()
-        token = self.tokenizer.token  # token has been advanced
+            token = self.compile_expression()
         if token.type == Token.SYMBOL and token.symbol == ';':
             self.emit(token)
         else:
             unexpected_token(token)
         self.pop()
+        return self.tokenizer.advance()
 
     def compile_expression(self):
         self.push("<expression>")
@@ -617,6 +550,7 @@ class CompilationEngine:
             self.compile_term()
             token = self.tokenizer.token  # token has advanced
         self.pop()
+        return self.tokenizer.token
 
     def compile_term(self):
         self.push("<term>")
@@ -636,11 +570,11 @@ class CompilationEngine:
                 if token.symbol == '(' or token.symbol == '.':
                     self.subroutine_call()
                 elif token.symbol == '[':
-                    self.paren_expression_paren(left='[', right=']')
+                    _ = self.paren_expression_paren(left='[', right=']')
                 else:
                     pass
         elif token.type == Token.SYMBOL and token.symbol == '(':
-            self.paren_expression_paren()
+            _ = self.paren_expression_paren()
         elif token.type == Token.SYMBOL and token.symbol in JackTokenizer.unaryOp:
             self.emit(token)
             _ = self.tokenizer.advance()
@@ -664,6 +598,7 @@ class CompilationEngine:
             self.paren_expression_list_paren()
         else:
             unexpected_token(token)
+        return self.tokenizer.token
 
     def paren_expression_list_paren(self):
         # the current token is '(' and hasn't been emitted
@@ -696,6 +631,22 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         # ')' (or "right") has been emitted and the current token is the one after
+        return self.tokenizer.token
+
+    def brace_statements_brace(self):
+        # the current token is '{' and hasn't been emitted
+        token = self.tokenizer.token
+        if not (token.type == Token.SYMBOL and token.symbol == '{'):
+            unexpected_token(token)
+        self.emit(token)
+        _ = self.tokenizer.advance()
+        self.compile_statements()
+        token = self.tokenizer.token  # token has advanced!
+        if not (token.type == Token.SYMBOL and token.symbol == '}'):
+            unexpected_token(token)
+        self.emit(token)
+        return self.tokenizer.advance()
+        # '}' has been emitted and the current token is the one after
 
     def compile_expression_list(self):
         self.push("<expressionList>")

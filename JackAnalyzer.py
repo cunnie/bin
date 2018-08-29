@@ -475,8 +475,13 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
+        if token.type == Token.SYMBOL and token.symbol == '[':
+            self.paren_expression_paren(left='[', right=']')
+            token = self.tokenizer.token  # token has advanced
         if token.type == Token.SYMBOL and token.symbol == '=':
             self.emit(token)
+        elif token.type == Token.SYMBOL and token.symbol == '[':
+            self.paren_expression_paren(left='[', right=']')
         else:
             unexpected_token(token)
         _ = self.tokenizer.advance()
@@ -512,6 +517,7 @@ class CompilationEngine:
         self.emit(token)
         token = self.tokenizer.advance()
         if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
+            self.emit(token)
             token = self.tokenizer.advance()
             if not (token.type == Token.SYMBOL and token.symbol == '{'):
                 unexpected_token(token)
@@ -630,8 +636,7 @@ class CompilationEngine:
                 if token.symbol == '(' or token.symbol == '.':
                     self.subroutine_call()
                 elif token.symbol == '[':
-                    # FIXME: x[y]
-                    unexpected_token(token)
+                    self.paren_expression_paren(left='[', right=']')
                 else:
                     pass
         elif token.type == Token.SYMBOL and token.symbol == '(':
@@ -676,21 +681,21 @@ class CompilationEngine:
             unexpected_token(token)
         # ')' has been emitted and the current token is the one after
 
-    def paren_expression_paren(self):
-        # the current token is '(' and hasn't been emitted
+    def paren_expression_paren(self, left='(', right=')'):
+        # the current token is '(' (or "left") and hasn't been emitted
         token = self.tokenizer.token
         self.emit(token)
-        if token.symbol != '(':
+        if token.symbol != left:
             unexpected_token(token)
         _ = self.tokenizer.advance()
         self.compile_expression()
         token = self.tokenizer.token  # token has advanced!
-        if token.symbol == ')':
+        if token.symbol == right:
             self.emit(token)
             _ = self.tokenizer.advance()
         else:
             unexpected_token(token)
-        # ')' has been emitted and the current token is the one after
+        # ')' (or "right") has been emitted and the current token is the one after
 
     def compile_expression_list(self):
         self.push("<expressionList>")

@@ -24,6 +24,12 @@ class Jack:
     ops = '+', '-', '*', '/', '&', '|', '<', '>', '='
     unaryOp = '-', '~'
     keywordConstant = 'true', 'false', 'null', 'this'
+    # Identifier kinds for SymbolTable
+    STATIC = 16
+    FIELD = 17
+    ARG = 18
+    VAR = 19
+    NONE = 19
 
     def __init__(self):
         # an empty init to satify lint
@@ -677,17 +683,24 @@ class JackCompiler:
 
 class SymbolTable:
     def __init__(self):
-        pass
+        self.classes = []
+        self.subroutines = []
+        self.current_class = None
 
     def start_subroutine(self):
         # Starts a new subroutine scope (i.e., resets the subroutine's symbol table)
-        pass
+        self.subroutines = {}
 
     def define(self, name, type, kind):
         # Defines a new identifier of a given name, type, and kind
         # and assigns it a running index. STATIC and FIELD identifiers
         # have a class scope, while ARG and VAR identifiers have a subroutine scope
-        pass
+        if kind == Jack.STATIC or kind == Jack.FIELD:
+            self.classes[self.current_class + '.' + name] = {'type': type, 'kind': kind}
+        elif kind == Jack.ARG or kind == Jack.VAR:
+            self.subroutines[name] = {'type': type, 'kind': kind}
+        else:
+            sys.exit("Invalid identifier type")
 
     def var_count(self, kind):
         #  Returns the number of variables of the given kind already defined in the current scope

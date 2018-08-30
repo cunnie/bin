@@ -661,6 +661,51 @@ class CompilationEngine:
         self.pop()
 
 
+class JackCompiler:
+    def __init__(self, source, dest):
+        self.source = source
+        self.dest = dest
+        self.symtab = SymbolTable()
+
+
+class SymbolTable:
+    def __init__(self):
+        pass
+
+    def start_subroutine(self):
+        # Starts a new subroutine scope (i.e., resets the subroutine's symbol table)
+        pass
+
+    def define(self, name, type, kind):
+        # Deﬁnes a new identiﬁer of a given name, type, and kind
+        # and assigns it a running index. STATIC and FIELD identiﬁers
+        # have a class scope, while ARG and VAR identiﬁers have a subroutine scope
+        pass
+
+    def var_count(self, kind):
+        #  Returns the number of variables of the given kind already deﬁned in the current scope
+        return 0
+
+    def kind_of(self, name):
+        # Returns the kind of the named identiﬁer in the current scope.
+        # If the identiﬁer is unknown in the current scope, returns NONE
+        # STATIC, FIELD, ARG, VAR,NONE
+        return "STATIC"
+
+    def type_of(self, name):
+        # Returns the type of the named identiﬁer in the current s cope
+        return "something"
+
+    def index_of(self, name):
+        # Returns the index assigned to the named identiﬁer.
+        return 0
+
+
+class VMWriter:
+    def __init__(self):
+        pass
+
+
 def unexpected_token(token):
     sys.stderr.write("Unexpected token: " + str(token) + "!\n")
     traceback.print_stack()

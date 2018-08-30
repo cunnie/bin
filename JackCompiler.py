@@ -14,23 +14,28 @@ class JackAnalyzer:
         return
 
 
-class JackTokenizer:
+class Jack:
     keywords = 'class', 'constructor', 'function', 'method', 'field', \
                'static', 'var', 'int', 'char', 'boolean', 'void', 'true', \
                'false', 'null', 'this', 'let', 'do', 'if', 'else', 'while', \
                'return'
     symbols = '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', \
               '/', '&', ',', '|', '<', '>', '=', '~'
-
     ops = '+', '-', '*', '/', '&', '|', '<', '>', '='
     unaryOp = '-', '~'
-    KeywordConstant = 'true', 'false', 'null', 'this'
+    keywordConstant = 'true', 'false', 'null', 'this'
 
+    def __init__(self):
+        # an empty init to satify lint
+        pass
+
+
+class JackTokenizer:
     # split() note: "f capturing parentheses are used in pattern, then the text of all groups
     # in the pattern are also returned as part of the resulting list". We save the symbols
     # but purposefully lose the whitespace.
     reSymbols = re.compile(r'([{\}()\[\],.;+\-*/&|<>=~])|\s+')
-    reIdentifier = re.compile(r'^[a-zA-Z]{1}[a-zA-Z0-9]*$')
+    reIdentifier = re.compile(r'^[a-zA-Z][a-zA-Z0-9]*$')
     reIntegerConstant = re.compile(r'^\d+$')
 
     def __init__(self, source, dest):
@@ -127,9 +132,9 @@ class JackTokenizer:
                 # Lame coding alert: I shouldn't have empty strings
                 # and I shouldn't skip them by using `pass`. This
                 # code is double-lame, but I'll never fix it, sorry.
-                if field in JackTokenizer.keywords:
+                if field in Jack.keywords:
                     tokens.append(Token(Token.KEYWORD, keyword=field))
-                elif field in JackTokenizer.symbols:
+                elif field in Jack.symbols:
                     tokens.append(Token(Token.SYMBOL, symbol=field))
                 elif JackTokenizer.reIdentifier.match(field):
                     tokens.append(Token(Token.IDENTIFIER, identifier=field))
@@ -277,7 +282,9 @@ class CompilationEngine:
             if token.type == token.KEYWORD:
                 if token.keyword == token.STATIC or token.keyword == token.FIELD:
                     self.compile_class_var_dec()
-                elif token.keyword == token.CONSTRUCTOR or token.keyword == token.FUNCTION or token.keyword == token.METHOD:
+                elif token.keyword == token.CONSTRUCTOR or \
+                        token.keyword == token.FUNCTION or \
+                        token.keyword == token.METHOD:
                     self.compile_subroutine()
                 else:
                     unexpected_token(token)
@@ -356,7 +363,7 @@ class CompilationEngine:
         # subroutine body
         if token.type == token.SYMBOL and token.symbol == '{':
             self.compile_subroutine_body()
-            token = self.tokenizer.token  # token has advanced!
+            _ = self.tokenizer.token  # token has advanced!
         else:
             unexpected_token(token)
         self.pop()
@@ -544,7 +551,7 @@ class CompilationEngine:
         self.push("<expression>")
         self.compile_term()
         token = self.tokenizer.token
-        while token.type == Token.SYMBOL and token.symbol in JackTokenizer.ops:
+        while token.type == Token.SYMBOL and token.symbol in Jack.ops:
             self.emit(token)
             _ = self.tokenizer.advance()
             self.compile_term()
@@ -558,7 +565,7 @@ class CompilationEngine:
         if token.type in (Token.INT_CONST, Token.STRING_CONST):
             self.emit(token)
             _ = self.tokenizer.advance()
-        elif token.type == Token.KEYWORD and token.keyword in JackTokenizer.KeywordConstant:
+        elif token.type == Token.KEYWORD and token.keyword in Jack.keywordConstant:
             self.emit(token)
             _ = self.tokenizer.advance()
         elif token.type == Token.IDENTIFIER:
@@ -575,7 +582,7 @@ class CompilationEngine:
                     pass
         elif token.type == Token.SYMBOL and token.symbol == '(':
             _ = self.paren_expression_paren()
-        elif token.type == Token.SYMBOL and token.symbol in JackTokenizer.unaryOp:
+        elif token.type == Token.SYMBOL and token.symbol in Jack.unaryOp:
             self.emit(token)
             _ = self.tokenizer.advance()
             self.compile_term()
@@ -677,32 +684,73 @@ class SymbolTable:
         pass
 
     def define(self, name, type, kind):
-        # Deﬁnes a new identiﬁer of a given name, type, and kind
-        # and assigns it a running index. STATIC and FIELD identiﬁers
-        # have a class scope, while ARG and VAR identiﬁers have a subroutine scope
+        # Defines a new identifier of a given name, type, and kind
+        # and assigns it a running index. STATIC and FIELD identifiers
+        # have a class scope, while ARG and VAR identifiers have a subroutine scope
         pass
 
     def var_count(self, kind):
-        #  Returns the number of variables of the given kind already deﬁned in the current scope
+        #  Returns the number of variables of the given kind already defined in the current scope
         return 0
 
     def kind_of(self, name):
-        # Returns the kind of the named identiﬁer in the current scope.
-        # If the identiﬁer is unknown in the current scope, returns NONE
+        # Returns the kind of the named identifier in the current scope.
+        # If the identifier is unknown in the current scope, returns NONE
         # STATIC, FIELD, ARG, VAR,NONE
         return "STATIC"
 
     def type_of(self, name):
-        # Returns the type of the named identiﬁer in the current s cope
+        # Returns the type of the named identifier in the current s cope
         return "something"
 
     def index_of(self, name):
-        # Returns the index assigned to the named identiﬁer.
+        # Returns the index assigned to the named identifier.
         return 0
 
 
 class VMWriter:
     def __init__(self):
+        pass
+
+    def write_push(self, segment, index):
+        # Writes a VM push command
+        # Segment (CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP)
+        # Index (int)
+        pass
+
+    def write_pop(self, segment, index):
+        # Writes a VM pop command
+        # Segment (CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP)
+        # Index (int)
+        pass
+
+    def write_arithmetic(self, command):
+        # Writes a VM arithmetic command
+        # command (ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT
+        pass
+
+    def write_label(self, label):
+        # Writes a VM `label` command
+        pass
+
+    def write_goto(self, label):
+        # Writes a VM `goto` command
+        pass
+
+    def write_call(self, name, n_args):
+        # Writes a VM `call` command
+        pass
+
+    def write_function(self, name, n_locals):
+        # Writes a VM `function` command
+        pass
+
+    def write_return(self):
+        # Writes a VM `return` command
+        pass
+
+    def close(self):
+        # Closes the output file
         pass
 
 
@@ -734,18 +782,23 @@ def jack_source_filenames():
 
 
 # main
-cmd_name = sys.argv[0].split('/')[-1]
-for sourceFileName in jack_source_filenames():
-    try:
-        source = open(sourceFileName, "r")
-    except:
-        sys.exit(cmd_name + " error. I couldn't open " + str(sourceFileName) + " for reading!")
-    sys.stderr.write(cmd_name + ": opened " + sourceFileName + " for reading.\n")
-    destFileName = sourceFileName.replace('.jack', '.xml')
-    try:
-        dest = open(destFileName, "w")
-    except:
-        sys.exit(cmd_name + " error. I couldn't open " + str(sourceFileName) + " for reading!")
-    sys.stderr.write(cmd_name + ": opened " + destFileName + " for writing.\n")
+def main():
+    cmd_name = sys.argv[0].split('/')[-1]
+    for source_filename in jack_source_filenames():
+        try:
+            source = open(source_filename, "r")
+        except IOError as e:
+            sys.exit(cmd_name + " error. I couldn't open " + str(source_filename) + " for reading: " + e.strerror)
+        sys.stderr.write(cmd_name + ": opened " + source_filename + " for reading.\n")
+        dest_filename = source_filename.replace('.jack', '.xml')
+        try:
+            dest = open(dest_filename, "w")
+        except IOError as e:
+            sys.exit(cmd_name + " error. I couldn't open " + str(source_filename) + " for reading: " + e.strerror)
+        sys.stderr.write(cmd_name + ": opened " + dest_filename + " for writing.\n")
 
-    analyzer = JackAnalyzer(source, dest)
+        _ = JackAnalyzer(source, dest)
+
+
+if __name__ == "__main__":
+    main()

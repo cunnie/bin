@@ -7,9 +7,9 @@ import traceback
 
 
 class JackAnalyzer:
-    def __init__(self, source, dest):
+    def __init__(self, tokenizer, dest):
         self.dest = dest
-        self.tokenizer = JackTokenizer(source, dest)
+        self.tokenizer = tokenizer
         self.compilationEngine = CompilationEngine(self.tokenizer, dest)
         return
 
@@ -44,33 +44,13 @@ class JackTokenizer:
     reIdentifier = re.compile(r'^[a-zA-Z][a-zA-Z0-9]*$')
     reIntegerConstant = re.compile(r'^\d+$')
 
-    def __init__(self, source, dest):
+    def __init__(self, source):
         self.source = source
-        self.dest = dest
         self.token = None
         self.tokens = self.read_all_tokens()
         self.indent = ''
         self.token_index = -1
         return
-
-    def xml(self):
-        self.dest.write('<tokens>\n')
-        for token in self.tokens:
-            if token.type == Token.KEYWORD:
-                self.dest.write('<keyword> ' + token.keyword + ' </keyword>')
-            elif token.type == Token.SYMBOL:
-                self.dest.write('<symbol> ' + escape_symbol(token.symbol) + ' </symbol>\n')
-            elif token.type == Token.IDENTIFIER:
-                self.dest.write('<identifier> ' + token.identifier + ' </identifier>')
-            elif token.type == Token.INT_CONST:
-                self.dest.write('<integerConstant> ' + str(token.intVal) + ' </integerConstant>')
-            elif token.type == Token.STRING_CONST:
-                self.dest.write('<stringConstant> ' + token.stringVal + ' </stringConstant>')
-            else:
-                sys.stderr.write("I know not this token: \"" + token.type + "\"\n")
-                sys.exit(3)
-            self.dest.write('\n')
-        self.dest.write('</tokens>\n')
 
     def has_more_tokens(self):
         if self.token_index < len(self.tokens) - 1:
@@ -226,50 +206,43 @@ class Token:
 # to whatever comes next
 class CompilationEngine:
 
-    def __init__(self, tokenizer, dest):
-        self.dest = dest
+    def __init__(self, tokenizer, symbol_table, dest_vm, dest_xml):
         self.tokenizer = tokenizer
-        token = self.tokenizer.token
-        if token is not None:
-            unexpected_token(token)
+        self.symbol_table = symbol_table
+        self.dest_vm = dest_vm
+        self.dest_xml = dest_xml
         self.indent = ''
         self.tags = []
-        while self.tokenizer.has_more_tokens():
-            token = self.tokenizer.advance()
-            if token.type == Token.KEYWORD and token.keyword == Token.CLASS:
-                self.compile_class()
-            else:
-                unexpected_token(token)
 
     def emit(self, token):
-        self.dest.write(self.indent)
+        self.dest_xml.write(self.indent)
         if token is None:
             sys.exit('Unexpected null token!\n')
         elif token.type == Token.KEYWORD:
-            self.dest.write("<keyword> " + token.keyword + " </keyword>\n")
+            self.dest_xml.write("<keyword> " + token.keyword + " </keyword>\n")
         elif token.type == Token.SYMBOL:
-            self.dest.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
+            self.dest_xml.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
         elif token.type == Token.IDENTIFIER:
-            self.dest.write("<identifier> " + token.identifier + " </identifier>\n")
+            self.dest_xml.write("<identifier> " + token.identifier + " </identifier>\n")
         elif token.type == Token.INT_CONST:
-            self.dest.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
+            self.dest_xml.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
         elif token.type == Token.STRING_CONST:
-            self.dest.write("<stringConstant> " + token.stringVal + " </stringConstant>\n")
+            self.dest_xml.write("<stringConstant> " + token.stringVal + " </stringConstant>\n")
         else:
             sys.exit('Unexpected token:' + str(token))
 
     # tag is typically "<class>" or something along those lines
     def push(self, tag):
-        self.dest.write(self.indent)
-        self.dest.write(tag + '\n')  # e.g. "class"
+        self.dest_xml.write(self.indent)
+        self.dest_xml.write(tag + '\n')  # e.g. "class"
         self.indent += '  '
         self.tags.append(tag)
 
     def pop(self):
         tag = self.tags.pop()
         self.indent = self.indent[2:]
-        self.dest.write(self.indent)
-        self.dest.write(tag.replace('<', '</') + '\n')
+        self.dest_xml.write(self.indent)
+        self.dest_xml.write(tag.replace('<', '</') + '\n')
 
     def compile_class(self):
         self.push('<class>')
@@ -674,13 +647,6 @@ class CompilationEngine:
         self.pop()
 
 
-class JackCompiler:
-    def __init__(self, source, dest):
-        self.source = source
-        self.dest = dest
-        self.symtab = SymbolTable()
-
-
 class SymbolTable:
     def __init__(self):
         self.classes = []
@@ -767,6 +733,29 @@ class VMWriter:
         pass
 
 
+class JackCompiler:
+    def __init__(self, source, dest_vm, dest_xml):
+        self.source = source
+        self.dest_vm = dest_vm
+        self.dest_xml = dest_xml
+        self.tokenizer = JackTokenizer(source)
+        self.symbol_table = SymbolTable()
+        self.vm_writer = VMWriter()
+        self.compilation_engine = CompilationEngine(self.tokenizer, self.symbol_table, dest_vm, dest_xml)
+
+        token = self.tokenizer.token
+        if token is not None:  # first token should always be None
+            unexpected_token(token)
+        self.indent = ''
+        self.tags = []
+        while self.tokenizer.has_more_tokens():
+            token = self.tokenizer.advance()
+            if token.type == Token.KEYWORD and token.keyword == Token.CLASS:
+                self.compilation_engine.compile_class()
+            else:
+                unexpected_token(token)
+
+
 def unexpected_token(token):
     sys.stderr.write("Unexpected token: " + str(token) + "!\n")
     traceback.print_stack()
@@ -803,14 +792,20 @@ def main():
         except IOError as e:
             sys.exit(cmd_name + " error. I couldn't open " + str(source_filename) + " for reading: " + e.strerror)
         sys.stderr.write(cmd_name + ": opened " + source_filename + " for reading.\n")
-        dest_filename = source_filename.replace('.jack', '.xml')
+        dest_xml_filename = source_filename.replace('.jack', '.xml')
         try:
-            dest = open(dest_filename, "w")
+            dest_xml = open(dest_xml_filename, "w")
         except IOError as e:
             sys.exit(cmd_name + " error. I couldn't open " + str(source_filename) + " for reading: " + e.strerror)
-        sys.stderr.write(cmd_name + ": opened " + dest_filename + " for writing.\n")
+        sys.stderr.write(cmd_name + ": opened " + dest_xml_filename + " for writing.\n")
+        dest_vm_filename = source_filename.replace('.jack', '.vm')
+        try:
+            dest_vm = open(dest_vm_filename, "w")
+        except IOError as e:
+            sys.exit(cmd_name + " error. I couldn't open " + str(source_filename) + " for reading: " + e.strerror)
+        sys.stderr.write(cmd_name + ": opened " + dest_vm_filename + " for writing.\n")
 
-        _ = JackAnalyzer(source, dest)
+        _ = JackCompiler(source, dest_vm, dest_xml)
 
 
 if __name__ == "__main__":

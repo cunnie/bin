@@ -215,34 +215,40 @@ class CompilationEngine:
         self.tags = []
 
     def emit(self, token):
+        self.dest_vm.write(self.indent)
         self.dest_xml.write(self.indent)
         if token is None:
             sys.exit('Unexpected null token!\n')
         elif token.type == Token.KEYWORD:
+            self.dest_vm.write("<keyword> " + token.keyword + " </keyword>\n")
             self.dest_xml.write("<keyword> " + token.keyword + " </keyword>\n")
         elif token.type == Token.SYMBOL:
+            self.dest_vm.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
             self.dest_xml.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
         elif token.type == Token.IDENTIFIER:
+            self.dest_vm.write("<identifier> " + token.identifier + " </identifier>\n")
             self.dest_xml.write("<identifier> " + token.identifier + " </identifier>\n")
         elif token.type == Token.INT_CONST:
+            self.dest_vm.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
             self.dest_xml.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
         elif token.type == Token.STRING_CONST:
+            self.dest_vm.write("<stringConstant> " + token.stringVal + " </stringConstant>\n")
             self.dest_xml.write("<stringConstant> " + token.stringVal + " </stringConstant>\n")
         else:
             sys.exit('Unexpected token:' + str(token))
 
     # tag is typically "<class>" or something along those lines
     def push(self, tag):
-        self.dest_xml.write(self.indent)
-        self.dest_xml.write(tag + '\n')  # e.g. "class"
+        self.dest_vm.write(self.indent + tag + '\n')
+        self.dest_xml.write(self.indent + tag + '\n')
         self.indent += '  '
         self.tags.append(tag)
 
     def pop(self):
         tag = self.tags.pop()
         self.indent = self.indent[2:]
-        self.dest_xml.write(self.indent)
-        self.dest_xml.write(tag.replace('<', '</') + '\n')
+        self.dest_vm.write(self.indent + tag.replace('<', '</') + '\n')
+        self.dest_xml.write(self.indent + tag.replace('<', '</') + '\n')
 
     def compile_class(self):
         self.push('<class>')

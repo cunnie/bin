@@ -572,8 +572,9 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
+        call_name = token.identifier
         _ = self.tokenizer.advance()
-        token = self.subroutine_call()
+        token = self.subroutine_call(call_name)
         if not (token.type == Token.SYMBOL and token.symbol == ';'):
             unexpected_token(token)
         self.emit(token)
@@ -636,21 +637,25 @@ class CompilationEngine:
             unexpected_token(token)
         self.pop()
 
-    def subroutine_call(self):
+    def subroutine_call(self, call_name):
         # the subroutine (identifier) has already been emitted; the current token is either '(' or '.'
         token = self.tokenizer.token
         if token.symbol == '(':
-            self.paren_expression_list_paren()
+            pass
         elif token.symbol == '.':
             self.emit(token)
             token = self.tokenizer.advance()
             if token.type != Token.IDENTIFIER:
                 unexpected_token(token)
             self.emit(token)
+            # if we're here, we're calling a function in another class
+            # e.g. `Output.printInt()`
+            call_name = call_name + '.' + token.identifier
             _ = self.tokenizer.advance()
-            self.paren_expression_list_paren()
         else:
             unexpected_token(token)
+        n_args = self.paren_expression_list_paren()
+        self.vm_writer.write_call(call_name, n_args)
         return self.tokenizer.token
 
     def paren_expression_list_paren(self):
@@ -660,7 +665,7 @@ class CompilationEngine:
         if token.symbol != '(':
             unexpected_token(token)
         _ = self.tokenizer.advance()
-        self.compile_expression_list()
+        n_args = self.compile_expression_list()
         token = self.tokenizer.token  # token has advanced!
         if token.symbol == ')':
             self.emit(token)
@@ -668,6 +673,7 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         # ')' has been emitted and the current token is the one after
+        return n_args
 
     def paren_expression_paren(self, left='(', right=')'):
         # the current token is '(' (or "left") and hasn't been emitted
@@ -703,15 +709,18 @@ class CompilationEngine:
 
     def compile_expression_list(self):
         self.push("<expressionList>")
+        n_args = 0  # number of arguments in expression list
         token = self.tokenizer.token
         while not (token.type == Token.SYMBOL and token.symbol == ')'):
             self.compile_expression()
+            n_args += 1
             token = self.tokenizer.token  # token has advanced!
 
             if token.type == Token.SYMBOL and token.symbol == ',':
                 self.emit(token)
                 token = self.tokenizer.advance()
         self.pop()
+        return n_args
 
 
 class SymbolTable:

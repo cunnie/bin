@@ -609,8 +609,13 @@ class CompilationEngine:
     def compile_term(self):
         self.push("<term>")
         token = self.tokenizer.token
-        if token.type in (Token.INT_CONST, Token.STRING_CONST):
+        if token.type == Token.INT_CONST:
             self.emit(token)
+            self.vm_writer.write_push("constant", token.intVal)
+            _ = self.tokenizer.advance()
+        elif token.type == Token.STRING_CONST:
+            self.emit(token)
+            self.vm_writer.write_push("constant", token.stringVal)
             _ = self.tokenizer.advance()
         elif token.type == Token.KEYWORD and token.keyword in Jack.keywordConstant:
             self.emit(token)

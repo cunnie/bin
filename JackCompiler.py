@@ -10,7 +10,6 @@ class JackAnalyzer:
     def __init__(self, tokenizer, dest):
         self.dest = dest
         self.tokenizer = tokenizer
-        self.compilationEngine = CompilationEngine(self.tokenizer, dest)
         return
 
 
@@ -24,12 +23,27 @@ class Jack:
     ops = '+', '-', '*', '/', '&', '|', '<', '>', '='
     unaryOp = '-', '~'
     keywordConstant = 'true', 'false', 'null', 'this'
-    # Identifier kinds for SymbolTable
-    STATIC = 16
-    FIELD = 17
-    ARG = 18
-    VAR = 19
-    NONE = 19
+
+    # Identifier "kinds" for SymbolTable
+    # The following 3 must NOT be recorded in the SymbolTable
+    CLASS = 17
+    SUBROUTINE = 18
+    # The following 4 must be recorded in the SymbolTable
+    STATIC = 19
+    FIELD = 20
+    ARG = 21
+    VAR = 22
+
+    @staticmethod
+    def kind_of(kind):
+        return {
+            Jack.CLASS: 'class',
+            Jack.SUBROUTINE: 'subroutine',
+            Jack.STATIC: 'static',
+            Jack.FIELD: 'field',
+            Jack.ARG: 'arg',
+            Jack.VAR: 'var'
+        }.get(kind, None)
 
     def __init__(self):
         # an empty init to satify lint
@@ -37,7 +51,7 @@ class Jack:
 
 
 class JackTokenizer:
-    # split() note: "f capturing parentheses are used in pattern, then the text of all groups
+    # split() note: "if capturing parentheses are used in pattern, then the text of all groups
     # in the pattern are also returned as part of the resulting list". We save the symbols
     # but purposefully lose the whitespace.
     reSymbols = re.compile(r'([{\}()\[\],.;+\-*/&|<>=~])|\s+')
@@ -214,7 +228,7 @@ class CompilationEngine:
         self.indent = ''
         self.tags = []
 
-    def emit(self, token):
+    def emit(self, token, kind=None, token_type=None):
         self.dest_vm.write(self.indent)
         self.dest_xml.write(self.indent)
         if token is None:
@@ -226,7 +240,16 @@ class CompilationEngine:
             self.dest_vm.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
             self.dest_xml.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
         elif token.type == Token.IDENTIFIER:
-            self.dest_vm.write("<identifier> " + token.identifier + " </identifier>\n")
+            if kind == None and token_type == None:  # Usage of identifier, not definition
+                kind = self.symbol_table.kind_of(token.identifier)
+                token_type = self.symbol_table.type_of(token.identifier)
+                index = self.symbol_table.index_of(token.identifier)
+            else:
+                index = self.symbol_table.define(token.identifier, token_type, kind)
+            kind_string = Jack.kind_of(kind)
+            self.dest_vm.write(
+                "<identifier kind={} token_type={} index={} > {} </identifier>\n".format(kind_string, token_type, index,
+                                                                                         token.identifier))
             self.dest_xml.write("<identifier> " + token.identifier + " </identifier>\n")
         elif token.type == Token.INT_CONST:
             self.dest_vm.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
@@ -254,9 +277,10 @@ class CompilationEngine:
         self.push('<class>')
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
+
         if token.type != Token.IDENTIFIER:
             unexpected_token(token)
-        self.emit(token)
+        self.emit(token, kind=Jack.CLASS, token_type=token.identifier)
         token = self.tokenizer.advance()
         if token.type != Token.SYMBOL or token.symbol != '{':
             unexpected_token(token)
@@ -317,6 +341,7 @@ class CompilationEngine:
         self.push('<subroutineDec>')
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
+        self.symbol_table.start_subroutine()
         if token.type == token.KEYWORD and (
                 (token.keyword == token.VOID) or
                 (token.keyword == token.INT) or
@@ -324,12 +349,12 @@ class CompilationEngine:
                 (token.keyword == token.BOOLEAN)):
             self.emit(token)
         elif token.type == token.IDENTIFIER:
-            self.emit(token)
+            self.emit(token, kind=Jack.CLASS, token_type=token.identifier)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
         if token.type == token.IDENTIFIER:
-            self.emit(token)
+            self.emit(token, kind=Jack.SUBROUTINE, token_type=token.identifier)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
@@ -369,17 +394,22 @@ class CompilationEngine:
     def compile_parameter_list(self):
         self.push("<parameterList>")
         token = self.tokenizer.token
+        token_type = None  # placate linter
         if not (token.type == token.SYMBOL and token.symbol == ')'):
             if token.type == token.KEYWORD and (
-                    (token.keyword == token.INT) or (token.keyword == token.CHAR) or (token.keyword == token.BOOLEAN)):
+                    (token.keyword == token.INT) or
+                    (token.keyword == token.CHAR) or
+                    (token.keyword == token.BOOLEAN)):
                 self.emit(token)
+                token_type = token.keyword
             elif token.type == token.IDENTIFIER:
-                self.emit(token)
+                token_type = token.identifier
+                self.emit(token, kind=Jack.CLASS, token_type=token_type)
             else:
                 unexpected_token(token)
             token = self.tokenizer.advance()
             if token.type == token.IDENTIFIER:
-                self.emit(token)
+                self.emit(token, kind=Jack.ARG, token_type=token_type)
             else:
                 unexpected_token(token)
             token = self.tokenizer.advance()
@@ -391,13 +421,15 @@ class CompilationEngine:
                         (token.keyword == token.CHAR) or
                         (token.keyword == token.BOOLEAN)):
                     self.emit(token)
+                    token_type = token.keyword
                 elif token.type == token.IDENTIFIER:
-                    self.emit(token)
+                    token_type = token.identifier
+                    self.emit(token, kind=Jack.CLASS, token_type=token_type)
                 else:
                     unexpected_token(token)
                 token = self.tokenizer.advance()
                 if token.type == token.IDENTIFIER:
-                    self.emit(token)
+                    self.emit(token, kind=Jack.ARG, token_type=token_type)
                 else:
                     unexpected_token(token)
                 token = self.tokenizer.advance()
@@ -409,19 +441,25 @@ class CompilationEngine:
         if token.keyword != Token.VAR:
             unexpected_token(token)
         self.emit(token)
+        # every symbol will be a "kind" of "VAR" in this method
+        token_kind = Jack.VAR
+        token_type = None  # placate linter
         token = self.tokenizer.advance()
         if token.type == token.KEYWORD and (
                 (token.keyword == token.INT) or
                 (token.keyword == token.CHAR) or
                 (token.keyword == token.BOOLEAN)):
             self.emit(token)
+            token_type = token.keyword
         elif token.type == token.IDENTIFIER:
-            self.emit(token)
+            # if we're not a builtin type, then we're a class type
+            token_type = token.identifier
+            self.emit(token, kind=Jack.CLASS, token_type=token_type)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
         if token.type == token.IDENTIFIER:
-            self.emit(token)
+            self.emit(token, kind=token_kind, token_type=token_type)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
@@ -429,7 +467,7 @@ class CompilationEngine:
             self.emit(token)
             token = self.tokenizer.advance()
             if token.type == token.IDENTIFIER:
-                self.emit(token)
+                self.emit(token, kind=token_kind, token_type=token_type)
                 token = self.tokenizer.advance()
             else:
                 unexpected_token(token)
@@ -462,6 +500,8 @@ class CompilationEngine:
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
         if token.type == Token.IDENTIFIER:
+            idx = self.symbol_table.index_of(token.identifier)
+            s = self.symbol_table
             self.emit(token)
             token = self.tokenizer.advance()
         else:
@@ -654,25 +694,37 @@ class CompilationEngine:
 
 
 class SymbolTable:
+    # The symbol table is two tables made to look like one;
+    # It works like this: The symbol table for the classes
+    # occupy indices 0 - (length of symbol for classes - 1)
+    # and the symbol table for subroutines occupy the indices
+    # (length of symbol table) - (length of both tables - 1)
     def __init__(self):
-        self.classes = []
-        self.subroutines = []
+        self.class_symbols = []
+        self.subroutine_symbols = []
         self.current_class = None
 
     def start_subroutine(self):
         # Starts a new subroutine scope (i.e., resets the subroutine's symbol table)
-        self.subroutines = {}
+        self.subroutine_symbols = []
 
-    def define(self, name, type, kind):
-        # Defines a new identifier of a given name, type, and kind
+    def define(self, name, token_type, kind):
+        # Defines a new identifier of a given name, token_type, and kind
         # and assigns it a running index. STATIC and FIELD identifiers
         # have a class scope, while ARG and VAR identifiers have a subroutine scope
-        if kind == Jack.STATIC or kind == Jack.FIELD:
-            self.classes[self.current_class + '.' + name] = {'type': type, 'kind': kind}
+        # returns index of symbol
+        if kind == Jack.CLASS or kind == Jack.SUBROUTINE:
+            return  # these aren't recorded in the SymbolTable
+        elif kind == Jack.STATIC or kind == Jack.FIELD:
+            self.class_symbols.append({'name': name, 'token_type': token_type, 'kind': kind})
+            return len(self.class_symbols) - 1
         elif kind == Jack.ARG or kind == Jack.VAR:
-            self.subroutines[name] = {'type': type, 'kind': kind}
+            self.subroutine_symbols.append({'name': name, 'token_type': token_type, 'kind': kind})
+            return len(self.class_symbols + self.subroutine_symbols) - 1
         else:
-            sys.exit("Invalid identifier type")
+            sys.stderr.write("Invalid identifier kind: \"{}\"\n".format(kind))
+            traceback.print_stack()
+            sys.exit(5)
 
     def var_count(self, kind):
         #  Returns the number of variables of the given kind already defined in the current scope
@@ -681,16 +733,33 @@ class SymbolTable:
     def kind_of(self, name):
         # Returns the kind of the named identifier in the current scope.
         # If the identifier is unknown in the current scope, returns NONE
-        # STATIC, FIELD, ARG, VAR,NONE
-        return "STATIC"
+        # STATIC, FIELD, ARG, VAR, NONE
+        symbol = self.find_my_symbol(name)
+        if symbol != None:
+            return symbol['kind']
 
     def type_of(self, name):
-        # Returns the type of the named identifier in the current s cope
-        return "something"
+        # Returns the type of the named identifier in the current scope
+        symbol = self.find_my_symbol(name)
+        if symbol != None:
+            return symbol['token_type']
+
+    def find_my_symbol(self, name):
+        for symbol in self.subroutine_symbols:
+            if symbol['name'] == name:
+                return symbol
+        for symbol in self.class_symbols:
+            if symbol['name'] == name:
+                return symbol
 
     def index_of(self, name):
         # Returns the index assigned to the named identifier.
-        return 0
+        for i, symbol in enumerate(self.subroutine_symbols):
+            if symbol['name'] == name:
+                return i + len(self.class_symbols)
+        for i, symbol in enumerate(self.class_symbols):
+            if symbol['name'] == name:
+                return i
 
 
 class VMWriter:

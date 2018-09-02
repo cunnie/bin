@@ -1,4 +1,5 @@
 #!/usr/local/bin/python2.7
+import datetime
 import glob
 import os
 import re
@@ -220,49 +221,35 @@ class Token:
 # to whatever comes next
 class CompilationEngine:
 
-    def __init__(self, tokenizer, symbol_table, dest_vm, dest_xml):
+    def __init__(self, tokenizer, symbol_table, vm_writer, dest_vm, dest_xml):
         self.tokenizer = tokenizer
         self.symbol_table = symbol_table
+        self.vm_writer = vm_writer
         self.dest_vm = dest_vm
         self.dest_xml = dest_xml
         self.indent = ''
+        self.class_name = None
         self.tags = []
 
-    def emit(self, token, kind=None, token_type=None):
-        self.dest_vm.write(self.indent)
+    def emit(self, token):
         self.dest_xml.write(self.indent)
         if token is None:
             sys.exit('Unexpected null token!\n')
         elif token.type == Token.KEYWORD:
-            self.dest_vm.write("<keyword> " + token.keyword + " </keyword>\n")
             self.dest_xml.write("<keyword> " + token.keyword + " </keyword>\n")
         elif token.type == Token.SYMBOL:
-            self.dest_vm.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
             self.dest_xml.write("<symbol> " + escape_symbol(token.symbol) + " </symbol>\n")
         elif token.type == Token.IDENTIFIER:
-            if kind == None and token_type == None:  # Usage of identifier, not definition
-                kind = self.symbol_table.kind_of(token.identifier)
-                token_type = self.symbol_table.type_of(token.identifier)
-                index = self.symbol_table.index_of(token.identifier)
-            else:
-                index = self.symbol_table.define(token.identifier, token_type, kind)
-            kind_string = Jack.kind_of(kind)
-            self.dest_vm.write(
-                "<identifier kind={} token_type={} index={} > {} </identifier>\n".format(kind_string, token_type, index,
-                                                                                         token.identifier))
             self.dest_xml.write("<identifier> " + token.identifier + " </identifier>\n")
         elif token.type == Token.INT_CONST:
-            self.dest_vm.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
             self.dest_xml.write("<integerConstant> " + str(token.intVal) + " </integerConstant>\n")
         elif token.type == Token.STRING_CONST:
-            self.dest_vm.write("<stringConstant> " + token.stringVal + " </stringConstant>\n")
             self.dest_xml.write("<stringConstant> " + token.stringVal + " </stringConstant>\n")
         else:
             sys.exit('Unexpected token:' + str(token))
 
     # tag is typically "<class>" or something along those lines
     def push(self, tag):
-        self.dest_vm.write(self.indent + tag + '\n')
         self.dest_xml.write(self.indent + tag + '\n')
         self.indent += '  '
         self.tags.append(tag)
@@ -270,7 +257,6 @@ class CompilationEngine:
     def pop(self):
         tag = self.tags.pop()
         self.indent = self.indent[2:]
-        self.dest_vm.write(self.indent + tag.replace('<', '</') + '\n')
         self.dest_xml.write(self.indent + tag.replace('<', '</') + '\n')
 
     def compile_class(self):
@@ -280,20 +266,21 @@ class CompilationEngine:
 
         if token.type != Token.IDENTIFIER:
             unexpected_token(token)
-        self.emit(token, kind=Jack.CLASS, token_type=token.identifier)
+        self.emit(token)
+        self.class_name = token.identifier
         token = self.tokenizer.advance()
         if token.type != Token.SYMBOL or token.symbol != '{':
             unexpected_token(token)
         self.emit(token)
 
         token = self.tokenizer.advance()
-        while not (token.type == token.SYMBOL and token.symbol == '}'):
-            if token.type == token.KEYWORD:
-                if token.keyword == token.STATIC or token.keyword == token.FIELD:
+        while not (token.type == Token.SYMBOL and token.symbol == '}'):
+            if token.type == Token.KEYWORD:
+                if token.keyword == Token.STATIC or token.keyword == Token.FIELD:
                     self.compile_class_var_dec()
-                elif token.keyword == token.CONSTRUCTOR or \
-                        token.keyword == token.FUNCTION or \
-                        token.keyword == token.METHOD:
+                elif token.keyword == Token.CONSTRUCTOR or \
+                        token.keyword == Token.FUNCTION or \
+                        token.keyword == Token.METHOD:
                     self.compile_subroutine()
                 else:
                     unexpected_token(token)
@@ -307,27 +294,39 @@ class CompilationEngine:
         self.push('<classVarDec>')
         token = self.tokenizer.token
         self.emit(token)
+        token_kind = token.keyword
+        token_type = None  # placate linter
         token = self.tokenizer.advance()
-        if token.type == token.KEYWORD and (
-                (token.keyword == token.INT) or
-                (token.keyword == token.CHAR) or
-                (token.keyword == token.BOOLEAN)):
+        if token.type == Token.KEYWORD and (
+                (token.keyword == Token.INT) or
+                (token.keyword == Token.CHAR) or
+                (token.keyword == Token.BOOLEAN)):
             self.emit(token)
-        elif token.type == token.IDENTIFIER:
+            token_type = token.keyword
+        elif token.type == Token.IDENTIFIER:
             self.emit(token)
+            token_type = token.identifier
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
-        if token.type == token.IDENTIFIER:
+        if token.type == Token.IDENTIFIER:
             self.emit(token)
+            self.symbol_table.define(
+                name=token.identifier,
+                kind=token_kind,
+                token_type=token_type)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
         while token.type == Token.SYMBOL and token.symbol == ",":
             self.emit(token)
             token = self.tokenizer.advance()
-            if token.type == token.IDENTIFIER:
+            if token.type == Token.IDENTIFIER:
                 self.emit(token)
+                self.symbol_table.define(
+                    name=token.identifier,
+                    kind=token_kind,
+                    token_type=token_type)
                 token = self.tokenizer.advance()
             else:
                 unexpected_token(token)
@@ -342,36 +341,41 @@ class CompilationEngine:
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
         self.symbol_table.start_subroutine()
-        if token.type == token.KEYWORD and (
-                (token.keyword == token.VOID) or
-                (token.keyword == token.INT) or
-                (token.keyword == token.CHAR) or
-                (token.keyword == token.BOOLEAN)):
+        if token.type == Token.KEYWORD and (
+                (token.keyword == Token.VOID) or
+                (token.keyword == Token.INT) or
+                (token.keyword == Token.CHAR) or
+                (token.keyword == Token.BOOLEAN)):
             self.emit(token)
-        elif token.type == token.IDENTIFIER:
-            self.emit(token, kind=Jack.CLASS, token_type=token.identifier)
+        elif token.type == Token.IDENTIFIER:
+            self.emit(token)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
-        if token.type == token.IDENTIFIER:
-            self.emit(token, kind=Jack.SUBROUTINE, token_type=token.identifier)
+        if token.type == Token.IDENTIFIER:
+            self.emit(token)
         else:
             unexpected_token(token)
+        function_name = token.identifier
         token = self.tokenizer.advance()
-        if token.type == token.SYMBOL and token.symbol == '(':
+        if token.type == Token.SYMBOL and token.symbol == '(':
             self.emit(token)
         else:
             unexpected_token(token)
         self.tokenizer.advance()
         self.compile_parameter_list()
         token = self.tokenizer.token  # token has advanced!
-        if token.type == token.SYMBOL and token.symbol == ')':
+        if token.type == Token.SYMBOL and token.symbol == ')':
             self.emit(token)
         else:
             unexpected_token(token)
+        self.vm_writer.write_function(
+            self.class_name + '.' + function_name,
+            self.symbol_table.var_count(Jack.VAR)
+        )
         token = self.tokenizer.advance()
         # subroutine body
-        if token.type == token.SYMBOL and token.symbol == '{':
+        if token.type == Token.SYMBOL and token.symbol == '{':
             self.compile_subroutine_body()
             _ = self.tokenizer.token  # token has advanced!
         else:
@@ -395,41 +399,50 @@ class CompilationEngine:
         self.push("<parameterList>")
         token = self.tokenizer.token
         token_type = None  # placate linter
-        if not (token.type == token.SYMBOL and token.symbol == ')'):
-            if token.type == token.KEYWORD and (
-                    (token.keyword == token.INT) or
-                    (token.keyword == token.CHAR) or
-                    (token.keyword == token.BOOLEAN)):
+        if not (token.type == Token.SYMBOL and token.symbol == ')'):
+            if token.type == Token.KEYWORD and (
+                    (token.keyword == Token.INT) or
+                    (token.keyword == Token.CHAR) or
+                    (token.keyword == Token.BOOLEAN)):
                 self.emit(token)
                 token_type = token.keyword
-            elif token.type == token.IDENTIFIER:
+            elif token.type == Token.IDENTIFIER:
                 token_type = token.identifier
-                self.emit(token, kind=Jack.CLASS, token_type=token_type)
+                self.emit(token)
             else:
                 unexpected_token(token)
+            self.symbol_table.define(
+                name=token.identifier,
+                kind=Jack.ARG,
+                token_type=token_type)
             token = self.tokenizer.advance()
-            if token.type == token.IDENTIFIER:
-                self.emit(token, kind=Jack.ARG, token_type=token_type)
+            if token.type == Token.IDENTIFIER:
+                self.symbol_table.define(token, kind=Jack.ARG, token_type=token_type)
+                self.emit(token)
             else:
                 unexpected_token(token)
             token = self.tokenizer.advance()
             while token.type == Token.SYMBOL and token.symbol == ",":
                 self.emit(token)
                 token = self.tokenizer.advance()
-                if token.type == token.KEYWORD and (
-                        (token.keyword == token.INT) or
-                        (token.keyword == token.CHAR) or
-                        (token.keyword == token.BOOLEAN)):
+                if token.type == Token.KEYWORD and (
+                        (token.keyword == Token.INT) or
+                        (token.keyword == Token.CHAR) or
+                        (token.keyword == Token.BOOLEAN)):
                     self.emit(token)
                     token_type = token.keyword
-                elif token.type == token.IDENTIFIER:
+                elif token.type == Token.IDENTIFIER:
                     token_type = token.identifier
-                    self.emit(token, kind=Jack.CLASS, token_type=token_type)
+                    self.emit(token)
                 else:
                     unexpected_token(token)
                 token = self.tokenizer.advance()
-                if token.type == token.IDENTIFIER:
-                    self.emit(token, kind=Jack.ARG, token_type=token_type)
+                if token.type == Token.IDENTIFIER:
+                    self.emit(token)
+                    self.symbol_table.define(
+                        name=token.identifier,
+                        kind=Jack.ARG,
+                        token_type=token_type)
                 else:
                     unexpected_token(token)
                 token = self.tokenizer.advance()
@@ -445,29 +458,37 @@ class CompilationEngine:
         token_kind = Jack.VAR
         token_type = None  # placate linter
         token = self.tokenizer.advance()
-        if token.type == token.KEYWORD and (
-                (token.keyword == token.INT) or
-                (token.keyword == token.CHAR) or
-                (token.keyword == token.BOOLEAN)):
+        if token.type == Token.KEYWORD and (
+                (token.keyword == Token.INT) or
+                (token.keyword == Token.CHAR) or
+                (token.keyword == Token.BOOLEAN)):
             self.emit(token)
             token_type = token.keyword
-        elif token.type == token.IDENTIFIER:
+        elif token.type == Token.IDENTIFIER:
             # if we're not a builtin type, then we're a class type
             token_type = token.identifier
-            self.emit(token, kind=Jack.CLASS, token_type=token_type)
+            self.emit(token)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
-        if token.type == token.IDENTIFIER:
-            self.emit(token, kind=token_kind, token_type=token_type)
+        if token.type == Token.IDENTIFIER:
+            self.emit(token)
+            self.symbol_table.define(
+                name=token.identifier,
+                kind=token_kind,
+                token_type=token_type)
         else:
             unexpected_token(token)
         token = self.tokenizer.advance()
         while token.type == Token.SYMBOL and token.symbol == ",":
             self.emit(token)
             token = self.tokenizer.advance()
-            if token.type == token.IDENTIFIER:
-                self.emit(token, kind=token_kind, token_type=token_type)
+            if token.type == Token.IDENTIFIER:
+                self.emit(token)
+                self.symbol_table.define(
+                    name=token.identifier,
+                    kind=token_kind,
+                    token_type=token_type)
                 token = self.tokenizer.advance()
             else:
                 unexpected_token(token)
@@ -708,7 +729,7 @@ class SymbolTable:
         # Starts a new subroutine scope (i.e., resets the subroutine's symbol table)
         self.subroutine_symbols = []
 
-    def define(self, name, token_type, kind):
+    def define(self, name, kind, token_type):
         # Defines a new identifier of a given name, token_type, and kind
         # and assigns it a running index. STATIC and FIELD identifiers
         # have a class scope, while ARG and VAR identifiers have a subroutine scope
@@ -728,20 +749,23 @@ class SymbolTable:
 
     def var_count(self, kind):
         #  Returns the number of variables of the given kind already defined in the current scope
-        return 0
+        return len(list(filter(
+            lambda x: x['kind'] == kind,
+            (self.class_symbols + self.subroutine_symbols)
+        )))
 
     def kind_of(self, name):
         # Returns the kind of the named identifier in the current scope.
         # If the identifier is unknown in the current scope, returns NONE
         # STATIC, FIELD, ARG, VAR, NONE
         symbol = self.find_my_symbol(name)
-        if symbol != None:
+        if symbol is not None:
             return symbol['kind']
 
     def type_of(self, name):
         # Returns the type of the named identifier in the current scope
         symbol = self.find_my_symbol(name)
-        if symbol != None:
+        if symbol is not None:
             return symbol['token_type']
 
     def find_my_symbol(self, name):
@@ -753,59 +777,65 @@ class SymbolTable:
                 return symbol
 
     def index_of(self, name):
-        # Returns the index assigned to the named identifier.
-        for i, symbol in enumerate(self.subroutine_symbols):
-            if symbol['name'] == name:
-                return i + len(self.class_symbols)
-        for i, symbol in enumerate(self.class_symbols):
+        kind = self.kind_of(name)
+        kind_list = list(filter(
+            lambda x: x['kind'] == kind,
+            (self.class_symbols + self.subroutine_symbols)
+        ))
+        for i, symbol in enumerate(kind_list):
             if symbol['name'] == name:
                 return i
 
 
 class VMWriter:
-    def __init__(self):
+    def __init__(self, dest):
+        self.dest = dest
         pass
 
     def write_push(self, segment, index):
         # Writes a VM push command
         # Segment (CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP)
         # Index (int)
-        pass
+        self.dest.write("push {} {}\n".format(segment, index))
 
     def write_pop(self, segment, index):
         # Writes a VM pop command
         # Segment (CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP)
         # Index (int)
-        pass
+        self.dest.write("pop {} {}\n".format(segment, index))
 
     def write_arithmetic(self, command):
         # Writes a VM arithmetic command
         # command (ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT
-        pass
+        self.dest.write("{}\n".format(command))
 
     def write_label(self, label):
         # Writes a VM `label` command
-        pass
+        self.dest.write("label {}\n".format(label))
 
     def write_goto(self, label):
         # Writes a VM `goto` command
-        pass
+        self.dest.write("goto {}\n".format(label))
+
+    def write_if(self, label):
+        # Writes a VM `If-goto` command
+        self.dest.write("if-goto {}\n".format(label))
 
     def write_call(self, name, n_args):
         # Writes a VM `call` command
-        pass
+        self.dest.write("call {} {}\n".format(name, str(n_args)))
 
     def write_function(self, name, n_locals):
         # Writes a VM `function` command
-        pass
+        self.dest.write("function {} {}\n".format(name, str(n_locals)))
 
     def write_return(self):
         # Writes a VM `return` command
-        pass
+        self.dest.write("return\n")
 
     def close(self):
         # Closes the output file
-        pass
+        self.dest.close()
 
 
 class JackCompiler:
@@ -815,8 +845,12 @@ class JackCompiler:
         self.dest_xml = dest_xml
         self.tokenizer = JackTokenizer(source)
         self.symbol_table = SymbolTable()
-        self.vm_writer = VMWriter()
-        self.compilation_engine = CompilationEngine(self.tokenizer, self.symbol_table, dest_vm, dest_xml)
+        self.vm_writer = VMWriter(dest_vm)
+        self.compilation_engine = CompilationEngine(tokenizer=self.tokenizer,
+                                                    symbol_table=self.symbol_table,
+                                                    vm_writer=self.vm_writer,
+                                                    dest_vm=dest_vm,
+                                                    dest_xml=dest_xml)
 
         token = self.tokenizer.token
         if token is not None:  # first token should always be None
@@ -858,6 +892,11 @@ def jack_source_filenames():
     return source_filenames
 
 
+def banner():
+    return "// Brian Cunnie's output for Nand to Tetris\n" + \
+           datetime.datetime.now().strftime("// Compiled: %Y-%m-%d %H:%M\n\n")
+
+
 # main
 def main():
     cmd_name = sys.argv[0].split('/')[-1]
@@ -876,6 +915,7 @@ def main():
         dest_vm_filename = source_filename.replace('.jack', '.vm')
         try:
             dest_vm = open(dest_vm_filename, "w")
+            dest_vm.write(banner())
         except IOError as e:
             sys.exit(cmd_name + " error. I couldn't open " + str(source_filename) + " for reading: " + e.strerror)
         sys.stderr.write(cmd_name + ": opened " + dest_vm_filename + " for writing.\n")

@@ -229,6 +229,7 @@ class CompilationEngine:
         self.dest_xml = dest_xml
         self.indent = ''
         self.class_name = None
+        self.function_name = None
         self.tags = []
 
     def emit(self, token):
@@ -385,10 +386,6 @@ class CompilationEngine:
         while not (token.type == Token.SYMBOL and token.symbol == '}'):
             if token.type == Token.KEYWORD and token.keyword == Token.VAR:
                 self.compile_var_dec()
-                self.vm_writer.write_function(
-                    self.class_name + '.' + self.function_name,
-                    self.symbol_table.var_count(Jack.VAR)
-                )
             else:
                 self.vm_writer.write_function(
                     self.class_name + '.' + self.function_name,
@@ -415,13 +412,12 @@ class CompilationEngine:
                 self.emit(token)
             else:
                 unexpected_token(token)
-            self.symbol_table.define(
-                name=token.identifier,
-                kind=Jack.ARG,
-                token_type=token_type)
             token = self.tokenizer.advance()
             if token.type == Token.IDENTIFIER:
-                self.symbol_table.define(token, kind=Jack.ARG, token_type=token_type)
+                self.symbol_table.define(
+                    name=token.identifier,
+                    kind=Jack.ARG,
+                    token_type=token_type)
                 self.emit(token)
             else:
                 unexpected_token(token)
@@ -532,6 +528,7 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         if token.type == Token.SYMBOL and token.symbol == '[':
+            # FIXME I'll need to do arrays at some point
             token = self.paren_expression_paren(left='[', right=']')
         if token.type == Token.SYMBOL and token.symbol == '=':
             self.emit(token)
@@ -645,17 +642,21 @@ class CompilationEngine:
             _ = self.tokenizer.advance()
         elif token.type == Token.IDENTIFIER:
             self.emit(token)
-            call_name = token.identifier
+            call_or_variable_name = token.identifier
             token = self.tokenizer.advance()
             # Is this a subroutine_call? Yes if the next token
             # is '(' or '.'
-            if token.type == Token.SYMBOL:
-                if token.symbol == '(' or token.symbol == '.':
-                    self.subroutine_call(call_name)
-                elif token.symbol == '[':
-                    _ = self.paren_expression_paren(left='[', right=']')
-                else:
-                    pass
+            if token.type == Token.SYMBOL and \
+                    (token.symbol == '(' or token.symbol == '.'):
+                self.subroutine_call(call_or_variable_name)
+            elif token.type == Token.SYMBOL and token.symbol == '[':
+                # FIXME deal with arrays
+                _ = self.paren_expression_paren(left='[', right=']')
+            else:  # it's a variable -- push it!
+                s = self.symbol_table
+                self.vm_writer.write_push(
+                    s.kind_to_segment(s.kind_of(call_or_variable_name)),
+                    s.index_of(call_or_variable_name))
         elif token.type == Token.SYMBOL and token.symbol == '(':
             _ = self.paren_expression_paren()
         elif token.type == Token.SYMBOL and token.symbol == '-':
@@ -780,7 +781,8 @@ class SymbolTable:
         rc += ']\n'
         return rc
 
-    def kind_to_segment(self, kind):
+    @staticmethod
+    def kind_to_segment(kind):
         if kind is not None:
             return {
                 Jack.STATIC: 'static',
@@ -798,6 +800,8 @@ class SymbolTable:
         # and assigns it a running index. STATIC and FIELD identifiers
         # have a class scope, while ARG and VAR identifiers have a subroutine scope
         # returns index of symbol
+        if name is None:
+            traceback.print_stack()
         if kind == Jack.CLASS or kind == Jack.SUBROUTINE:
             return  # these aren't recorded in the SymbolTable
         elif kind == Jack.STATIC or kind == Jack.FIELD:

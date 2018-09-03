@@ -711,6 +711,7 @@ class CompilationEngine:
     def subroutine_call(self, call_name):
         # the subroutine (identifier) has already been emitted; the current token is either '(' or '.'
         token = self.tokenizer.token
+        n_args = 0
         if token.symbol == '(':
             pass
         elif token.symbol == '.':
@@ -719,15 +720,42 @@ class CompilationEngine:
             if token.type != Token.IDENTIFIER:
                 unexpected_token(token)
             self.emit(token)
-            # if we're here, we're calling a function in another class
-            # e.g. `Output.printInt()`
-            call_name = call_name + '.' + token.identifier
+            if self.is_method(object_or_class=call_name):
+                s = self.symbol_table
+                # we need to push the first argument, myself
+                # e.g. 'game'
+                self.vm_writer.write_push(
+                    s.kind_to_segment(s.kind_of(call_name)),
+                    s.index_of(call_name))
+                # we're calling a method, not a function, so we need
+                # to get the class name from the symbol table
+                # e.g. SquareGame.run
+                call_name = s.type_of(call_name) + '.' + token.identifier
+                # ...and also we need to increment the number of args
+                # to account for the implied object arg (first one)
+                n_args = 1
+            else:
+                # if we're here, we're calling a function in another class
+                # e.g. `Output.printInt()`
+                call_name = call_name + '.' + token.identifier
             _ = self.tokenizer.advance()
         else:
             unexpected_token(token)
-        n_args = self.paren_expression_list_paren()
+        n_args += self.paren_expression_list_paren()
         self.vm_writer.write_call(call_name, n_args)
         return self.tokenizer.token
+
+    # Are we a method or a function? This determines how we call
+    # it (methods are called with an extra, "invisible" variable
+    # which is the object). If the "call" name is in the
+    # symbol table (e.g 'game'), then it's a method, otherwise the "call"
+    # name is a class (e.g. 'SquareGame'), and classes aren't in the symbol table
+    def is_method(self, object_or_class):
+        if self.symbol_table.index_of(object_or_class) is not None:
+            # it's an object, not a classname, so it's a method
+            return True
+        else:
+            return False
 
     def paren_expression_list_paren(self):
         # the current token is '(' and hasn't been emitted

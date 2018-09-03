@@ -232,6 +232,7 @@ class CompilationEngine:
         self.function_name = None
         self.tags = []
         self.while_exp = 0
+        self.if_true = 0
 
     def emit(self, token):
         self.dest_xml.write(self.indent)
@@ -339,6 +340,10 @@ class CompilationEngine:
         self.pop()
 
     def compile_subroutine(self):
+        # reset the loop counters, not important, but makes
+        # this compiler's output match the canonical's
+        self.if_true = 0
+        self.while_exp = 0
         self.push('<subroutineDec>')
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
@@ -548,29 +553,40 @@ class CompilationEngine:
 
     def compile_if(self):
         self.push("<ifStatement>")
+        # store our index & increment index for next while
+        iter = self.if_true
+        self.if_true += 1
         self.emit(self.tokenizer.token)
         _ = self.tokenizer.advance()
         _ = self.paren_expression_paren()
+        self.vm_writer.write_if('IF_TRUE{}'.format(iter))
+        self.vm_writer.write_goto('IF_FALSE{}'.format(iter))
+        self.vm_writer.write_label('IF_TRUE{}'.format(iter))
         token = self.brace_statements_brace()
+        self.vm_writer.write_goto('IF_END{}'.format(iter))
+        self.vm_writer.write_label('IF_FALSE{}'.format(iter))
         if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
             self.emit(token)
             _ = self.tokenizer.advance()
             _ = self.brace_statements_brace()
+        self.vm_writer.write_label('IF_END{}'.format(iter))
         self.pop()
         return self.tokenizer.token
 
     def compile_while(self):
         self.push("<whileStatement>")
-        self.vm_writer.write_label('WHILE_EXP{}'.format(self.while_exp))
+        # store our index & increment index for next while
+        iter = self.while_exp
+        self.while_exp += 1
+        self.vm_writer.write_label('WHILE_EXP{}'.format(iter))
         self.emit(self.tokenizer.token)  # while
         _ = self.tokenizer.advance()
         _ = self.paren_expression_paren()
         self.vm_writer.write_arithmetic('not')
-        self.vm_writer.write_if('WHILE_END{}'.format(self.while_exp))
+        self.vm_writer.write_if('WHILE_END{}'.format(iter))
         _ = self.brace_statements_brace()
-        self.vm_writer.write_goto('WHILE_EXP{}'.format(self.while_exp))
-        self.vm_writer.write_label('WHILE_END{}'.format(self.while_exp))
-        self.while_exp += 1
+        self.vm_writer.write_goto('WHILE_EXP{}'.format(iter))
+        self.vm_writer.write_label('WHILE_END{}'.format(iter))
         self.pop()
         return self.tokenizer.token
 
@@ -598,12 +614,13 @@ class CompilationEngine:
         token = self.tokenizer.advance()
         if not (token.type == Token.SYMBOL and token.symbol == ';'):
             token = self.compile_expression()
+        else:
+            # if we're doing a bare return, return 0
+            self.vm_writer.write_push('constant', 0)
         if token.type == Token.SYMBOL and token.symbol == ';':
             self.emit(token)
         else:
             unexpected_token(token)
-        # FIXME: why are we doing the pop-push before we return?
-        self.vm_writer.write_push('constant', 0)
         self.vm_writer.write_return()
         self.pop()
         return self.tokenizer.advance()
@@ -805,7 +822,7 @@ class SymbolTable:
             return {
                 Jack.STATIC: 'static',
                 Jack.FIELD: 'field',
-                Jack.ARG: 'arg',
+                Jack.ARG: 'argument',
                 Jack.VAR: 'local',
             }[kind]
 

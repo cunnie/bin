@@ -638,6 +638,17 @@ class CompilationEngine:
             self.vm_writer.write_push("constant", token.stringVal)
             _ = self.tokenizer.advance()
         elif token.type == Token.KEYWORD and token.keyword in Jack.keywordConstant:
+            if token.keyword == 'true':
+                self.vm_writer.write_push("constant", 0)
+                # p 235 says to use 'neg' but their compiler uses 'not'
+                self.vm_writer.write_arithmetic('not')
+            elif token.keyword == 'null' or token.keyword == 'false':
+                self.vm_writer.write_push("constant", 0)
+            elif token.keyword == 'this':
+                traceback.print_stack()
+                sys.exit(5)
+            else:
+                unexpected_token(token)
             self.emit(token)
             _ = self.tokenizer.advance()
         elif token.type == Token.IDENTIFIER:

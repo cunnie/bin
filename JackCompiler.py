@@ -599,9 +599,22 @@ class CompilationEngine:
         self.compile_term()
         token = self.tokenizer.token
         while token.type == Token.SYMBOL and token.symbol in Jack.ops:
+            op = token.symbol
             self.emit(token)
             _ = self.tokenizer.advance()
             self.compile_term()
+            self.vm_writer.write_arithmetic(
+                {
+                    '+': 'add',
+                    '-': 'sub',
+                    '*': 'call Math.multiply 2',
+                    '/': 'call Math.divide 2',
+                    '&': 'and',
+                    '|': 'or',
+                    '<': 'lt',
+                    '>': 'gt',
+                    '=': 'eq',
+                }[op])
             token = self.tokenizer.token  # token has advanced
         self.pop()
         return self.tokenizer.token
@@ -622,22 +635,29 @@ class CompilationEngine:
             _ = self.tokenizer.advance()
         elif token.type == Token.IDENTIFIER:
             self.emit(token)
+            call_name = token.identifier
             token = self.tokenizer.advance()
             # Is this a subroutine_call? Yes if the next token
             # is '(' or '.'
             if token.type == Token.SYMBOL:
                 if token.symbol == '(' or token.symbol == '.':
-                    self.subroutine_call()
+                    self.subroutine_call(call_name)
                 elif token.symbol == '[':
                     _ = self.paren_expression_paren(left='[', right=']')
                 else:
                     pass
         elif token.type == Token.SYMBOL and token.symbol == '(':
             _ = self.paren_expression_paren()
-        elif token.type == Token.SYMBOL and token.symbol in Jack.unaryOp:
+        elif token.type == Token.SYMBOL and token.symbol == '-':
             self.emit(token)
             _ = self.tokenizer.advance()
             self.compile_term()
+            self.vm_writer.write_arithmetic('neg')
+        elif token.type == Token.SYMBOL and token.symbol == '~':
+            self.emit(token)
+            _ = self.tokenizer.advance()
+            self.compile_term()
+            self.vm_writer.write_arithmetic('not')
         else:
             unexpected_token(token)
         self.pop()

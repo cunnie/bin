@@ -9,3 +9,4 @@
 " set shiftwidth=2
 let g:neocomplete#enable_at_startup = 0   " disable neocomplete
 let g:neocomplcache_enable_at_startup = 0 " disable the fallback version when no LUA
+syntax on

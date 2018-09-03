@@ -356,7 +356,7 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
-        function_name = token.identifier
+        self.function_name = token.identifier
         token = self.tokenizer.advance()
         if token.type == Token.SYMBOL and token.symbol == '(':
             self.emit(token)
@@ -369,10 +369,6 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
-        self.vm_writer.write_function(
-            self.class_name + '.' + function_name,
-            self.symbol_table.var_count(Jack.VAR)
-        )
         token = self.tokenizer.advance()
         # subroutine body
         if token.type == Token.SYMBOL and token.symbol == '{':
@@ -389,7 +385,15 @@ class CompilationEngine:
         while not (token.type == Token.SYMBOL and token.symbol == '}'):
             if token.type == Token.KEYWORD and token.keyword == Token.VAR:
                 self.compile_var_dec()
+                self.vm_writer.write_function(
+                    self.class_name + '.' + self.function_name,
+                    self.symbol_table.var_count(Jack.VAR)
+                )
             else:
+                self.vm_writer.write_function(
+                    self.class_name + '.' + self.function_name,
+                    self.symbol_table.var_count(Jack.VAR)
+                )
                 self.compile_statements()
             token = self.tokenizer.token  # token has advanced!
         self.emit(token)
@@ -520,10 +524,10 @@ class CompilationEngine:
         self.push("<letStatement>")
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
+        lhs = None  # placate linter
         if token.type == Token.IDENTIFIER:
-            idx = self.symbol_table.index_of(token.identifier)
-            s = self.symbol_table
             self.emit(token)
+            lhs = token.identifier  # lhs = left-hand side = assignee
             token = self.tokenizer.advance()
         else:
             unexpected_token(token)
@@ -539,6 +543,8 @@ class CompilationEngine:
         if not (token.type == Token.SYMBOL and token.symbol == ';'):
             unexpected_token(token)
         self.emit(token)
+        s = self.symbol_table
+        self.vm_writer.write_pop(s.kind_to_segment(s.kind_of(lhs)), s.index_of(lhs))
         self.pop()
         return self.tokenizer.advance()
 
@@ -575,6 +581,7 @@ class CompilationEngine:
         call_name = token.identifier
         _ = self.tokenizer.advance()
         token = self.subroutine_call(call_name)
+        self.vm_writer.write_pop('temp', 0)  # pop return value to Never Never Land
         if not (token.type == Token.SYMBOL and token.symbol == ';'):
             unexpected_token(token)
         self.emit(token)
@@ -592,7 +599,6 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         # FIXME: why are we doing the pop-push before we return?
-        self.vm_writer.write_pop('temp', 0)
         self.vm_writer.write_push('constant', 0)
         self.vm_writer.write_return()
         self.pop()
@@ -763,6 +769,26 @@ class SymbolTable:
         self.subroutine_symbols = []
         self.current_class = None
 
+    def __repr__(self):
+        rc = '[\n'
+        for symbol in self.class_symbols:
+            rc += '  {{ name: "{}", token_type: {}, kind: {} }},\n'.format(
+                symbol['name'], symbol['token_type'], symbol['kind'])
+        for symbol in self.subroutine_symbols:
+            rc += '  {{ name: {}, token_type: {}, kind: {} }},\n'.format(
+                symbol['name'], symbol['token_type'], symbol['kind'])
+        rc += ']\n'
+        return rc
+
+    def kind_to_segment(self, kind):
+        if kind is not None:
+            return {
+                Jack.STATIC: 'static',
+                Jack.FIELD: 'field',
+                Jack.ARG: 'arg',
+                Jack.VAR: 'local',
+            }[kind]
+
     def start_subroutine(self):
         # Starts a new subroutine scope (i.e., resets the subroutine's symbol table)
         self.subroutine_symbols = []
@@ -828,6 +854,7 @@ class SymbolTable:
 class VMWriter:
     def __init__(self, dest):
         self.dest = dest
+        self.functions = []
         pass
 
     def write_push(self, segment, index):
@@ -865,7 +892,9 @@ class VMWriter:
 
     def write_function(self, name, n_locals):
         # Writes a VM `function` command
-        self.dest.write("function {} {}\n".format(name, str(n_locals)))
+        if name not in self.functions:
+            self.functions.append(name)
+            self.dest.write("function {} {}\n".format(name, str(n_locals)))
 
     def write_return(self):
         # Writes a VM `return` command

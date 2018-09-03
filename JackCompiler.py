@@ -591,6 +591,10 @@ class CompilationEngine:
             self.emit(token)
         else:
             unexpected_token(token)
+        # FIXME: why are we doing the pop-push before we return?
+        self.vm_writer.write_pop('temp', 0)
+        self.vm_writer.write_push('constant', 0)
+        self.vm_writer.write_return()
         self.pop()
         return self.tokenizer.advance()
 

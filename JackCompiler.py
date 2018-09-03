@@ -231,6 +231,7 @@ class CompilationEngine:
         self.class_name = None
         self.function_name = None
         self.tags = []
+        self.while_exp = 0
 
     def emit(self, token):
         self.dest_xml.write(self.indent)
@@ -560,10 +561,16 @@ class CompilationEngine:
 
     def compile_while(self):
         self.push("<whileStatement>")
+        self.vm_writer.write_label('WHILE_EXP{}'.format(self.while_exp))
         self.emit(self.tokenizer.token)  # while
         _ = self.tokenizer.advance()
         _ = self.paren_expression_paren()
+        self.vm_writer.write_arithmetic('not')
+        self.vm_writer.write_if('WHILE_END{}'.format(self.while_exp))
         _ = self.brace_statements_brace()
+        self.vm_writer.write_goto('WHILE_EXP{}'.format(self.while_exp))
+        self.vm_writer.write_label('WHILE_END{}'.format(self.while_exp))
+        self.while_exp += 1
         self.pop()
         return self.tokenizer.token
 

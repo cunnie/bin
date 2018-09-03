@@ -554,39 +554,39 @@ class CompilationEngine:
     def compile_if(self):
         self.push("<ifStatement>")
         # store our index & increment index for next while
-        iter = self.if_true
+        i = self.if_true
         self.if_true += 1
         self.emit(self.tokenizer.token)
         _ = self.tokenizer.advance()
         _ = self.paren_expression_paren()
-        self.vm_writer.write_if('IF_TRUE{}'.format(iter))
-        self.vm_writer.write_goto('IF_FALSE{}'.format(iter))
-        self.vm_writer.write_label('IF_TRUE{}'.format(iter))
+        self.vm_writer.write_if('IF_TRUE{}'.format(i))
+        self.vm_writer.write_goto('IF_FALSE{}'.format(i))
+        self.vm_writer.write_label('IF_TRUE{}'.format(i))
         token = self.brace_statements_brace()
-        self.vm_writer.write_goto('IF_END{}'.format(iter))
-        self.vm_writer.write_label('IF_FALSE{}'.format(iter))
+        self.vm_writer.write_goto('IF_END{}'.format(i))
+        self.vm_writer.write_label('IF_FALSE{}'.format(i))
         if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
             self.emit(token)
             _ = self.tokenizer.advance()
             _ = self.brace_statements_brace()
-        self.vm_writer.write_label('IF_END{}'.format(iter))
+        self.vm_writer.write_label('IF_END{}'.format(i))
         self.pop()
         return self.tokenizer.token
 
     def compile_while(self):
         self.push("<whileStatement>")
         # store our index & increment index for next while
-        iter = self.while_exp
+        i = self.while_exp
         self.while_exp += 1
-        self.vm_writer.write_label('WHILE_EXP{}'.format(iter))
+        self.vm_writer.write_label('WHILE_EXP{}'.format(i))
         self.emit(self.tokenizer.token)  # while
         _ = self.tokenizer.advance()
         _ = self.paren_expression_paren()
         self.vm_writer.write_arithmetic('not')
-        self.vm_writer.write_if('WHILE_END{}'.format(iter))
+        self.vm_writer.write_if('WHILE_END{}'.format(i))
         _ = self.brace_statements_brace()
-        self.vm_writer.write_goto('WHILE_EXP{}'.format(iter))
-        self.vm_writer.write_label('WHILE_END{}'.format(iter))
+        self.vm_writer.write_goto('WHILE_EXP{}'.format(i))
+        self.vm_writer.write_label('WHILE_END{}'.format(i))
         self.pop()
         return self.tokenizer.token
 

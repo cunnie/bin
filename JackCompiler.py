@@ -26,7 +26,7 @@ class Jack:
     keywordConstant = 'true', 'false', 'null', 'this'
 
     # Identifier "kinds" for SymbolTable
-    # The following 3 must NOT be recorded in the SymbolTable
+    # The following 2 must NOT be recorded in the SymbolTable
     CLASS = 17
     SUBROUTINE = 18
     # The following 4 must be recorded in the SymbolTable
@@ -233,6 +233,7 @@ class CompilationEngine:
         self.tags = []
         self.while_exp = 0
         self.if_true = 0
+        self.subroutine_type = ''  # ( 'constructor' | 'function' | 'method' )
 
     def emit(self, token):
         self.dest_xml.write(self.indent)
@@ -284,6 +285,7 @@ class CompilationEngine:
                 elif token.keyword == Token.CONSTRUCTOR or \
                         token.keyword == Token.FUNCTION or \
                         token.keyword == Token.METHOD:
+                    self.subroutine_type = token.keyword
                     self.compile_subroutine()
                 else:
                     unexpected_token(token)
@@ -297,8 +299,14 @@ class CompilationEngine:
         self.push('<classVarDec>')
         token = self.tokenizer.token
         self.emit(token)
-        token_kind = token.keyword
+        token_kind = None  # placate_linter
         token_type = None  # placate linter
+        if token.type == Token.KEYWORD and token.keyword == Token.FIELD:
+            token_kind = Jack.FIELD
+        elif token.type == Token.KEYWORD and token.keyword == Token.STATIC:
+            token_kind = Jack.STATIC
+        else:
+            unexpected_token(token)
         token = self.tokenizer.advance()
         if token.type == Token.KEYWORD and (
                 (token.keyword == Token.INT) or
@@ -397,6 +405,14 @@ class CompilationEngine:
                     self.class_name + '.' + self.function_name,
                     self.symbol_table.var_count(Jack.VAR)
                 )
+                if self.subroutine_type == Token.CONSTRUCTOR:
+                    self.vm_writer.write_push('constant', self.symbol_table.var_count(Jack.FIELD))
+                    self.vm_writer.write_call('Memory.alloc', 1)
+                    self.vm_writer.write_pop('pointer', 0)
+                elif self.subroutine_type == Token.METHOD:
+                    # pop 'this'
+                    self.vm_writer.write_push('argument', 0)
+                    self.vm_writer.write_pop('pointer', 0)
                 self.compile_statements()
             token = self.tokenizer.token  # token has advanced!
         self.emit(token)
@@ -563,13 +579,13 @@ class CompilationEngine:
         self.vm_writer.write_goto('IF_FALSE{}'.format(i))
         self.vm_writer.write_label('IF_TRUE{}'.format(i))
         token = self.brace_statements_brace()
-        self.vm_writer.write_goto('IF_END{}'.format(i))
         self.vm_writer.write_label('IF_FALSE{}'.format(i))
         if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
             self.emit(token)
             _ = self.tokenizer.advance()
+            self.vm_writer.write_goto('IF_END{}'.format(i))
             _ = self.brace_statements_brace()
-        self.vm_writer.write_label('IF_END{}'.format(i))
+            self.vm_writer.write_label('IF_END{}'.format(i))
         self.pop()
         return self.tokenizer.token
 
@@ -669,8 +685,7 @@ class CompilationEngine:
             elif token.keyword == 'null' or token.keyword == 'false':
                 self.vm_writer.write_push("constant", 0)
             elif token.keyword == 'this':
-                traceback.print_stack()
-                sys.exit(5)
+                self.vm_writer.write_push("pointer", 0)
             else:
                 unexpected_token(token)
             self.emit(token)
@@ -713,7 +728,18 @@ class CompilationEngine:
         token = self.tokenizer.token
         n_args = 0
         if token.symbol == '(':
-            pass
+            # if it's a relative subroutine call (no '.', e.g. not 'Class.function'
+            # then we can assume it's a method call
+            # we need to push the first argument, myself (this), which is pointer 0
+            # e.g. 'game'
+            self.vm_writer.write_push('pointer', 0)
+            # we're calling a method, not a function, so we need
+            # to get the class name from the symbol table
+            # e.g. SquareGame.run
+            call_name = self.class_name + '.' + call_name
+            # ...and also we need to increment the number of args
+            # to account for the implied object arg (first one)
+            n_args = 1
         elif token.symbol == '.':
             self.emit(token)
             token = self.tokenizer.advance()
@@ -849,7 +875,7 @@ class SymbolTable:
         if kind is not None:
             return {
                 Jack.STATIC: 'static',
-                Jack.FIELD: 'field',
+                Jack.FIELD: 'this',
                 Jack.ARG: 'argument',
                 Jack.VAR: 'local',
             }[kind]
@@ -928,6 +954,9 @@ class VMWriter:
         # Writes a VM push command
         # Segment (CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP)
         # Index (int)
+        if segment is None or index is None:
+            traceback.print_stack()
+            sys.exit("Don't push None!")
         self.dest.write("push {} {}\n".format(segment, index))
 
     def write_pop(self, segment, index):

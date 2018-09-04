@@ -677,7 +677,7 @@ class CompilationEngine:
             _ = self.tokenizer.advance()
         elif token.type == Token.STRING_CONST:
             self.emit(token)
-            self.vm_writer.write_push("constant", token.stringVal)
+            self.write_string_val(token)
             _ = self.tokenizer.advance()
         elif token.type == Token.KEYWORD and token.keyword in Jack.keywordConstant:
             if token.keyword == 'true':
@@ -724,6 +724,14 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         self.pop()
+
+    def write_string_val(self, token):
+        string = token.stringVal
+        self.vm_writer.write_push("constant", len(string))
+        self.vm_writer.write_call('String.new', 1)
+        for i, _ in enumerate(string):
+            self.vm_writer.write_push("constant", ord(string[i]))
+            self.vm_writer.write_call('String.appendChar', 2)
 
     def subroutine_call(self, call_name):
         # the subroutine (identifier) has already been emitted; the current token is either '(' or '.'

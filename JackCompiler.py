@@ -579,13 +579,15 @@ class CompilationEngine:
         self.vm_writer.write_goto('IF_FALSE{}'.format(i))
         self.vm_writer.write_label('IF_TRUE{}'.format(i))
         token = self.brace_statements_brace()
-        self.vm_writer.write_label('IF_FALSE{}'.format(i))
         if token.type == Token.KEYWORD and token.keyword == Token.ELSE:
             self.emit(token)
             _ = self.tokenizer.advance()
             self.vm_writer.write_goto('IF_END{}'.format(i))
+            self.vm_writer.write_label('IF_FALSE{}'.format(i))
             _ = self.brace_statements_brace()
             self.vm_writer.write_label('IF_END{}'.format(i))
+        else:
+            self.vm_writer.write_label('IF_FALSE{}'.format(i))
         self.pop()
         return self.tokenizer.token
 

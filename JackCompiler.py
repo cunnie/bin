@@ -543,6 +543,7 @@ class CompilationEngine:
         self.emit(self.tokenizer.token)
         token = self.tokenizer.advance()
         lhs = None  # placate linter
+        i_am_an_array = False
         if token.type == Token.IDENTIFIER:
             self.emit(token)
             lhs = token.identifier  # lhs = left-hand side = assignee
@@ -550,8 +551,14 @@ class CompilationEngine:
         else:
             unexpected_token(token)
         if token.type == Token.SYMBOL and token.symbol == '[':
-            # FIXME I'll need to do arrays at some point
+            i_am_an_array = True
+            s = self.symbol_table
+            # calculate the index, the result should be at the top of the stack
             token = self.paren_expression_paren(left='[', right=']')
+            # push array on top of the stack
+            self.vm_writer.write_push(s.kind_to_segment(s.kind_of(lhs)), s.index_of(lhs))
+            # add the index to the array, leave it at the top of the stack
+            self.vm_writer.write_arithmetic('add')
         if token.type == Token.SYMBOL and token.symbol == '=':
             self.emit(token)
             _ = self.tokenizer.advance()
@@ -563,7 +570,17 @@ class CompilationEngine:
             unexpected_token(token)
         self.emit(token)
         s = self.symbol_table
-        self.vm_writer.write_pop(s.kind_to_segment(s.kind_of(lhs)), s.index_of(lhs))
+        if i_am_an_array:
+            # let's pop the result of the expression into temp 0
+            self.vm_writer.write_pop('temp', 0)
+            # pop the top of the stack, array + index, to pointer 1
+            self.vm_writer.write_pop('pointer', 1)
+            # That temp 0? We need to push it back on the stack
+            self.vm_writer.write_push('temp', 0)
+            # ... so that we can pop it into "that 0", which is the array[index]
+            self.vm_writer.write_pop('that', 0)
+        else:
+            self.vm_writer.write_pop(s.kind_to_segment(s.kind_of(lhs)), s.index_of(lhs))
         self.pop()
         return self.tokenizer.advance()
 
@@ -702,8 +719,15 @@ class CompilationEngine:
                     (token.symbol == '(' or token.symbol == '.'):
                 self.subroutine_call(call_or_variable_name)
             elif token.type == Token.SYMBOL and token.symbol == '[':
-                # FIXME deal with arrays
                 _ = self.paren_expression_paren(left='[', right=']')
+                # the top of the stack is the index, so we need to push the array & add
+                s = self.symbol_table
+                self.vm_writer.write_push(s.kind_to_segment(
+                    s.kind_of(call_or_variable_name)), s.index_of(call_or_variable_name))
+                self.vm_writer.write_arithmetic('add')
+                # let's do our array dance -- pop the result to pointer 1 & push that 0
+                self.vm_writer.write_pop('pointer', 1)
+                self.vm_writer.write_push('that', 0)
             else:  # it's a variable -- push it!
                 s = self.symbol_table
                 self.vm_writer.write_push(

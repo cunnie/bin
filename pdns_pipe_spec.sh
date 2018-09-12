@@ -96,6 +96,22 @@ test_ns() {
   test_ns_resp
 }
 
+test_mx_resp() {
+  read -r RESP
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		10	mail.protonmail.ch" ]; then
+    pass "${RESP}"
+  else
+    fail "${RESP}"
+  fi
+}
+
+test_mx() {
+  QTYPE=MX QNAME=$1
+  >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  test_mx_resp
+}
+
 test_txt_resp() {
   read -r RESP
   if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		protonmail-verification=ce0ca3f5010aa7a2cf8bcc693778338ffde73e26" ]; then
@@ -159,6 +175,7 @@ test_any() {
   QTYPE=SOA test_soa_resp
   QTYPE=NS test_ns_resp
   QTYPE=TXT test_txt_resp
+  QTYPE=MX test_mx_resp
   if [ "${EXPECTED}" == "" ]; then
     return
   fi
@@ -188,6 +205,9 @@ test_ns api.system.10.10.1.80.sslip.io
 test_end
 
 test_ns api.system.10.10.1.80.sslip.io
+test_end
+
+test_mx sslip.io
 test_end
 
 test_txt sslip.io

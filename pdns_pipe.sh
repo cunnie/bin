@@ -41,7 +41,9 @@ XIP_NS=(           "ns-aws.nono.io" "ns-azure.nono.io" "ns-gce.nono.io" "ns-he.n
 #   "10"  "mx.zoho.com"
 #   "20"  "mx2.zoho.com"
 # )
-XIP_MX_RECORDS=( )
+XIP_MX_RECORDS=(
+  "10"	"mail.protonmail.ch"
+)
 
 # These are the TXT records for your domain.  IF YOU'RE NOT SURE,
 # don't set it at at all (comment it out)--it defaults to no

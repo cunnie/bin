@@ -43,6 +43,12 @@ XIP_NS=(           "ns-aws.nono.io" "ns-azure.nono.io" "ns-gce.nono.io" "ns-he.n
 # )
 XIP_MX_RECORDS=( )
 
+# These are the TXT records for your domain.  IF YOU'RE NOT SURE,
+# don't set it at at all (comment it out)--it defaults to no
+XIP_TXT_RECORDS=(
+  "protonmail-verification=ce0ca3f5010aa7a2cf8bcc693778338ffde73e26"
+)
+
 if [ -a "$1" ]; then
   source "$1"
 fi
@@ -177,6 +183,13 @@ answer_mx_query() {
   done
 }
 
+answer_txt_query() {
+  local address
+  for text in "${XIP_TXT_RECORDS[@]}"; do
+    send_answer "TXT" "$text"
+  done
+}
+
 answer_subdomain_a_query_for() {
   local type="$1"
   local address="$(resolve_${type}_subdomain)"
@@ -209,6 +222,9 @@ while read_query; do
   fi
   if qtype_is "NS"; then
     answer_ns_query
+  fi
+  if qtype_is "TXT"; then
+    answer_txt_query
   fi
   if qtype_is "MX"; then
     answer_mx_query

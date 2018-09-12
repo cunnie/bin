@@ -55,7 +55,7 @@ test_soa_resp() {
 }
 
 test_soa() {
-  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2018030100 300 300 300 300"
+  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2018091200 300 300 300 300"
   QTYPE=SOA QNAME=$1
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"

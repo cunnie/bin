@@ -7,7 +7,7 @@ shopt -s nocasematch
 # Configuration
 #
 # Increment this timestamp when the contents of the file change.
-XIP_TIMESTAMP="2018030100"
+XIP_TIMESTAMP="2018091200"
 
 # The top-level domain for which the name server is authoritative.
 # CHANGEME: change "sslip.io" to your domain

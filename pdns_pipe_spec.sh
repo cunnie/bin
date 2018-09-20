@@ -219,6 +219,9 @@ test_end
 test_a sSliP.io 78.46.204.247
 test_end
 
+test_a localhost.sslip.io 127.0.0.1
+test_end
+
 test_a api.system.192.168.168.168.sslip.io 192.168.168.168
 test_end
 
@@ -241,6 +244,9 @@ test_aaaa sslip.io 2a01:4f8:c17:b8f::2
 test_end
 
 test_aaaa SsLiP.Io 2a01:4f8:c17:b8f::2
+test_end
+
+test_aaaa localhost.sslip.io ::1
 test_end
 
 test_aaaa --.sslip.io ::

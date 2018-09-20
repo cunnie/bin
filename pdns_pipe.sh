@@ -177,6 +177,14 @@ answer_root_aaaa_query() {
   done
 }
 
+answer_localhost_a_query() {
+  send_answer "A" "127.0.0.1"
+}
+
+answer_localhost_aaaa_query() {
+  send_answer "AAAA" "::1"
+}
+
 answer_mx_query() {
   set -- "${XIP_MX_RECORDS[@]}"
   while [ $# -gt 1 ]; do
@@ -236,7 +244,9 @@ while read_query; do
     if [ $LC_QNAME == $XIP_DOMAIN ]; then
       answer_root_a_query
     else
-      if subdomain_is_dashed_ip; then
+      if [ $LC_QNAME == "localhost.$XIP_DOMAIN" ]; then
+        answer_localhost_a_query
+      elif subdomain_is_dashed_ip; then
         answer_subdomain_a_query_for dashed_ip
       elif subdomain_is_ip; then
         answer_subdomain_a_query_for ip
@@ -248,10 +258,10 @@ while read_query; do
     LC_QNAME=$(echo $QNAME | tr 'A-Z' 'a-z')
     if [ $LC_QNAME == $XIP_DOMAIN ]; then
       answer_root_aaaa_query
-    else
-      if subdomain_is_dashed_ipv6; then
+    elif [ $LC_QNAME == "localhost.$XIP_DOMAIN" ]; then
+        answer_localhost_aaaa_query
+    elif subdomain_is_dashed_ipv6; then
         answer_subdomain_aaaa_query_for dashed_ipv6
-      fi
     fi
   fi
 

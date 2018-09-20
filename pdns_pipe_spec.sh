@@ -55,7 +55,7 @@ test_soa_resp() {
 }
 
 test_soa() {
-  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2018091200 300 300 300 300"
+  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2018091900 300 300 300 300"
   QTYPE=SOA QNAME=$1
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
@@ -82,7 +82,7 @@ test_ns_resp() {
     fail "${RESP}"
   fi
   read -r RESP
-  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-he.nono.io" ]; then
+  if [ "${RESP}" == "DATA	${QNAME}	IN	${QTYPE}	300		ns-vultr.nono.io" ]; then
     pass "${RESP}"
   else
     fail "${RESP}"

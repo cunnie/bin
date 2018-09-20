@@ -7,7 +7,7 @@ shopt -s nocasematch
 # Configuration
 #
 # Increment this timestamp when the contents of the file change.
-XIP_TIMESTAMP="2018091200"
+XIP_TIMESTAMP="2018091900"
 
 # The top-level domain for which the name server is authoritative.
 # CHANGEME: change "sslip.io" to your domain
@@ -31,8 +31,8 @@ XIP_ROOT_ADDRESSES_AAAA=( "2a01:4f8:c17:b8f::2" )
 # `A` queries for these subdomains map to the corresponding addresses here.
 # CHANGEME: change this to match your NS records; one of these IP addresses
 # should match the jobs(xip).networks.static_ips listed above
-XIP_NS_ADDRESSES=( "52.0.56.137"    "52.187.42.158"    "104.155.144.4"  "78.47.249.19" )
-XIP_NS=(           "ns-aws.nono.io" "ns-azure.nono.io" "ns-gce.nono.io" "ns-he.nono.io" )
+XIP_NS_ADDRESSES=( "52.0.56.137"    "52.187.42.158"    "104.155.144.4"  "207.148.72.47" )
+XIP_NS=(           "ns-aws.nono.io" "ns-azure.nono.io" "ns-gce.nono.io" "ns-vultr.nono.io" )
 
 # These are the MX records for your domain.  IF YOU'RE NOT SURE,
 # don't set it at at all (comment it out)--it defaults to no

@@ -55,7 +55,7 @@ test_soa_resp() {
 }
 
 test_soa() {
-  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2018091900 300 300 300 300"
+  EXPECTED_SOA="briancunnie.gmail.com ns-he.nono.io 2018092000 300 300 300 300"
   QTYPE=SOA QNAME=$1
   >&2 echo "It responds to our 'Q ${QNAME} IN ${QTYPE}'"
   printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
@@ -240,6 +240,12 @@ test_end
 test_a nonesuch.sslip.io ""
 test_end
 
+test_a api.system.192.168.168.168.some.random.com 192.168.168.168
+test_end
+
+test_a api.system.192-168-168-168.some.random.com 192.168.168.168
+test_end
+
 test_aaaa sslip.io 2a01:4f8:c17:b8f::2
 test_end
 
@@ -271,6 +277,12 @@ test_aaaa api.system.2a01-4f8-c17-b8f--2.sslip.io 2a01:4f8:c17:b8f::2
 test_end
 
 test_aaaa api.system.2a01-4f8-c17-b8f--xxxx.sslip.io ""
+test_end
+
+test_aaaa 2a01-4f8-c17-b8f--2.some.random.com 2a01:4f8:c17:b8f::2
+test_end
+
+test_aaaa api.system.2a01-4f8-c17-b8f--2.some.random.com 2a01:4f8:c17:b8f::2
 test_end
 
 test_any api.system.255-255-255-255.sslip.io 255.255.255.255

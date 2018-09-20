@@ -7,7 +7,7 @@ shopt -s nocasematch
 # Configuration
 #
 # Increment this timestamp when the contents of the file change.
-XIP_TIMESTAMP="2018091900"
+XIP_TIMESTAMP="2018092000"
 
 # The top-level domain for which the name server is authoritative.
 # CHANGEME: change "sslip.io" to your domain
@@ -26,12 +26,9 @@ XIP_ROOT_ADDRESSES=( "78.46.204.247" )
 XIP_ROOT_ADDRESSES_AAAA=( "2a01:4f8:c17:b8f::2" )
 
 # The public IP addresses on which this xip-pdns server will run.
-# `NS` queries for the top-level domain will return this list of addresses.
-# Each entry maps to a 1-based subdomain of the format `ns-1`, `ns-2`, etc.
-# `A` queries for these subdomains map to the corresponding addresses here.
-# CHANGEME: change this to match your NS records; one of these IP addresses
-# should match the jobs(xip).networks.static_ips listed above
-XIP_NS_ADDRESSES=( "52.0.56.137"    "52.187.42.158"    "104.155.144.4"  "207.148.72.47" )
+# `NS` queries for the top-level domain will return this list of servers.
+# Note: [change from xip.io] The NS servers are in a different domain
+# (i.e. nono.io) so the addresses don't need to be included.
 XIP_NS=(           "ns-aws.nono.io" "ns-azure.nono.io" "ns-gce.nono.io" "ns-vultr.nono.io" )
 
 # These are the MX records for your domain.  IF YOU'RE NOT SURE,
@@ -129,11 +126,6 @@ subdomain_is_dashed_ip() {
 
 subdomain_is_dashed_ipv6() {
   [[ "$QNAME" =~ $DASHED_IPV6_PATTERN ]]
-}
-
-resolve_ns_subdomain() {
-  local index="${SUBDOMAIN:3}"
-  echo "${XIP_NS_ADDRESSES[$index-1]}"
 }
 
 resolve_ip_subdomain() {

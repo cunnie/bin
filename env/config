@@ -96,6 +96,7 @@ Host om om.nono.io
 	HostName om.nono.io
 	User ubuntu
 	IdentityFile ~/.ssh/nono
+	UserKnownHostsFile /dev/null
 
 Host shay
 	HostName shay.nono.io

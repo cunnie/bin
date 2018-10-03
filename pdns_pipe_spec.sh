@@ -7,10 +7,10 @@
 #  bosh int --path /pdns_pipe ~/workspace/sslip.io/conf/sslip.io+nono.io.yml > ~/bin/pdns_pipe.sh
 
 set_up() {
-  TEST_INPUT_FD=/tmp/input.$$
-  TEST_OUTPUT_FD=/tmp/output.$$
+  TEST_INPUT_FD=/tmp/pdns_pipe.stdin.$$
+  TEST_OUTPUT_FD=/tmp/pdns_pipe.stdout.$$
   mkfifo $TEST_INPUT_FD $TEST_OUTPUT_FD
-  ${0/_spec/} < $TEST_OUTPUT_FD > $TEST_INPUT_FD 2> /dev/null &
+  ${0/_spec/} < $TEST_OUTPUT_FD > $TEST_INPUT_FD &
   PDNS_PID=$!
   exec -- > $TEST_OUTPUT_FD < $TEST_INPUT_FD
 
@@ -189,10 +189,23 @@ test_any() {
   fi
 }
 
+test_excluded_domain() {
+  QTYPE=ANY QNAME=$1
+  >&2 echo "It doesn't respond to our excluded domain, 'Q ${QNAME} IN ${QTYPE}'"
+  printf "Q\t${QNAME}\tIN\t${QTYPE}\n"
+  # we don't read a response, for there should be no records
+}
+
 >&2 echo BEGIN testing of $0
 set_up
 
 test_soa sslip.io
+test_end
+
+test_soa some-random-domain.com
+test_end
+
+test_excluded_domain nono.io
 test_end
 
 test_soa api.system.10.10.1.80.sslip.io
@@ -222,7 +235,7 @@ test_end
 test_a localhost.sslip.io 127.0.0.1
 test_end
 
-test_a api.system.192.168.168.168.sslip.io 192.168.168.168
+test_a nono.io.192.168.168.168.sslip.io 192.168.168.168
 test_end
 
 test_a api.system.192-168-168-168.sslip.io 192.168.168.168

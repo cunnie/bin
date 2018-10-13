@@ -1,3 +1,5 @@
+# python3 google_stt.py > /tmp/gcp_stt.json
+
 # https://cloud.google.com/speech-to-text/docs/multiple-voices
 # https://cloud.google.com/speech-to-text/docs/reference/libraries#client-libraries-usage-python
 
@@ -11,13 +13,8 @@ from google.cloud import speech_v1p1beta1 as speech
 # Instantiates a client
 client = speech.SpeechClient()
 
-# The name of the audio file to transcribe
-file_name = "/Users/cunnie/Google Drive/BlabberTabber/meeting2.wav"
-
-# Loads the audio into memory
-with io.open(file_name, 'rb') as audio_file:
-    content = audio_file.read()
-    audio = speech.types.RecognitionAudio(content=content)
+# gsutil cp ~/Google\ Drive/BlabberTabber/meeting2.wav gs://blabbertabber/meeting.wav
+audio = client.types.RecognitionAudio(uri="gs://blabbertabber/meeting.wav")
 
 config = speech.types.RecognitionConfig(
     encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -27,6 +24,12 @@ config = speech.types.RecognitionConfig(
     enable_speaker_diarization=True,
     model='video'
 )
+
+# https://cloud.google.com/speech-to-text/docs/async-recognize
+operation = client.long_running_recognize(config, audio)
+
+print('Waiting for operation to complete...')
+response = operation.result(timeout=90)
 
 # Detects speech in the audio file
 response = client.recognize(config, audio)

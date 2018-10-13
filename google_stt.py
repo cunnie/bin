@@ -14,7 +14,7 @@ from google.cloud import speech_v1p1beta1 as speech
 client = speech.SpeechClient()
 
 # gsutil cp ~/Google\ Drive/BlabberTabber/meeting2.wav gs://blabbertabber/meeting.wav
-audio = client.types.RecognitionAudio(uri="gs://blabbertabber/meeting.wav")
+audio = client.types.RecognitionAudio(uri='gs://blabbertabber/meeting.wav')
 
 config = speech.types.RecognitionConfig(
     encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,

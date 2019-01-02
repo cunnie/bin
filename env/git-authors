@@ -3,6 +3,7 @@ authors:
   bmc-work: Brian Cunnie
   bec: Brendan Cunnie; saintbrendan
   cc: Charlotte Cunningham; mahgninnuc
+  cy: Caitlyn Yu
   ks: Kai Su
   rj: Rowan Jacobs
 email:
@@ -11,3 +12,4 @@ email_addresses:
   bmc-work: bcunnie@pivotal.io
   ks: skai@vmware.com
   rj: rojacobs@pivotal.io
+  cy: cyu@pivotal.io

@@ -39,6 +39,13 @@ Host bosh-gce
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
+Host bosh-vsphere
+	HostName  bosh-vsphere-ipv4.nono.io
+	User jumpbox
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
 Host bosh-lite
 	HostName  bosh-lite.nono.io
 	User jumpbox

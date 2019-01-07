@@ -5,7 +5,7 @@ TMPDIR=/tmp/
 TIMESTAMP=$(date +%s) # for easier lexical ordering
 
 # save the request
-cat > $TMPDIR/cpi.in.$TIMESTAMP
+cat >> $TMPDIR/cpi.in.$TIMESTAMP
 
 # a non-committal, non-error response
 echo <<EOF

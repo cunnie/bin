@@ -40,7 +40,7 @@ Host bosh-gce
 	UserKnownHostsFile /dev/null
 
 Host bosh-vsphere
-	HostName  bosh-vsphere-ipv4.nono.io
+	HostName  bosh-vsphere.nono.io
 	User jumpbox
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

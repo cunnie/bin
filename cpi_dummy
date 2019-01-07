@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+TMPDIR=/tmp/
+[ -d /var/vcap/data/tmp ] && TMPDIR=/var/vcap/data/tmp/
+TIMESTAMP=$(date +%s) # for easier lexical ordering
+
+# save the request
+cat > $TMPDIR/cpi.in.$TIMESTAMP
+
+# a non-committal, non-error response
+echo <<EOF
+{
+  "result": "random-result",
+  "error": null,
+  "log": ""
+}
+EOF

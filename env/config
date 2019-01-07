@@ -117,6 +117,12 @@ Host test test.diarizer.com
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host unifi
+	HostName unifi.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host vain
 	HostName vain.nono.io
 	User cunnie

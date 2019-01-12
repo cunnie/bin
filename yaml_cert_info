@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+#
+# Convenience script for viewing the SANS of BOSH-generated creds
+#
+# typical invocation:
+#   yaml_cert_info bosh-vsphere-creds.yml
+#
+require 'YAML'
+require 'Open3'
+
+bosh_creds = YAML.load(ARGF.read)
+indent = ""
+
+def emit_certificate(cert, indent)
+  cert_info, status = Open3.capture2('openssl', 'x509', '-noout', '-text', :stdin_data => cert)
+  cert_info.split("\n").map do |cert_line|
+    if cert_line.include?('IP Address') or cert_line.include?('Subject:')
+      puts "#{indent}#{cert_line}"
+    end
+  end
+end
+
+def emit(cred, indent)
+  cred.each do |key, sub_cred|
+    if sub_cred.class == Array or sub_cred.class == Hash
+      puts "#{indent}#{key}:"
+      emit(sub_cred, indent + "  ")
+    else
+      if sub_cred.include?("\n")
+        puts "#{indent}#{key}: |"
+        if sub_cred.match(/^-----BEGIN CERTIFICATE-----/)
+          emit_certificate(sub_cred, indent + '  ')
+        else
+          puts "#{indent}  #{sub_cred.split("\n").first}"
+        end
+      else
+        puts "#{indent}#{key}: #{sub_cred}"
+      end
+    end
+  end
+end
+
+emit(bosh_creds, indent)

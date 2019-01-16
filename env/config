@@ -18,27 +18,6 @@ Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
 
-Host bosh-aws ns-aws
-	HostName  bosh-aws.nono.io
-	User jumpbox
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
-Host bosh-azure ns-azure
-	HostName  bosh-azure.nono.io
-	User jumpbox
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
-Host bosh-gce
-	HostName  bosh-gce.nono.io
-	User jumpbox
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
 Host bosh-vsphere
 	HostName  10.2.0.250
 	User jumpbox
@@ -99,17 +78,32 @@ Host nas nas.nono.io
 	User root
 	IdentityFile ~/.ssh/nono
 
+Host ns-aws
+	HostName  ns-aws.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
+Host ns-azure
+	HostName  ns-azure.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
+Host ns-gce
+	HostName  ns-gce.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
 Host om om.nono.io
 	HostName om.nono.io
 	User ubuntu
 	IdentityFile ~/.ssh/nono
 	UserKnownHostsFile /dev/null
-
-Host shay
-	HostName shay.nono.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
 
 Host test test.diarizer.com
 	Hostname test.diarizer.com
@@ -128,11 +122,6 @@ Host vain
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-
-Host vcenter vcenter.nono.io
-	Hostname vcenter.nono.io
-	User root
-	IdentityFile ~/.ssh/nono
 
 # wildcards at bottom, otherwise they trump
 Host *.nono.io

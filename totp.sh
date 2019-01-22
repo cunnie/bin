@@ -1,13 +1,13 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
+#
+# Script to display QR codes containing TOTP secrets to be scanned in
+# by an authenticator app.
+#
+# invocation: totp.sh < file_of_urls_one_per_line
+#
+# e.g. lpass show --note totp.txt | totp.sh
 
-set -- $(lpass show --note totp.txt)
-
-while [ $# -gt 2 ]; do
-  DESCRIPTION=$1
-  SECRET=$2
-
-  qrencode -o - -t ANSI otpauth://totp/$DESCRIPTION?secret=$SECRET
-  echo $URI
-  shift 2
+while read URL; do
+  [ -z "$URL" ] || qrencode -o - -t ANSI $URL
 done
 

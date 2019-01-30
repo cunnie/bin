@@ -16,7 +16,8 @@ xml_trees = []
 
 
 def print_rttm_line(start_time, end_time, speaker_num):
-    print("SPEAKER meeting\t1\t{}\t{}\t<NA>\t<NA>\tSpeaker_{}\t<NA>".format(start_time, end_time, xml_file_index))
+    print("SPEAKER meeting\t1\t{}\t{}\t<NA>\t<NA>\tSpeaker_{}\t<NA>".format(start_time, end_time - start_time,
+                                                                            speaker_num))
 
 
 def convert_xml_to_rttm():
@@ -30,7 +31,7 @@ def convert_xml_to_rttm():
             if start_time is None:
                 start_time = float(element.attrib['starttime'])
             if end_time is None:
-                end_time = float(element.attrib['endtime'])
+                end_time = float(element.attrib['starttime'])  # yes, 'starttime'
             if math.isclose(end_time, float(element.attrib['starttime']), abs_tol=0.01):
                 # collapse the two
                 end_time = float(element.attrib['endtime'])

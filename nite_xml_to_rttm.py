@@ -6,7 +6,7 @@
 
 # Typical invocation:
 #
-#   nite_xml_to_rttm.py ~/Downloads/ami_public_manual_1.6.2/words/ES2008a.*.words.xml | sort -n -k 4 /tmp/ES2008a.rttm
+#   nite_xml_to_rttm.py ~/Downloads/ami_public_manual_1.6.2/words/ES2008a.*.words.xml | sort -n -k 4 > /tmp/ES2008a.rttm
 #
 import math
 import sys
@@ -21,10 +21,8 @@ def print_rttm_line(start_time, end_time, speaker_num):
 
 def convert_xml_to_rttm():
     xml_file = xml_files[xml_file_index]
-    print("opening file: " + xml_file)
     tree = ET.parse(xml_file)
     root = tree.getroot()
-    print("root: " + root.tag)
     xml_trees.append(root)
     start_time = end_time = None
     for element in root:

@@ -36,7 +36,7 @@ class TestRTTMMethods(unittest.TestCase):
         pre_squashed = [
             "SPEAKER meeting 1       31.69   0.31000000000000014     <NA>    <NA>    Speaker_3       <NA>",
         ]
-        squashed = "SPEAKER\tmeeting\t1\t31.69\t0.31\t<NA>\t<NA>\tSpeaker_3\t<NA>"
+        squashed = "SPEAKER\tmeeting\t1\t31.69\t0.31\t<NA>\t<NA>\tSpeaker_3\t<NA>\n"
         self.assertEqual(squash_rttm(pre_squashed), squashed)
 
     def test_squash_rttm_two_lines(self):
@@ -44,12 +44,30 @@ class TestRTTMMethods(unittest.TestCase):
             "SPEAKER meeting 1       31.69   0.31000000000000014     <NA>    <NA>    Speaker_3       <NA>",
             "SPEAKER meeting 1       32.00   0.59000000000000014     <NA>    <NA>    Speaker_3       <NA>",
         ]
-        squashed = "SPEAKER\tmeeting\t1\t31.69\t0.90\t<NA>\t<NA>\tSpeaker_3\t<NA>"
+        squashed = "SPEAKER\tmeeting\t1\t31.69\t0.90\t<NA>\t<NA>\tSpeaker_3\t<NA>\n"
+        self.assertEqual(squash_rttm(pre_squashed), squashed)
+
+    def test_squash_rttm_two_lines_two_speakers(self):
+        pre_squashed = [
+            "SPEAKER meeting 1       31.69   0.31000000000000014     <NA>    <NA>    Speaker_2       <NA>",
+            "SPEAKER meeting 1       32.00   0.59000000000000014     <NA>    <NA>    Speaker_3       <NA>",
+        ]
+        squashed = "SPEAKER\tmeeting\t1\t31.69\t0.31\t<NA>\t<NA>\tSpeaker_2\t<NA>\n" + \
+                   "SPEAKER\tmeeting\t1\t32.00\t0.59\t<NA>\t<NA>\tSpeaker_3\t<NA>\n"
+        self.assertEqual(squash_rttm(pre_squashed), squashed)
+
+    def test_squash_rttm_two_lines_one_pause(self):
+        pre_squashed = [
+            "SPEAKER meeting 1       31.69   0.29000000000000014     <NA>    <NA>    Speaker_3       <NA>",
+            "SPEAKER meeting 1       32.00   0.59000000000000014     <NA>    <NA>    Speaker_3       <NA>",
+        ]
+        squashed = "SPEAKER\tmeeting\t1\t31.69\t0.29\t<NA>\t<NA>\tSpeaker_3\t<NA>\n" + \
+                   "SPEAKER\tmeeting\t1\t32.00\t0.59\t<NA>\t<NA>\tSpeaker_3\t<NA>\n"
         self.assertEqual(squash_rttm(pre_squashed), squashed)
 
 
 def _format_rttm_line(type, file, chnl, tbeg, tdur, ortho, stype, name, conf):
-    return ("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{}\t{}\t{}\t{}".format(
+    return ("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{}\t{}\t{}\t{}\n".format(
         type,
         file,
         chnl,
@@ -70,18 +88,40 @@ def squash_rttm(rttm_lines):
         (type, file, chnl, tbeg, tdur, ortho, stype, name, conf) = line.split()
         tbeg = float(tbeg)
         tdur = float(tdur)
+        sys.stderr.write("top: {:.2f}\n".format(tdur))
         if o_tbeg is None:
+            o_type = type
+            o_file = file
+            o_chnl = chnl
             o_tbeg = tbeg
             o_tdur = tdur
+            o_ortho = ortho
+            o_stype = stype
             o_name = name
+            o_conf = conf
+            sys.stderr.write("initialization: {:.2f}\n".format(o_tdur))
         else:
             if o_name == name and math.isclose(tbeg, (o_tbeg + o_tdur), abs_tol=0.01):
                 # collapse the two
                 o_tdur += tdur
+                sys.stderr.write("collapse: {:.2f}\n".format(o_tdur))
             else:
-                squashed_rttm += _format_rttm_line(type, file, chnl, tbeg, tdur, ortho, stype, name, conf)
+                # print the line & move on
+                squashed_rttm += _format_rttm_line(o_type, o_file, o_chnl, o_tbeg, o_tdur, o_ortho, o_stype, o_name,
+                                                   o_conf)
+                sys.stderr.write("emit: {:.2f}\n".format(o_tdur))
+                o_type = type
+                o_file = file
+                o_chnl = chnl
+                o_tbeg = tbeg
+                o_tdur = tdur
+                o_ortho = ortho
+                o_stype = stype
+                o_name = name
+                o_conf = conf
     if not (o_tbeg is None):
-        squashed_rttm += _format_rttm_line(type, file, chnl, tbeg, tdur, ortho, stype, name, conf)
+        squashed_rttm += _format_rttm_line(o_type, o_file, o_chnl, o_tbeg, o_tdur, o_ortho, o_stype, o_name, o_conf)
+        sys.stderr.write("final_emit: {:.2f}\n".format(o_tdur))
     return (squashed_rttm)
 
 

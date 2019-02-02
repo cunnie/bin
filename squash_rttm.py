@@ -66,63 +66,55 @@ class TestRTTMMethods(unittest.TestCase):
         self.assertEqual(squash_rttm(pre_squashed), squashed)
 
 
-def _format_rttm_line(type, file, chnl, tbeg, tdur, ortho, stype, name, conf):
-    return ("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{}\t{}\t{}\t{}\n".format(
-        type,
-        file,
-        chnl,
-        tbeg,
-        tdur,
-        ortho,
-        stype,
-        name,
-        conf
-    ))
+class RTTM:
+    def __init__(self, array_of_args):
+        self.type = array_of_args[0]
+        self.file = array_of_args[1]
+        self.chnl = array_of_args[2]
+        self.tbeg = float(array_of_args[3])
+        self.tdur = float(array_of_args[4])
+        self.ortho = array_of_args[5]
+        self.stype = array_of_args[6]
+        self.name = array_of_args[7]
+        self.conf = array_of_args[8]
+
+    def __str__(self):
+        return ("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{}\t{}\t{}\t{}\n".format(
+            self.type,
+            self.file,
+            self.chnl,
+            self.tbeg,
+            self.tdur,
+            self.ortho,
+            self.stype,
+            self.name,
+            self.conf
+        ))
+
+    def end(self):
+        return self.tbeg + self.tdur
 
 
 def squash_rttm(rttm_lines):
-    o_tbeg = None  # "original" time beginning
-    squashed_rttm = ''
+    previous_rttm = None  # "original"
+    squashed_rttm_lines = ''
 
     for line in rttm_lines:
-        (type, file, chnl, tbeg, tdur, ortho, stype, name, conf) = line.split()
-        tbeg = float(tbeg)
-        tdur = float(tdur)
-        sys.stderr.write("top: {:.2f}\n".format(tdur))
-        if o_tbeg is None:
-            o_type = type
-            o_file = file
-            o_chnl = chnl
-            o_tbeg = tbeg
-            o_tdur = tdur
-            o_ortho = ortho
-            o_stype = stype
-            o_name = name
-            o_conf = conf
-            sys.stderr.write("initialization: {:.2f}\n".format(o_tdur))
+        current_rttm = RTTM(line.split())
+        if previous_rttm is None:
+            previous_rttm = current_rttm
         else:
-            if o_name == name and math.isclose(tbeg, (o_tbeg + o_tdur), abs_tol=0.01):
+            if current_rttm.name == previous_rttm.name and math.isclose(current_rttm.tbeg, previous_rttm.end(),
+                                                                        abs_tol=0.01):
                 # collapse the two
-                o_tdur += tdur
-                sys.stderr.write("collapse: {:.2f}\n".format(o_tdur))
+                previous_rttm.tdur += current_rttm.tdur
             else:
                 # print the line & move on
-                squashed_rttm += _format_rttm_line(o_type, o_file, o_chnl, o_tbeg, o_tdur, o_ortho, o_stype, o_name,
-                                                   o_conf)
-                sys.stderr.write("emit: {:.2f}\n".format(o_tdur))
-                o_type = type
-                o_file = file
-                o_chnl = chnl
-                o_tbeg = tbeg
-                o_tdur = tdur
-                o_ortho = ortho
-                o_stype = stype
-                o_name = name
-                o_conf = conf
-    if not (o_tbeg is None):
-        squashed_rttm += _format_rttm_line(o_type, o_file, o_chnl, o_tbeg, o_tdur, o_ortho, o_stype, o_name, o_conf)
-        sys.stderr.write("final_emit: {:.2f}\n".format(o_tdur))
-    return (squashed_rttm)
+                squashed_rttm_lines += str(previous_rttm)
+                previous_rttm = current_rttm
+    if not (previous_rttm is None):
+        squashed_rttm_lines += str(previous_rttm)
+    return (squashed_rttm_lines)
 
 
 print(squash_rttm(sys.stdin.readlines()))

@@ -67,16 +67,16 @@ class TestRTTMMethods(unittest.TestCase):
 
 
 class RTTM:
-    def __init__(self, array_of_args):
-        self.type = array_of_args[0]
-        self.file = array_of_args[1]
-        self.chnl = array_of_args[2]
-        self.tbeg = float(array_of_args[3])
-        self.tdur = float(array_of_args[4])
-        self.ortho = array_of_args[5]
-        self.stype = array_of_args[6]
-        self.name = array_of_args[7]
-        self.conf = array_of_args[8]
+    def __init__(self, type, file, chnl, tbeg, tdur, ortho, stype, name, conf):
+        self.type = type
+        self.file = file
+        self.chnl = chnl
+        self.tbeg = float(tbeg)
+        self.tdur = float(tdur)
+        self.ortho = ortho
+        self.stype = stype
+        self.name = name
+        self.conf = conf
 
     def __str__(self):
         return ("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{}\t{}\t{}\t{}\n".format(
@@ -100,7 +100,7 @@ def squash_rttm(rttm_lines):
     squashed_rttm_lines = ''
 
     for line in rttm_lines:
-        current_rttm = RTTM(line.split())
+        current_rttm = RTTM(*line.split())
         if previous_rttm is None:
             previous_rttm = current_rttm
         else:

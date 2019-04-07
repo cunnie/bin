@@ -2,3 +2,5 @@
 .idea
 # Vim artifacts
 *.swp
+# Python artifacts
+__pycache__/

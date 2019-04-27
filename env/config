@@ -59,6 +59,11 @@ Host esxi-1
 	User root
 	IdentityFile ~/.ssh/nono
 
+Host esxi-2
+	HostName esxi-2.nono.io
+	User root
+	IdentityFile ~/.ssh/nono
+
 Host fedora
 	HostName fedora.nono.io
 	IdentityFile ~/.ssh/nono

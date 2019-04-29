@@ -134,6 +134,26 @@ Host vain
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+# work
+Host haas-200
+  HostName 10.193.141.240
+  User pivotal
+  UserKnownHostsFile /dev/null
+  RequestTTY force
+  RemoteCommand ssh ubuntu@opsmgr-01.haas-200.pez.pivotal.io
+Host haas-223
+  HostName 10.193.177.240
+  User pivotal
+  UserKnownHostsFile /dev/null
+  RequestTTY force
+  RemoteCommand ssh ubuntu@opsmgr-01.haas-223.pez.pivotal.io
+Host haas-241
+  HostName 10.193.159.240
+  User pivotal
+  UserKnownHostsFile /dev/null
+  RequestTTY force
+  RemoteCommand ssh ubuntu@opsmgr-01.haas-241.pez.pivotal.io
+
 # wildcards at bottom, otherwise they trump
 Host *.nono.io
 	User cunnie

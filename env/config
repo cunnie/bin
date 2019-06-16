@@ -38,11 +38,6 @@ Host bosh-lite
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
-Host ns-vultr
-	HostName ns-vultr.nono.io
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
 Host diarizer diarizer.com
 	HostName  diarizer.com
 	Port 22
@@ -103,12 +98,23 @@ Host ns-azure
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
+Host ns-digitalocean
+	HostName  ns-digitalocean.nono.io
+	User freebsd
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host ns-gce
 	HostName  ns-gce.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
+
+Host ns-vultr
+	HostName ns-vultr.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
 
 Host om om.nono.io
 	HostName om.nono.io

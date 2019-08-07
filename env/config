@@ -27,7 +27,6 @@ Host bitbucket.org
 Host bosh-vsphere
 	HostName  10.2.0.250
 	User jumpbox
-	IdentityFile ~/.ssh/bosh_deployment_key_no_ecdsa
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 

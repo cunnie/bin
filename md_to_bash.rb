@@ -18,14 +18,17 @@ api = ''
 env_vars = []
 
 class Api
+
+  attr_accessor :api, :env_vars
+
   @@longest_env_var = 0
   @@longest_api = 0
 
   def initialize(env_vars: [], api: '')
-    @env_vars = env_vars
+    @env_vars = env_vars.uniq
     @api = api
     @@longest_api = api.length if api.length > @@longest_api
-    env_vars.each do |env_var|
+    @env_vars.each do |env_var|
       @@longest_env_var = env_var.length if env_var.length > @@longest_env_var
     end
   end
@@ -38,6 +41,12 @@ class Api
       print " ] && DNS_CHALLENGE_TYPE=#{@api}"
       print ' ' * (@@longest_api - @api.length)
       print " && return\n"
+    end
+  end
+
+  def emit_env_vars_for_concourse_yml
+    @env_vars.each do |env_var|
+      print "  #{env_var}:\n"
     end
   end
 end
@@ -63,10 +72,13 @@ STDIN.read.split("\n").each do |line|
 
   api = get_api line
   unless api.nil?
-    apis << Api.new(env_vars: env_vars, api: api) if api
+    if apis.select { |other_api| other_api.api == api }.empty?
+      apis << Api.new(env_vars: env_vars, api: api) if api
+    end
   end
   api = ''
   env_vars = []
 end
 
-apis.each(&:emit)
+# apis.each(&:emit)
+# apis.each(&:emit_env_vars_for_concourse_yml)

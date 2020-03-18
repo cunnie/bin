@@ -121,7 +121,7 @@ Host om om.nono.io
 	IdentityFile ~/.ssh/nono
 	UserKnownHostsFile /dev/null
 
-Host paris paris.diarizer.com
+Host paris paris.nono.io
 	HostName paris.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono

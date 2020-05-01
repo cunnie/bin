@@ -43,20 +43,13 @@ Host diarizer diarizer.com
 	ForwardAgent yes
 	IdentityFile ~/.ssh/nono
 
-Host esxi-0
-	HostName esxi-0.nono.io
-	User root
-	IdentityFile ~/.ssh/nono
-
 Host esxi-1
 	HostName esxi-1.nono.io
 	User root
-	IdentityFile ~/.ssh/nono
 
 Host esxi-2
 	HostName esxi-2.nono.io
 	User root
-	IdentityFile ~/.ssh/nono
 
 Host fedora
 	HostName fedora.nono.io
@@ -144,6 +137,11 @@ Host vain
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
+
+Host vcenter-70
+	HostName vcenter-70.nono.io
+	User root
+	IdentityFile /dev/null
 
 # work
 

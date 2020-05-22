@@ -4,3 +4,4 @@
 *.swp
 # Python artifacts
 __pycache__/
+Brewfile.lock.json

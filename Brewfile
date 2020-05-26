@@ -55,3 +55,5 @@ cask "vlc"
 cask "whatsapp"
 cask "xquartz"
 cask "zoomus"
+
+brew "cloudfoundry/tap/credhub-cli"

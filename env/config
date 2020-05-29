@@ -126,6 +126,11 @@ Host test test.diarizer.com
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host tetra
+	HostName tetra.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host unifi
 	HostName unifi.nono.io
 	User cunnie

@@ -3,15 +3,7 @@ authors:
   bmc-work: Brian Cunnie
   bmc: Brian Cunnie; brian.cunnie
   cc: Charlotte Cunningham; mahgninnuc
-  cy: Caitlyn Yu
-  jr: Josh Russett
-  ks: Kai Su
-  rj: Rowan Jacobs
 email:
   domain: gmail.com
 email_addresses:
-  bmc-work: bcunnie@pivotal.io
-  cy: cyu@pivotal.io
-  jr: jrussett@pivotal.io
-  ks: skai@vmware.com
-  rj: rojacobs@pivotal.io
+  bmc-work: bcunnie@vmware.com

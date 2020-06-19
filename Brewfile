@@ -39,6 +39,7 @@ brew "wget"
 
 cask "atom"
 cask "battle-net"
+cask "discord"
 cask "docker"
 cask "firefox"
 cask "flycut"

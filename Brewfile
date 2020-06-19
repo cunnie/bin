@@ -1,9 +1,11 @@
+tap "cloudfoundry/tap"
+tap "git-duet/tap"
 tap "golangci/tap"
 tap "homebrew/cask"
-tap "git-duet/tap"
 
 brew "automake"
 brew "awscli"
+brew "bbl"
 brew "bison"
 brew "chruby"
 brew "cloudfoundry/tap/bosh-cli"

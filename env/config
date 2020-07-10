@@ -14,6 +14,12 @@ Host nono.com nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host aasfmarin aasfmarin.org test.aasfmarin.org
+	HostName aasfmarin.org
+	User forge
+	IdentityFile ~/.ssh/github
+	ForwardAgent yes
+
 Host algorand
 	HostName algorand.nono.io
 	User algorand

@@ -154,6 +154,12 @@ Host vcenter-70
 	User root
 	IdentityFile /dev/null
 
+Host westminster
+	HostName westminster.la.pivotallabs.com
+	User pivotal
+	IdentityFile ~/.ssh/github
+	ForwardAgent yes
+
 # work
 
 # append these entries to your local `ssh_config`

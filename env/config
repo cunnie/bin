@@ -114,8 +114,8 @@ Host ns-vultr
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host om om.nono.io
-	HostName om.nono.io
+Host om om.tas.nono.io
+	HostName om.tas.nono.io
 	User ubuntu
 	IdentityFile ~/.ssh/nono
 	UserKnownHostsFile /dev/null

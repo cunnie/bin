@@ -1,9 +1,13 @@
 authors:
+  ac: Andrew Crump; acrmp
   bec: Brendan Cunnie; saintbrendan
   bmc-work: Brian Cunnie
   bmc: Brian Cunnie; brian.cunnie
   cc: Charlotte Cunningham; mahgninnuc
+  ch: Christopher Hunter; chunter
 email:
   domain: gmail.com
 email_addresses:
   bmc-work: bcunnie@vmware.com
+  ch: chunter@pivotal.io
+  ac: crumpan@vmware.com

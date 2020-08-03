@@ -26,12 +26,6 @@ Host aasfmarin.nono.io
 	IdentityFile ~/.ssh/github
 	ForwardAgent yes
 
-Host algorand
-	HostName algorand.nono.io
-	User algorand
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
 Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
@@ -165,13 +159,18 @@ Host vcenter-70
 	User root
 	IdentityFile /dev/null
 
+# work
+
+Host nimbus
+	HostName nimbus-gateway.eng.vmware.com
+	User bcunnie
+	ForwardAgent yes
+
 Host westminster
 	HostName westminster.la.pivotallabs.com
 	User pivotal
 	IdentityFile ~/.ssh/github
 	ForwardAgent yes
-
-# work
 
 # append these entries to your local `ssh_config`
 #

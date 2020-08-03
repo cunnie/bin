@@ -20,6 +20,12 @@ Host aasfmarin aasfmarin.org test.aasfmarin.org
 	IdentityFile ~/.ssh/github
 	ForwardAgent yes
 
+Host aasfmarin.nono.io
+	HostName aasfmarin.nono.io
+	User forge
+	IdentityFile ~/.ssh/github
+	ForwardAgent yes
+
 Host algorand
 	HostName algorand.nono.io
 	User algorand

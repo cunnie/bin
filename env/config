@@ -160,6 +160,12 @@ Host vcenter-70
 	IdentityFile /dev/null
 
 # work
+#
+Host belinda
+	HostName belinda.cli.fun
+	User rdloaner
+	ForwardAgent yes
+	IdentityFile ~/.ssh/github
 
 Host nimbus
 	HostName nimbus-gateway.eng.vmware.com

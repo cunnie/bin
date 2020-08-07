@@ -3,6 +3,7 @@ authors:
   bec: Brendan Cunnie; saintbrendan
   bmc-work: Brian Cunnie
   bmc: Brian Cunnie; brian.cunnie
+  bl: Belinda Liu; belinda-liu
   cc: Charlotte Cunningham; mahgninnuc
   ch: Christopher Hunter; chunter
 email:
@@ -11,3 +12,4 @@ email_addresses:
   bmc-work: bcunnie@vmware.com
   ch: chunter@pivotal.io
   ac: crumpan@vmware.com
+  bl: lbelinda@vmware.com

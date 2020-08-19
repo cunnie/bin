@@ -167,6 +167,12 @@ Host belinda
 	ForwardAgent yes
 	IdentityFile ~/.ssh/github
 
+Host crhntr
+	HostName home.crhntr.com
+	User pivotal
+	ForwardAgent yes
+	IdentityFile ~/.ssh/github
+
 Host nimbus
 	HostName nimbus-gateway.eng.vmware.com
 	User bcunnie

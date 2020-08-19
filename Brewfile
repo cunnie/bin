@@ -1,5 +1,6 @@
 # TKS and TKGI are installed from https://network.pivotal.io/products/pivotal-container-service/
 
+tap "AdoptOpenJDK/openjdk"
 tap "cloudfoundry/tap"
 tap "git-duet/tap"
 tap "golangci/tap"

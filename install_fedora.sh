@@ -48,6 +48,20 @@ EOF
   fi
 }
 
+install_fasd() {
+  if [ ! -x /usr/local/bin/fasd ]; then
+    cd ~/workspace
+    git clone git@github.com:clvv/fasd.git
+    cd fasd
+    sudo make install
+    cat >> ~/.zshrc <<EOF
+
+eval "\$(fasd --init posix-alias zsh-hook)"
+alias z='fasd_cd -d'     # cd, same functionality as j in autojump
+EOF
+  fi
+}
+
 install_fly_cli() {
   if [ ! -x /usr/local/bin/fly ]; then
     curl -s -o /tmp/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
@@ -144,6 +158,7 @@ configure_zsh          # needs to come before install steps that modify .zshrc
 install_bosh_cli
 install_cf_cli
 install_chruby
+install_fasd
 install_fly_cli
 install_om_cli
 install_pivnet_cli

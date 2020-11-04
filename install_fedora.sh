@@ -2,7 +2,7 @@
 set -eu -o pipefail
 
 install_packages() {
-  dnf groupinstall -y "Development Tools"
+  sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
     bind-utils \
     btrfs-progs \

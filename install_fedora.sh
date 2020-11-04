@@ -2,14 +2,31 @@
 set -eu -o pipefail
 
 install_packages() {
+  dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
+    bind-utils \
+    btrfs-progs \
     docker-compose \
+    fd-find \
     golang \
+    iproute \
+    iputils \
     moby-engine \
+    mysql-devel \
     neovim \
+    net-tools \
+    npm \
+    openssl-devel \
     python \
     python3-neovim \
+    redhat-rpm-config \
+    ripgrep \
+    ruby \
+    ruby-devel \
+    rubygems \
+    strace \
     wget \
+    zlib-devel \
     zsh \
 
 }
@@ -96,6 +113,13 @@ install_luan_nvim() {
   fi
 }
 
+install_zsh_autosuggestions() {
+  if [ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
+      git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+      sed -i 's/^plugins=(/&zsh-autosuggestions /' $HOME/.zshrc
+  fi
+}
+
 configure_direnv() {
   if ! grep -q "direnv hook zsh" ~/.zshrc; then
     echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
@@ -163,6 +187,7 @@ install_fly_cli
 install_om_cli
 install_pivnet_cli
 install_luan_nvim
+install_zsh_autosuggestions
 use_pacific_time
 configure_direnv
 configure_docker

@@ -220,6 +220,30 @@ Host haas-256
   RequestTTY force
   RemoteCommand ssh ubuntu@opsmgr-01.haas-256.pez.pivotal.io
 
+Host esxi-200
+  HostName sc2-host-b102-35.haas-200.pez.pivotal.io
+  User root
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+
+Host esxi-237
+  HostName sc2-host-b104-31.haas-237.pez.pivotal.io
+  User root
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+
+Host esxi-241
+  HostName sc2-host-b103-41.haas-241.pez.pivotal.io
+  User root
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+
+Host esxi-256
+  HostName sc2-host-b104-42.haas-256.pez.pivotal.io
+  User root
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+
 # wildcards at bottom, otherwise they trump
 Host *.nono.io
 	User cunnie

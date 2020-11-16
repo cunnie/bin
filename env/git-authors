@@ -1,16 +1,18 @@
 authors:
   ac: Andrew Crump; acrmp
   bec: Brendan Cunnie; saintbrendan
+  bl: Belinda Liu; belinda-liu
   bmc-work: Brian Cunnie
   bmc: Brian Cunnie; brian.cunnie
-  bl: Belinda Liu; belinda-liu
   cc: Charlotte Cunningham; mahgninnuc
   ch: Christopher Hunter; chunter
+  jh: Julian Hjortshoj; julian-hj
   wf: Weyman Fung; wfung
 email:
   domain: gmail.com
 email_addresses:
   bmc-work: bcunnie@vmware.com
+  jh: jhortshoj@vmware.com
   ch: hunterch@vmware.com
   ac: crumpan@vmware.com
   bl: lbelinda@vmware.com

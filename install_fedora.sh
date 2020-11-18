@@ -28,6 +28,8 @@ install_packages() {
     wget \
     zlib-devel \
     zsh \
+    zsh-lovers \
+    zsh-syntax-highlighting \
 
 }
 

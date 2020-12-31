@@ -3,17 +3,21 @@ authors:
   bec: Brendan Cunnie; saintbrendan
   bl: Belinda Liu; belinda-liu
   bmc-work: Brian Cunnie
+  mo: Michael Oleske
   bmc: Brian Cunnie; brian.cunnie
   cc: Charlotte Cunningham; mahgninnuc
   ch: Christopher Hunter; chunter
   jh: Julian Hjortshoj; julian-hj
+  gl: Gary Liu; syslxg
   wf: Weyman Fung; wfung
 email:
   domain: gmail.com
 email_addresses:
   bmc-work: bcunnie@vmware.com
+  mo: moleske@vmware.com
   jh: jhortshoj@vmware.com
   ch: hunterch@vmware.com
   ac: crumpan@vmware.com
   bl: lbelinda@vmware.com
   wf: weymanf@vmware.com
+  gl: garyliu@vmware.com

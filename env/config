@@ -184,6 +184,9 @@ Host westminster
 	IdentityFile ~/.ssh/github
 	ForwardAgent yes
 
+Host sof2-dbc401.eng.vmware.com
+  IdentityFile ~/.ssh/dbc
+
 # append these entries to your local `ssh_config`
 #
 # GOTCHA: first ssh attempt will fail with `Connection closed by ....`, try again

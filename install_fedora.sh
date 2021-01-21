@@ -175,7 +175,7 @@ configure_tmux() {
     echo "If you don't have an ugly magenta bottom of your tmux screen, if nvim is unusable, then"
     echo "you may need to run this command to completely install tmux configuration:"
     echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
-    zsh -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
   fi
 }
 

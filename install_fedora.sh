@@ -115,6 +115,14 @@ install_luan_nvim() {
   fi
 }
 
+install_terraform() {
+  if [ ! -x /usr/local/bin/terraform ]; then
+    curl -o tf.zip -L https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
+    unzip tf.zip
+    sudo install terraform /usr/local/bin/
+  fi
+}
+
 install_zsh_autosuggestions() {
   if [ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
       git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
@@ -188,6 +196,7 @@ install_fasd
 install_fly_cli
 install_om_cli
 install_pivnet_cli
+install_terraform
 install_luan_nvim
 install_zsh_autosuggestions
 use_pacific_time

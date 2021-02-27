@@ -123,6 +123,15 @@ install_terraform() {
   fi
 }
 
+install_aws_cli() {
+  if [ ! -x /usr/local/bin/aws ]; then
+    # From https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install
+  fi
+}
+
 install_zsh_autosuggestions() {
   if [ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
       git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
@@ -197,6 +206,7 @@ install_fly_cli
 install_om_cli
 install_pivnet_cli
 install_terraform
+install_aws_cli
 install_luan_nvim
 install_zsh_autosuggestions
 use_pacific_time

@@ -4,7 +4,6 @@ set -eu -o pipefail
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
-    bin-utils \
     bind-utils \
     btrfs-progs \
     conntrack \

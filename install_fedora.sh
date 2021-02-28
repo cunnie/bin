@@ -4,10 +4,12 @@ set -eu -o pipefail
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
+    bin-utils \
     bind-utils \
     btrfs-progs \
     docker-compose \
     fd-find \
+    git \
     golang \
     iproute \
     iputils \
@@ -25,6 +27,9 @@ install_packages() {
     ruby-devel \
     rubygems \
     strace \
+    the_silver_searcher \
+    tmux \
+    util-linux-user \
     wget \
     zlib-devel \
     zsh \

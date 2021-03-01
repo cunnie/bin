@@ -164,7 +164,7 @@ configure_docker() {
 
 configure_zsh() {
   if [ ! -f $HOME/.zshrc ]; then
-    sudo chsh -s /usr/bin/zsh pivotal
+    sudo chsh -s /usr/bin/zsh $USER
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc
     echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~/.zshrc

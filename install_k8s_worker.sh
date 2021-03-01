@@ -41,20 +41,7 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
-}
-
-install_bosh_cli() {
-  if [ ! -x /usr/local/bin/bosh ]; then
-    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v6.4.1/bosh-cli-6.4.1-linux-amd64 -o /tmp/bosh
-    sudo install /tmp/bosh /usr/local/bin
-  fi
-}
-
-install_cf_cli() {
-  if [ ! -x /usr/bin/cf ]; then
-    sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
-    sudo dnf install -y cf7-cli
-  fi
+  sudo rpm -e moby-engine # don't need docker; don't need cluttered iptables
 }
 
 install_chruby() {
@@ -96,20 +83,6 @@ install_fly_cli() {
     curl -s -o /tmp/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
     sudo install /tmp/fly /usr/local/bin
     sudo chmod a+w /usr/local/bin
-  fi
-}
-
-install_om_cli() {
-  if [ ! -x /usr/local/bin/om ]; then
-    curl -s -L -o /tmp/om https://github.com/pivotal-cf/om/releases/download/6.3.0/om-linux-6.3.0
-    sudo install /tmp/om /usr/local/bin
-  fi
-}
-
-install_pivnet_cli() {
-  if [ ! -x /usr/local/bin/pivnet ]; then
-    curl -s -L -o /tmp/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v2.0.1/pivnet-linux-amd64-2.0.1
-    sudo install /tmp/pivnet /usr/local/bin
   fi
 }
 
@@ -161,15 +134,9 @@ configure_direnv() {
   done
 }
 
-configure_docker() {
-  # https://fedoramagazine.org/docker-and-fedora-32/
-  sudo systemctl enable docker
-  sudo usermod -aG docker $USER
-}
-
 configure_zsh() {
   if [ ! -f $HOME/.zshrc ]; then
-    sudo chsh -s /usr/bin/zsh pivotal
+    sudo chsh -s /usr/bin/zsh $USER
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc
     echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~/.zshrc
@@ -208,19 +175,14 @@ configure_tmux() {
 
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
-install_bosh_cli
-install_cf_cli
 install_chruby
 install_fasd
 install_fly_cli
-install_om_cli
-install_pivnet_cli
 install_terraform
 install_aws_cli
 install_luan_nvim
 install_zsh_autosuggestions
 use_pacific_time
 configure_direnv
-configure_docker
 configure_git
 configure_tmux

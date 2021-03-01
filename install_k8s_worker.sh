@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu -o pipefail
+set -xeu -o pipefail
 
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
@@ -41,7 +41,7 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
-  sudo rpm -e moby-engine # don't need docker; don't need cluttered iptables
+  sudo dnf remove moby-engine # don't need docker; don't need cluttered iptables
 }
 
 install_chruby() {
@@ -160,6 +160,8 @@ configure_git() {
   git config --global color.diff auto
   git config --global color.status auto
   git config --global core.editor nvim
+
+  mkdir -p ~/workspace # where we typically clone our repos
 }
 
 configure_tmux() {

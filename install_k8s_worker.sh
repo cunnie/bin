@@ -10,6 +10,7 @@ install_packages() {
     containerd \
     containernetworking-plugins \
     cri-tools \
+    direnv \
     fd-find \
     git \
     golang \
@@ -109,7 +110,7 @@ install_terraform() {
 install_aws_cli() {
   if [ ! -x /usr/local/bin/aws ]; then
     # From https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     sudo ./aws/install
   fi
@@ -175,6 +176,7 @@ configure_tmux() {
   fi
 }
 
+ARCH=$(uname -i)
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby

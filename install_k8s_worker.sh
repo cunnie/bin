@@ -41,7 +41,7 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
-  sudo dnf remove moby-engine # don't need docker; don't need cluttered iptables
+  sudo dnf -y remove moby-engine # don't need docker; don't need cluttered iptables
 }
 
 install_chruby() {

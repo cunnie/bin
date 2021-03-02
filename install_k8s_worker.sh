@@ -177,6 +177,7 @@ configure_tmux() {
 }
 
 ARCH=$(uname -i)
+mkdir -p $HOME/workspace
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby

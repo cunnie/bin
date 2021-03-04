@@ -49,7 +49,6 @@ create_user_cunnie() {
   if ! id cunnie; then
     sudo adduser \
       --create-home \
-      --shell=/usr/bin/zsh \
       --comment="Brian Cunnie" \
       --groups=adm,wheel,systemd-journal \
       cunnie

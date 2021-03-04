@@ -49,6 +49,7 @@ create_user_cunnie() {
   if ! id cunnie; then
     sudo adduser \
       --create-home \
+      --shell=/usr/bin/zsh \
       --comment="Brian Cunnie" \
       --groups=adm,wheel,systemd-journal \
       cunnie
@@ -149,7 +150,7 @@ configure_direnv() {
 }
 
 configure_zsh() {
-  if [ ! -f $HOME/.zshrc ]; then
+  if [ ! -d $HOME/.oh-my-zsh ]; then
     sudo chsh -s /usr/bin/zsh $USER
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc

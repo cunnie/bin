@@ -45,6 +45,20 @@ install_packages() {
   sudo dnf -y remove moby-engine # don't need docker; don't need cluttered iptables
 }
 
+create_user_cunnie() {
+  if ! id cunnie; then
+    sudo adduser \
+      --create-home \
+      --shell=/usr/bin/zsh \
+      --comment="Brian Cunnie" \
+      --groups=adm,wheel,systemd-journal \
+      cunnie
+    sudo -u cunnie mkdir ~cunnie/.ssh
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo -u cunnie tee ~cunnie/.ssh/authorized_keys
+    sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
+  fi
+}
+
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.7.0.tar.gz \
@@ -165,6 +179,10 @@ configure_git() {
   mkdir -p ~/workspace # where we typically clone our repos
 }
 
+configure_sudo() {
+  sudo sed -i 's/# %wheel/%wheel/' /etc/sudoers
+}
+
 configure_tmux() {
   # https://github.com/luan/tmuxfiles, to clear, `rm -rf ~/.tmux.conf ~/.tmux`
   if [ ! -f $HOME/.tmux.conf ]; then
@@ -173,20 +191,6 @@ configure_tmux() {
     echo "you may need to run this command to completely install tmux configuration:"
     echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
     bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
-  fi
-}
-
-create_user_cunnie() {
-  if ! id cunnie; then
-    sudo adduser \
-      --create-home \
-      --shell=/usr/bin/zsh \
-      --comment="Brian Cunnie" \
-      --groups=adm,wheel,systemd-journal \
-      cunnie
-    sudo -u cunnie mkdir ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo -u cunnie tee ~cunnie/.ssh/authorized_keys
-    sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
   fi
 }
 
@@ -205,4 +209,5 @@ install_zsh_autosuggestions
 use_pacific_time
 configure_direnv
 configure_git
+configure_sudo
 configure_tmux

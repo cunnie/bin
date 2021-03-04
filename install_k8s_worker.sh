@@ -176,9 +176,19 @@ configure_tmux() {
   fi
 }
 
+create_user_cunnie() {
+  if ! id cunnie; then
+    sudo adduser --create-home --shell=/usr/bin/zsh --comment="Brian Cunnie" cunnie
+    sudo -u cunnie mkdir ~cunnie/.ssh
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo -u cunnie tee ~cunnie/.ssh/authorized_keys
+    sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
+  fi
+}
+
 ARCH=$(uname -i)
 mkdir -p $HOME/workspace
 install_packages
+create_user_cunnie
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
 install_fasd

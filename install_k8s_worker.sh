@@ -38,6 +38,7 @@ install_packages() {
     tmux \
     util-linux-user \
     wget \
+    wireguard-tools \
     zlib-devel \
     zsh \
     zsh-lovers \

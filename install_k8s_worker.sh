@@ -16,6 +16,7 @@ install_packages() {
     golang \
     iproute \
     ipset \
+    iptables \
     iputils \
     kubernetes \
     mysql-devel \
@@ -42,7 +43,8 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
-  sudo dnf -y remove moby-engine # don't need docker; don't need cluttered iptables
+  # don't use `dnf uninstall`; it removes the k8s dependencies
+  sudo rpm -e moby-engine # don't need docker; don't need cluttered iptables
 }
 
 create_user_cunnie() {

@@ -45,7 +45,7 @@ install_packages() {
     zsh-syntax-highlighting \
 
   # don't use `dnf uninstall`; it removes the k8s dependencies
-  sudo rpm -e moby-engine # don't need docker; don't need cluttered iptables
+  sudo rpm -e moby-engine || true # don't need docker; don't need cluttered iptables
 }
 
 create_user_cunnie() {
@@ -166,6 +166,13 @@ use_pacific_time() {
   sudo timedatectl set-timezone America/Los_Angeles
 }
 
+disable_selinux() {
+  if grep -q SELINUX=enforcing /etc/selinux/config; then
+    printf "disabling SELINUX and firewall"
+    sudo sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
+  fi
+}
+
 configure_git() {
   # https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
   git config --global user.name "Brian Cunnie"
@@ -210,6 +217,7 @@ install_aws_cli
 install_luan_nvim
 install_zsh_autosuggestions
 use_pacific_time
+disable_selinux
 configure_direnv
 configure_git
 configure_sudo

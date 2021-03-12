@@ -74,7 +74,7 @@ install_chruby() {
     tar -xzvf chruby-0.3.9.tar.gz
     cd chruby-0.3.9/
     sudo make install
-    cat >> ~/.zshrc <<EOF
+    cat >> $HOME/.zshrc <<EOF
 
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
@@ -84,11 +84,11 @@ EOF
 
 install_fasd() {
   if [ ! -x /usr/local/bin/fasd ]; then
-    cd ~/workspace
+    cd $HOME/workspace
     git clone git@github.com:clvv/fasd.git
     cd fasd
     sudo make install
-    cat >> ~/.zshrc <<EOF
+    cat >> $HOME/.zshrc <<EOF
 
 eval "\$(fasd --init posix-alias zsh-hook)"
 alias z='fasd_cd -d'     # cd, same functionality as j in autojump
@@ -141,8 +141,8 @@ install_zsh_autosuggestions() {
 }
 
 configure_direnv() {
-  if ! grep -q "direnv hook zsh" ~/.zshrc; then
-    echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+  if ! grep -q "direnv hook zsh" $HOME/.zshrc; then
+    echo 'eval "$(direnv hook zsh)"' >> $HOME/.zshrc
     eval "$(direnv hook bash)"
   fi
   for envrc in $(find "$HOME/workspace" -maxdepth 2 -name '.envrc' -print); do
@@ -156,9 +156,9 @@ configure_zsh() {
   if [ ! -d $HOME/.oh-my-zsh ]; then
     sudo chsh -s /usr/bin/zsh $USER
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    sed -i 's/robbyrussell/agnoster/' ~/.zshrc
-    echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~/.zshrc
-    echo 'export EDITOR=nvim' >> ~/.zshrc
+    sed -i 's/robbyrussell/agnoster/' $HOME/.zshrc
+    echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> $HOME/.zshrc
+    echo 'export EDITOR=nvim' >> $HOME/.zshrc
   fi
 }
 
@@ -186,7 +186,7 @@ configure_git() {
   git config --global color.status auto
   git config --global core.editor nvim
 
-  mkdir -p ~/workspace # where we typically clone our repos
+  mkdir -p $HOME/workspace # where we typically clone our repos
 }
 
 configure_sudo() {
@@ -205,9 +205,9 @@ configure_tmux() {
 }
 
 ARCH=$(uname -i)
-mkdir -p $HOME/workspace
 install_packages
 create_user_cunnie
+mkdir -p ${HOME:=~cunnie}/workspace # sometimes run as root via terraform user_date, no HOME
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
 install_fasd
@@ -222,3 +222,4 @@ configure_direnv
 configure_git
 configure_sudo
 configure_tmux
+sudo chown -R cunnie:cunnie ~cunnie

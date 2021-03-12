@@ -207,7 +207,9 @@ configure_tmux() {
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
-mkdir -p ${HOME:=~cunnie}/workspace # sometimes run as root via terraform user_date, no HOME
+HOME=${HOME:-~cunnie}
+USER=${USER:-cunnie}
+mkdir -p HOME/workspace # sometimes run as root via terraform user_data, no HOME
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
 install_fasd

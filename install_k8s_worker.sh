@@ -30,6 +30,7 @@ install_packages() {
     mysql-devel \
     neovim \
     net-tools \
+    nmap-ncat \
     npm \
     openssl-devel \
     python \

@@ -1,4 +1,12 @@
 #!/bin/bash
+
+# This script is meant to be an idempotent script (you can run it multiple
+# times in a row).
+
+# This script is meant to be run by the root user (via AWS's cloud-init /
+# terraform's user_data) with no ssh key, no USER or HOME variable, and also be
+# run by user cunnie, with ssh keys and environment variables set.
+
 set -xeu -o pipefail
 
 install_packages() {
@@ -56,8 +64,10 @@ create_user_cunnie() {
       --comment="Brian Cunnie" \
       --groups=adm,wheel,systemd-journal \
       cunnie
-    sudo -u cunnie mkdir ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo -u cunnie tee ~cunnie/.ssh/authorized_keys
+    mkdir ~cunnie/.ssh
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " > ~cunnie/.ssh/authorized_keys
+    ssh-keyscan github.com > ~cunnie/.ssh/known_hosts
+    sudo chown -R cunnie:cunnie ~cunnie
     sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
   fi
 }
@@ -180,7 +190,6 @@ configure_git() {
   git config --global alias.co checkout
   git config --global alias.ci commit
   git config --global alias.st status
-  git config --global url."git@github.com:".insteadOf "https://github.com/"
   git config --global color.branch auto
   git config --global color.diff auto
   git config --global color.status auto
@@ -200,15 +209,15 @@ configure_tmux() {
     echo "If you don't have an ugly magenta bottom of your tmux screen, if nvim is unusable, then"
     echo "you may need to run this command to completely install tmux configuration:"
     echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
+    su - cunnie zsh -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
   fi
 }
 
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
-HOME=${HOME:-~cunnie}
-USER=${USER:-cunnie}
+export HOME=${HOME:-~cunnie}
+export USER=${USER:-cunnie}
 mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
@@ -224,4 +233,6 @@ configure_direnv
 configure_git
 configure_sudo
 configure_tmux
+
 sudo chown -R cunnie:cunnie ~cunnie
+git config --global url."git@github.com:".insteadOf "https://github.com/"

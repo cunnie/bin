@@ -85,7 +85,7 @@ EOF
 install_fasd() {
   if [ ! -x /usr/local/bin/fasd ]; then
     cd $HOME/workspace
-    git clone git@github.com:clvv/fasd.git
+    git clone https://github.com/clvv/fasd.git
     cd fasd
     sudo make install
     cat >> $HOME/.zshrc <<EOF

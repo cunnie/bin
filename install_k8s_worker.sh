@@ -27,6 +27,7 @@ install_packages() {
     iptables \
     iputils \
     kubernetes \
+    kubernetes-kubeadm \
     mysql-devel \
     neovim \
     net-tools \
@@ -214,6 +215,90 @@ configure_tmux() {
   fi
 }
 
+disable_swap() {
+  if [ ! "$(sudo swapon --show)" = "" ]; then
+    sudo swapoff -a;
+    sudo sed --in-place '/none *swap /d' /etc/fstab;
+    sudo systemctl daemon-reload
+  fi
+}
+
+make_k8s_dirs() {
+  sudo mkdir -p \
+    /etc/cni/net.d \
+    /var/lib/kubernetes \
+    /var/lib/kube-proxy \
+
+}
+
+configure_cni_networking() {
+  if [ ! -f /etc/cni/net.d/10-bridge.conf ]; then
+    sudo tee /etc/cni/net.d/10-bridge.conf <<EOF
+{
+    "cniVersion": "0.3.1",
+    "name": "bridge",
+    "type": "bridge",
+    "bridge": "cnio0",
+    "isGateway": true,
+    "ipMasq": true,
+    "ipam": {
+        "type": "host-local",
+        "ranges": [
+          [{"subnet": "${POD_CIDR}"}]
+        ],
+        "routes": [{"dst": "0.0.0.0/0"}]
+    }
+}
+EOF
+  fi
+  if [ ! -f /etc/cni/net.d/99-loopback.conf ]; then
+    sudo tee /etc/cni/net.d/99-loopback.conf <<EOF
+{
+    "cniVersion": "0.3.1",
+    "name": "lo",
+    "type": "loopback"
+}
+EOF
+  fi
+}
+
+configure_containerd() {
+  if [ ! -f /etc/systemd/system/containerd.service ]; then
+    sudo tee /etc/containerd/config.toml <<EOF
+[plugins]
+[plugins.cri.containerd]
+  snapshotter = "overlayfs"
+  [plugins.cri.containerd.default_runtime]
+    runtime_type = "io.containerd.runtime.v1.linux"
+    runtime_engine = "/usr/bin/runc"
+    runtime_root = ""
+[plugins.cri.cni]
+  bin_dir = "/usr/libexec/cni"
+EOF
+    sudo tee /etc/systemd/system/containerd.service <<EOF
+[Unit]
+Description=containerd container runtime
+Documentation=https://containerd.io
+After=network.target
+
+[Service]
+ExecStartPre=/sbin/modprobe overlay
+ExecStart=/usr/bin/containerd
+Restart=always
+RestartSec=5
+Delegate=yes
+KillMode=process
+OOMScoreAdjust=-999
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  fi
+}
+
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
@@ -234,6 +319,10 @@ configure_direnv
 configure_git
 configure_sudo
 configure_tmux
+disable_swap
+make_k8s_dirs
+configure_cni_networking
+configure_containerd
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"

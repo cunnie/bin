@@ -4,13 +4,22 @@ authors:
   bl: Belinda Liu; belinda-liu
   bmc-work: Brian Cunnie
   bmc: Brian Cunnie; brian.cunnie
+  bu: Brian Upton; bupton
   cc: Charlotte Cunningham; mahgninnuc
   ch: Christopher Hunter; chunter
+  ds: David Stevenson; stevensonda
   gl: Gary Liu; syslxg
   jh: Julian Hjortshoj; julian-hj
+  jp: Joseph Palermo; jpalermo
+  kl: Kenneth Lakin; klakin
   mas: Maria Shaldybin
   mo: Michael Oleske
+  mr: Maya Rosecrance; mrosecrance
+  ms: Maria Shaldybin; mariash
   ms: Mark Stokan
+  mx: Ming Xiao; mxiao
+  sc: Sam Coward; scoward
+  vk: Vibhas Kumar; vibhas
   wf: Weyman Fung; wfung
 email:
   domain: gmail.com
@@ -18,10 +27,19 @@ email_addresses:
   ac: crumpan@vmware.com
   bl: lbelinda@vmware.com
   bmc-work: bcunnie@vmware.com
+  bu: bupton@vmware.com
   ch: hunterch@vmware.com
+  ds: stevensonda@vmware.com
   gl: garyliu@vmware.com
   jh: jhortshoj@vmware.com
+  jp: jpalermo@vmware.com
+  kl: klakin@vmware.com
   mas: mariash@vmware.com
   mo: moleske@vmware.com
+  mr: mrosecrance@vmware.com
+  ms: mariash@vmware.com
   ms: stokanm@vmware.com
+  mx: mxiao@vmware.com
+  sc: scoward@vmware.com
+  vk: vibhas@vmware.com
   wf: weymanf@vmware.com

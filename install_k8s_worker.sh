@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # This script is meant to be an idempotent script (you can run it multiple
 # times in a row).
@@ -233,6 +233,14 @@ make_k8s_dirs() {
 
 configure_cni_networking() {
   if [ ! -f /etc/cni/net.d/10-bridge.conf ]; then
+    HOSTNAME=$(hostname)
+    POD_CIDR_THIRD_OCTET=${HOSTNAME#worker-}
+    if [[ $POD_CIDR_THIRD_OCTET =~ ^[0-9]+$ ]]; then
+      POD_CIDR="10.200.$POD_CIDR_THIRD_OCTET.0/24"
+    else
+      echo "hostname must be set to something that matches 'worker-[0-9]+'" 1>&2
+      exit 1
+    fi
     sudo tee /etc/cni/net.d/10-bridge.conf <<EOF
 {
     "cniVersion": "0.3.1",

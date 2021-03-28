@@ -307,6 +307,13 @@ EOF
   fi
 }
 
+configure_cgroups_v1() {
+  if ! sudo ag systemd.unified_cgroup_hierarchy=0 /boot/loader/entries/ > /dev/null; then
+    sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
+    echo "remember to reboot to apply cgroups v1" >&2
+  fi
+}
+
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
@@ -331,6 +338,7 @@ disable_swap
 make_k8s_dirs
 configure_cni_networking
 configure_containerd
+configure_cgroups_v1
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"

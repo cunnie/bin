@@ -1,5 +1,6 @@
 # TKS and TKGI are installed from https://network.pivotal.io/products/pivotal-container-service/
 
+tap "adoptopenjdk/openjdk"
 tap "cloudfoundry/tap"
 tap "git-duet/tap"
 tap "golangci/tap"
@@ -79,6 +80,7 @@ brew "zsh-git-prompt"
 brew "zsh-lovers"
 brew "zsh-syntax-highlighting"
 
+cask "adoptopenjdk11"
 cask "adoptopenjdk8"
 cask "battle-net"
 cask "discord"

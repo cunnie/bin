@@ -185,6 +185,17 @@ disable_selinux() {
   fi
 }
 
+configure_pod_cidr() {
+  # POD_CIDR is used in at least two different places
+  POD_CIDR_THIRD_OCTET=${HOSTNAME#worker-}
+  if [[ $POD_CIDR_THIRD_OCTET =~ ^[0-9]+$ ]]; then
+    POD_CIDR="10.200.$POD_CIDR_THIRD_OCTET.0/24"
+  else
+    echo "hostname must be set to something that matches 'worker-[0-9]+'" 1>&2
+    exit 1
+  fi
+}
+
 configure_git() {
   # https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
   git config --global user.name "Brian Cunnie"
@@ -233,14 +244,6 @@ make_k8s_dirs() {
 
 configure_cni_networking() {
   if [ ! -f /etc/cni/net.d/10-bridge.conf ]; then
-    HOSTNAME=$(hostname)
-    POD_CIDR_THIRD_OCTET=${HOSTNAME#worker-}
-    if [[ $POD_CIDR_THIRD_OCTET =~ ^[0-9]+$ ]]; then
-      POD_CIDR="10.200.$POD_CIDR_THIRD_OCTET.0/24"
-    else
-      echo "hostname must be set to something that matches 'worker-[0-9]+'" 1>&2
-      exit 1
-    fi
     sudo tee /etc/cni/net.d/10-bridge.conf <<EOF
 {
     "cniVersion": "0.3.1",
@@ -307,6 +310,86 @@ EOF
   fi
 }
 
+configure_kubelet() {
+  if [ ! -f /var/lib/kubelet/kubelet-config.yaml ]; then
+    sudo tee /var/lib/kubelet/kubelet-config.yaml <<EOF
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+authentication:
+  anonymous:
+    enabled: false
+  webhook:
+    enabled: true
+  x509:
+    clientCAFile: "/var/lib/kubernetes/ca.pem"
+authorization:
+  mode: Webhook
+clusterDomain: "cluster.local"
+clusterDNS:
+  - "10.32.0.10"
+podCIDR: "${POD_CIDR}"
+resolvConf: "/run/systemd/resolve/resolv.conf"
+runtimeRequestTimeout: "15m"
+tlsCertFile: "/var/lib/kubelet/${HOSTNAME}.pem"
+tlsPrivateKeyFile: "/var/lib/kubelet/${HOSTNAME}-key.pem"
+EOF
+  fi
+  if [ ! -f /etc/systemd/system/kubelet.service ]; then
+    sudo tee /etc/systemd/system/kubelet.service <<EOF
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+After=containerd.service
+Requires=containerd.service
+
+[Service]
+ExecStart=/usr/bin/kubelet \\
+  --config=/var/lib/kubelet/kubelet-config.yaml \\
+  --container-runtime=remote \\
+  --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\
+  --image-pull-progress-deadline=2m \\
+  --kubeconfig=/var/lib/kubelet/kubeconfig \\
+  --network-plugin=cni \\
+  --register-node=true \\
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  fi
+}
+
+configure_kube_proxy() {
+  if [ ! -f /var/lib/kube-proxy/kube-proxy-config.yaml ]; then
+    sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml <<EOF
+kind: KubeProxyConfiguration
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+clientConnection:
+  kubeconfig: "/var/lib/kube-proxy/kubeconfig"
+mode: "iptables"
+clusterCIDR: "10.200.0.0/16"
+EOF
+  fi
+  if [ ! -f /etc/systemd/system/kube-proxy.service ]; then
+    sudo tee /etc/systemd/system/kube-proxy.service <<EOF
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/bin/kube-proxy \\
+  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  fi
+}
+
 configure_cgroups_v1() {
   if ! sudo ag systemd.unified_cgroup_hierarchy=0 /boot/loader/entries/ > /dev/null; then
     sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
@@ -319,7 +402,9 @@ install_packages
 create_user_cunnie
 export HOME=${HOME:-~cunnie}
 export USER=${USER:-cunnie}
+export HOSTNAME=$(hostname)
 mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
+configure_pod_cidr
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
 install_fasd
@@ -338,6 +423,8 @@ disable_swap
 make_k8s_dirs
 configure_cni_networking
 configure_containerd
+configure_kubelet
+configure_kube_proxy
 configure_cgroups_v1
 
 sudo chown -R cunnie:cunnie ~cunnie

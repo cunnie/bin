@@ -11,6 +11,7 @@ set -xeu -o pipefail
 
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
+  sudo rpm -e chrony || true # chrony is good for a client, ntp is good for a server
   sudo dnf install -y \
     bind-utils \
     btrfs-progs \
@@ -33,6 +34,7 @@ install_packages() {
     net-tools \
     nmap-ncat \
     npm \
+    ntp \
     openssl-devel \
     python \
     python3-neovim \
@@ -223,6 +225,26 @@ configure_tmux() {
     echo "you may need to run this command to completely install tmux configuration:"
     echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
     su - cunnie zsh -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
+  fi
+}
+
+configure_ntp() {
+  if ! grep -q time1.google.com /etc/ntp.conf; then
+    cat <<EOF | sudo tee /etc/ntp.conf
+# Our upstream timekeepers; thank you Google
+server time1.google.com iburst
+server time2.google.com iburst
+server time3.google.com iburst
+server time4.google.com iburst
+# "Batten down the hatches!"
+# see http://support.ntp.org/bin/view/Support/AccessRestrictions
+restrict default limited kod nomodify notrap nopeer
+restrict -6 default limited kod nomodify notrap nopeer
+restrict 127.0.0.0 mask 255.0.0.0
+restrict -6 ::1
+EOF
+    sudo systemctl enable ntpd
+    sudo systemctl start ntpd
   fi
 }
 
@@ -419,6 +441,7 @@ configure_direnv
 configure_git
 configure_sudo
 configure_tmux
+configure_ntp
 disable_swap
 make_k8s_dirs
 configure_cni_networking

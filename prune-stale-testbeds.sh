@@ -5,6 +5,7 @@ DATACENTER=wdc
 USER=svc.tas-anycloud NIMBUS_LOCATION=$DATACENTER nimbus-ctl --testbed list > $TESTBED_FILE
 sort -k 2 < $TESTBED_FILE | # sort by testbed name
   grep -v "^ " | # remove the VMs, keep only the testbed info
+  grep -v "svc.tas" | # don't kill the MaaS testbeds
   grep -v "lease expires at unknown" | # ignore zombie testbeds which have no VMs
   cut -b 16-512 | # remove weird & useless datacenter info
   sed 's=(ID: .......),.*==' | # remove everything but the testbed name

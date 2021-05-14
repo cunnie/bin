@@ -15,9 +15,10 @@ authors:
   mas: Maria Shaldybin
   mo: Michael Oleske
   mr: Maya Rosecrance; mrosecrance
-  ms: Maria Shaldybin; mariash
+  mariash: Maria Shaldybin; mariash
   ms: Mark Stokan
   mx: Ming Xiao; mxiao
+  rk: Ruben Koster; rkoster
   sc: Sam Coward; scoward
   vk: Vibhas Kumar; vibhas
   wf: Weyman Fung; wfung
@@ -37,9 +38,10 @@ email_addresses:
   mas: mariash@vmware.com
   mo: moleske@vmware.com
   mr: mrosecrance@vmware.com
-  ms: mariash@vmware.com
+  mariash: mariash@vmware.com
   ms: stokanm@vmware.com
   mx: mxiao@vmware.com
+  rk: rubenk@vmware.com
   sc: scoward@vmware.com
   vk: vibhas@vmware.com
   wf: weymanf@vmware.com

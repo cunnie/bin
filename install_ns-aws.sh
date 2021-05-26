@@ -15,10 +15,6 @@ install_packages() {
   sudo dnf install -y \
     bind-utils \
     btrfs-progs \
-    conntrack \
-    containerd \
-    containernetworking-plugins \
-    cri-tools \
     direnv \
     fd-find \
     git \
@@ -27,8 +23,6 @@ install_packages() {
     ipset \
     iptables \
     iputils \
-    kubernetes \
-    kubernetes-kubeadm \
     mysql-devel \
     neovim \
     net-tools \
@@ -43,8 +37,6 @@ install_packages() {
     ruby \
     ruby-devel \
     rubygems \
-    runc \
-    socat \
     strace \
     the_silver_searcher \
     tmux \
@@ -248,177 +240,6 @@ EOF
   fi
 }
 
-disable_swap() {
-  if [ ! "$(sudo swapon --show)" = "" ]; then
-    sudo swapoff -a;
-    sudo sed --in-place '/none *swap /d' /etc/fstab;
-    sudo systemctl daemon-reload
-  fi
-}
-
-make_k8s_dirs() {
-  sudo mkdir -p \
-    /etc/cni/net.d \
-    /var/lib/kubernetes \
-    /var/lib/kube-proxy \
-
-}
-
-configure_cni_networking() {
-  if [ ! -f /etc/cni/net.d/10-bridge.conf ]; then
-    sudo tee /etc/cni/net.d/10-bridge.conf <<EOF
-{
-    "cniVersion": "0.3.1",
-    "name": "bridge",
-    "type": "bridge",
-    "bridge": "cnio0",
-    "isGateway": true,
-    "ipMasq": true,
-    "ipam": {
-        "type": "host-local",
-        "ranges": [
-          [{"subnet": "${POD_CIDR}"}]
-        ],
-        "routes": [{"dst": "0.0.0.0/0"}]
-    }
-}
-EOF
-  fi
-  if [ ! -f /etc/cni/net.d/99-loopback.conf ]; then
-    sudo tee /etc/cni/net.d/99-loopback.conf <<EOF
-{
-    "cniVersion": "0.3.1",
-    "name": "lo",
-    "type": "loopback"
-}
-EOF
-  fi
-}
-
-configure_containerd() {
-  if [ ! -f /etc/systemd/system/containerd.service ]; then
-    sudo tee /etc/containerd/config.toml <<EOF
-[plugins]
-[plugins.cri.containerd]
-  snapshotter = "overlayfs"
-  [plugins.cri.containerd.default_runtime]
-    runtime_type = "io.containerd.runtime.v1.linux"
-    runtime_engine = "/usr/bin/runc"
-    runtime_root = ""
-[plugins.cri.cni]
-  bin_dir = "/usr/libexec/cni"
-EOF
-    sudo tee /etc/systemd/system/containerd.service <<EOF
-[Unit]
-Description=containerd container runtime
-Documentation=https://containerd.io
-After=network.target
-
-[Service]
-ExecStartPre=/sbin/modprobe overlay
-ExecStart=/usr/bin/containerd
-Restart=always
-RestartSec=5
-Delegate=yes
-KillMode=process
-OOMScoreAdjust=-999
-LimitNOFILE=1048576
-LimitNPROC=infinity
-LimitCORE=infinity
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  fi
-}
-
-configure_kubelet() {
-  if [ ! -f /var/lib/kubelet/kubelet-config.yaml ]; then
-    sudo tee /var/lib/kubelet/kubelet-config.yaml <<EOF
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
-  anonymous:
-    enabled: false
-  webhook:
-    enabled: true
-  x509:
-    clientCAFile: "/var/lib/kubernetes/ca.pem"
-authorization:
-  mode: Webhook
-clusterDomain: "cluster.local"
-clusterDNS:
-  - "10.32.0.10"
-podCIDR: "${POD_CIDR}"
-resolvConf: "/run/systemd/resolve/resolv.conf"
-runtimeRequestTimeout: "15m"
-tlsCertFile: "/var/lib/kubelet/${HOSTNAME}.pem"
-tlsPrivateKeyFile: "/var/lib/kubelet/${HOSTNAME}-key.pem"
-EOF
-  fi
-  if [ ! -f /etc/systemd/system/kubelet.service ]; then
-    sudo tee /etc/systemd/system/kubelet.service <<EOF
-[Unit]
-Description=Kubernetes Kubelet
-Documentation=https://github.com/kubernetes/kubernetes
-After=containerd.service
-Requires=containerd.service
-
-[Service]
-ExecStart=/usr/bin/kubelet \\
-  --config=/var/lib/kubelet/kubelet-config.yaml \\
-  --container-runtime=remote \\
-  --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\
-  --image-pull-progress-deadline=2m \\
-  --kubeconfig=/var/lib/kubelet/kubeconfig \\
-  --network-plugin=cni \\
-  --register-node=true \\
-  --v=2
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  fi
-}
-
-configure_kube_proxy() {
-  if [ ! -f /var/lib/kube-proxy/kube-proxy-config.yaml ]; then
-    sudo tee /var/lib/kube-proxy/kube-proxy-config.yaml <<EOF
-kind: KubeProxyConfiguration
-apiVersion: kubeproxy.config.k8s.io/v1alpha1
-clientConnection:
-  kubeconfig: "/var/lib/kube-proxy/kubeconfig"
-mode: "iptables"
-clusterCIDR: "10.200.0.0/16"
-EOF
-  fi
-  if [ ! -f /etc/systemd/system/kube-proxy.service ]; then
-    sudo tee /etc/systemd/system/kube-proxy.service <<EOF
-[Unit]
-Description=Kubernetes Kube Proxy
-Documentation=https://github.com/kubernetes/kubernetes
-
-[Service]
-ExecStart=/usr/bin/kube-proxy \\
-  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  fi
-}
-
-configure_cgroups_v1() {
-  if ! sudo ag systemd.unified_cgroup_hierarchy=0 /boot/loader/entries/ > /dev/null; then
-    sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
-    echo "remember to reboot to apply cgroups v1" >&2
-  fi
-}
-
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
@@ -442,13 +263,6 @@ configure_git
 configure_sudo
 configure_tmux
 configure_ntp
-disable_swap
-make_k8s_dirs
-configure_cni_networking
-configure_containerd
-configure_kubelet
-configure_kube_proxy
-configure_cgroups_v1
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"

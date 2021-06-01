@@ -28,7 +28,7 @@ install_packages() {
     net-tools \
     nmap-ncat \
     npm \
-    ntp \
+    ntpsec \
     openssl-devel \
     python \
     python3-neovim \

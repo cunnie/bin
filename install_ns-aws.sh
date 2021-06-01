@@ -179,17 +179,6 @@ disable_selinux() {
   fi
 }
 
-configure_pod_cidr() {
-  # POD_CIDR is used in at least two different places
-  POD_CIDR_THIRD_OCTET=${HOSTNAME#worker-}
-  if [[ $POD_CIDR_THIRD_OCTET =~ ^[0-9]+$ ]]; then
-    POD_CIDR="10.200.$POD_CIDR_THIRD_OCTET.0/24"
-  else
-    echo "hostname must be set to something that matches 'worker-[0-9]+'" 1>&2
-    exit 1
-  fi
-}
-
 configure_git() {
   # https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
   git config --global user.name "Brian Cunnie"
@@ -247,7 +236,6 @@ export HOME=${HOME:-~cunnie}
 export USER=${USER:-cunnie}
 export HOSTNAME=$(hostname)
 mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
-configure_pod_cidr
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
 install_fasd

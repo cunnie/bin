@@ -11,7 +11,7 @@ set -xeu -o pipefail
 
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
-  sudo rpm -e chrony || true # chrony is good for a client, ntp is good for a server
+  sudo rpm -e chrony || true # chrony is good for a client, ntpsec is good for a server
   sudo dnf install -y \
     bind-utils \
     btrfs-progs \
@@ -229,6 +229,13 @@ EOF
   fi
 }
 
+install_sslip_io() {
+  GOLANG_ARCH=${ARCH/aarch64/arm64/}
+  curl -L https://github.com/cunnie/sslip.io/releases/download/2.1.2/sslip.io-dns-server-linux-$GOLANG_ARCH \
+    -o sslip.io
+  sudo install sslip.io /usr/bin
+}
+
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
@@ -251,6 +258,7 @@ configure_git
 configure_sudo
 configure_tmux
 configure_ntp
+install_sslip_io
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"

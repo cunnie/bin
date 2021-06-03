@@ -230,10 +230,17 @@ EOF
 }
 
 install_sslip_io() {
-  GOLANG_ARCH=${ARCH/aarch64/arm64/}
-  curl -L https://github.com/cunnie/sslip.io/releases/download/2.1.2/sslip.io-dns-server-linux-$GOLANG_ARCH \
-    -o sslip.io
-  sudo install sslip.io /usr/bin
+  if [ ! -x /usr/bin/sslip.io-dns-server ]; then
+    GOLANG_ARCH=${ARCH/aarch64/arm64/}
+    curl -L https://github.com/cunnie/sslip.io/releases/download/2.1.2/sslip.io-dns-server-linux-$GOLANG_ARCH \
+      -o sslip.io-dns-server
+    sudo install sslip.io-dns-server /usr/bin
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/ns-aws/sslip.io.service \
+      -o /etc/systemd/system/sslip.io-dns.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable sslip.io-dns
+    sudo systemctl start sslip.io-dns
+  fi
 }
 
 ARCH=$(uname -i)

@@ -26,6 +26,7 @@ install_packages() {
     mysql-devel \
     neovim \
     net-tools \
+    nginx \
     nmap-ncat \
     npm \
     ntpsec \
@@ -229,7 +230,7 @@ EOF
   fi
 }
 
-install_sslip_io() {
+install_sslip_io_dns() {
   if [ ! -x /usr/bin/sslip.io-dns-server ]; then
     GOLANG_ARCH=${ARCH/aarch64/arm64/}
     curl -L https://github.com/cunnie/sslip.io/releases/download/2.1.2/sslip.io-dns-server-linux-$GOLANG_ARCH \
@@ -241,6 +242,11 @@ install_sslip_io() {
     sudo systemctl enable sslip.io-dns
     sudo systemctl start sslip.io-dns
   fi
+}
+
+install_sslip_io_web() {
+  sudo systemctl enable nginx
+  sudo systemctl start nginx
 }
 
 ARCH=$(uname -i)
@@ -265,7 +271,8 @@ configure_git
 configure_sudo
 configure_tmux
 configure_ntp
-install_sslip_io
+install_sslip_io_dns
+install_sslip_io_web
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"

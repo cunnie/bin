@@ -236,7 +236,7 @@ install_sslip_io_dns() {
     curl -L https://github.com/cunnie/sslip.io/releases/download/2.1.2/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/ns-aws/sslip.io.service \
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io.service \
       -o /etc/systemd/system/sslip.io-dns.service
     sudo systemctl daemon-reload
     sudo systemctl enable sslip.io-dns

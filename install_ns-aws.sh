@@ -15,6 +15,7 @@ install_packages() {
   sudo dnf install -y \
     bind-utils \
     btrfs-progs \
+    cronie \
     direnv \
     fd-find \
     git \
@@ -39,6 +40,7 @@ install_packages() {
     ruby \
     ruby-devel \
     rubygems \
+    socat \
     strace \
     the_silver_searcher \
     tmux \
@@ -60,7 +62,7 @@ create_user_cunnie() {
       --create-home \
       --shell=/usr/bin/zsh \
       --comment="Brian Cunnie" \
-      --groups=root,adm,wheel,systemd-journal \
+      --groups=root,adm,wheel,systemd-journal,nginx \
       cunnie
     mkdir ~cunnie/.ssh
     echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " > ~cunnie/.ssh/authorized_keys
@@ -264,6 +266,28 @@ install_sslip_io_web() {
   fi
 }
 
+install_tls() {
+  TLS_DIR=/etc/pki/nginx
+  if [ ! -d $TLS_DIR ]; then
+    PUBLIC_IPV4=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -4 | tr -d \")
+    PUBLIC_IPV4_UNDERSCORES=${PUBLIC_IPV4//./-}
+    curl https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
+    ~/.acme.sh/acme.sh --issue \
+      -d $PUBLIC_IPV4.sslip.io \
+      -d $PUBLIC_IPV4_UNDERSCORES.sslip.io \
+      -w /var/nginx/sslip.io || true # it'll fail & exit if the cert's already issued, but we don't want to exit
+    sudo mkdir -p $TLS_DIR/private/
+    sudo touch $TLS_DIR/server.crt $TLS_DIR/private/server.key
+    sudo chown nginx:nginx $TLS_DIR
+    sudo chmod -R g+w $TLS_DIR
+    sudo chmod -R o-rwx $TLS_DIR/private
+    ~/.acme.sh/acme.sh --install-cert -d $PUBLIC_IPV4.sslip.io -d $PUBLIC_IPV4_UNDERSCORES.sslip.io \
+      --key-file       $TLS_DIR/private/server.key  \
+      --fullchain-file $TLS_DIR/server.crt \
+      --reloadcmd     "sudo systemctl restart nginx"
+  fi
+}
+
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
@@ -287,6 +311,7 @@ configure_sudo
 configure_tmux
 configure_ntp
 install_sslip_io_dns
+install_tls # certs need to be in place before starting nginx
 install_sslip_io_web
 
 sudo chown -R cunnie:cunnie ~cunnie

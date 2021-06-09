@@ -59,7 +59,7 @@ create_user_cunnie() {
       --create-home \
       --shell=/usr/bin/zsh \
       --comment="Brian Cunnie" \
-      --groups=adm,wheel,systemd-journal \
+      --groups=root,adm,wheel,systemd-journal \
       cunnie
     mkdir ~cunnie/.ssh
     echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " > ~cunnie/.ssh/authorized_keys

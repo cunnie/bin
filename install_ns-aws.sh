@@ -247,6 +247,18 @@ install_sslip_io_dns() {
 install_sslip_io_web() {
   sudo systemctl enable nginx
   sudo systemctl start nginx
+  if [ ! -d ~/workspace/sslip.io ]; then
+    git clone https://github.com/cunnie/sslip.io.git ~/workspace/sslip.io
+  fi
+  HTML_DIR=/var/nginx/sslip.io
+  if [ ! -d $HTML_DIR ]; then
+    sudo mkdir -p $HTML_DIR
+    sudo rsync -avH ~/workspace/sslip.io/k8s/document_root/ $HTML_DIR/
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.nginx.conf \
+      -o /etc/nginx/conf.d/sslip.io.conf
+    sudo systemctl restart nginx # pick up the new config
+    sudo chmod g+rx /var/log/nginx # so I can look at the files without running sudo
+  fi
 }
 
 ARCH=$(uname -i)

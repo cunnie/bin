@@ -177,6 +177,8 @@ disable_selinux() {
   if grep -q SELINUX=enforcing /etc/selinux/config; then
     printf "disabling SELINUX and firewall"
     sudo sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
+    # The following really, truly disables selinux
+    sudo grubby --update-kernel ALL --args selinux=0
   fi
 }
 

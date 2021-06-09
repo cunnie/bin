@@ -19,6 +19,7 @@ install_packages() {
     fd-find \
     git \
     golang \
+    htop \
     iproute \
     ipset \
     iptables \

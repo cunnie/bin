@@ -33,6 +33,7 @@ install_packages() {
     npm \
     ntpsec \
     openssl-devel \
+    policycoreutils-python-utils \
     python \
     python3-neovim \
     redhat-rpm-config \
@@ -177,6 +178,8 @@ use_pacific_time() {
 }
 
 disable_selinux() {
+  # does not take effect until reboot, and we can't reboot halfway through the script
+  # because we can't easily pick up where we left off
   if grep -q SELINUX=enforcing /etc/selinux/config; then
     printf "disabling SELINUX and firewall"
     sudo sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
@@ -250,6 +253,7 @@ install_sslip_io_dns() {
 }
 
 install_sslip_io_web() {
+  sudo semanage permissive -a httpd_t # fixes 403 Forbidden, allows certs to be acquired
   sudo systemctl enable nginx
   sudo systemctl start nginx
   if [ ! -d ~/workspace/sslip.io ]; then
@@ -259,6 +263,8 @@ install_sslip_io_web() {
   if [ ! -d $HTML_DIR ]; then
     sudo mkdir -p $HTML_DIR
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root/ $HTML_DIR/
+    sudo chown -R nginx:nginx $HTML_DIR
+    sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io.conf
     sudo systemctl restart nginx # enable sslip.io HTTP

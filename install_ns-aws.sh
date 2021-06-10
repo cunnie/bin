@@ -261,8 +261,8 @@ install_sslip_io_web() {
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root/ $HTML_DIR/
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io.conf
-    sudo systemctl restart nginx # pick up the new config
-    sudo chmod g+rx /var/log/nginx # so I can look at the files without running sudo
+    sudo systemctl restart nginx # enable sslip.io HTTP
+    sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
   fi
 }
 
@@ -270,21 +270,31 @@ install_tls() {
   TLS_DIR=/etc/pki/nginx
   if [ ! -d $TLS_DIR ]; then
     PUBLIC_IPV4=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -4 | tr -d \")
-    PUBLIC_IPV4_UNDERSCORES=${PUBLIC_IPV4//./-}
+    PUBLIC_IPV6=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -6 | tr -d \")
+    PUBLIC_IPV4_DASHES=${PUBLIC_IPV4//./-}
+    PUBLIC_IPV6_DASHES=${PUBLIC_IPV6//:/-}
     curl https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
     ~/.acme.sh/acme.sh --issue \
       -d $PUBLIC_IPV4.sslip.io \
-      -d $PUBLIC_IPV4_UNDERSCORES.sslip.io \
+      -d $PUBLIC_IPV4_DASHES.sslip.io \
+      -d $PUBLIC_IPV6_DASHES.sslip.io \
       -w /var/nginx/sslip.io || true # it'll fail & exit if the cert's already issued, but we don't want to exit
     sudo mkdir -p $TLS_DIR/private/
     sudo touch $TLS_DIR/server.crt $TLS_DIR/private/server.key
     sudo chown nginx:nginx $TLS_DIR
     sudo chmod -R g+w $TLS_DIR
     sudo chmod -R o-rwx $TLS_DIR/private
-    ~/.acme.sh/acme.sh --install-cert -d $PUBLIC_IPV4.sslip.io -d $PUBLIC_IPV4_UNDERSCORES.sslip.io \
+    ~/.acme.sh/acme.sh --install-cert \
+      -d $PUBLIC_IPV4.sslip.io \
+      -d $PUBLIC_IPV4_DASHES.sslip.io \
+      -d $PUBLIC_IPV6_DASHES.sslip.io \
       --key-file       $TLS_DIR/private/server.key  \
       --fullchain-file $TLS_DIR/server.crt \
       --reloadcmd     "sudo systemctl restart nginx"
+    # Now that we have a cert we can safely load nginx's HTTPS configuration
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io-https.nginx.conf \
+      -o /etc/nginx/conf.d/sslip.io-https.conf
+    sudo systemctl restart nginx # enable sslip.io HTTPS
   fi
 }
 
@@ -311,8 +321,8 @@ configure_sudo
 configure_tmux
 configure_ntp
 install_sslip_io_dns
-install_tls # certs need to be in place before starting nginx
-install_sslip_io_web
+install_sslip_io_web # installs HTTP only
+install_tls # gets certs & updates nginx to include HTTPS
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"

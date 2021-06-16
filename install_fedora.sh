@@ -148,6 +148,23 @@ install_zsh_autosuggestions() {
   fi
 }
 
+install_gcloud() {
+  YUM_REPO_PATH=/etc/yum.repos.d/google-cloud-sdk.repo
+  if [ ! -f $YUM_REPO_PATH ]; then
+    sudo tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
+[google-cloud-sdk]
+name=Google Cloud SDK
+baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOM
+    sudo dnf install -y google-cloud-sdk
+  fi
+}
+
 configure_direnv() {
   if ! grep -q "direnv hook zsh" ~/.zshrc; then
     echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
@@ -218,6 +235,7 @@ install_terraform
 install_aws_cli
 install_luan_nvim
 install_zsh_autosuggestions
+install_gcloud
 use_pacific_time
 configure_direnv
 configure_docker

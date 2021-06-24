@@ -132,6 +132,18 @@ install_terraform() {
   fi
 }
 
+install_helm() {
+  if [ ! -x /usr/local/bin/helm ]; then
+    TMP_DIR=/tmp/install-$$
+    mkdir $TMP_DIR
+    curl -o $TMP_DIR/helm.tgz -L https://get.helm.sh/helm-v3.6.1-linux-amd64.tar.gz
+    pushd $TMP_DIR
+    tar xzvf helm.tgz
+    sudo install linux-amd64/helm /usr/local/bin/
+    popd
+  fi
+}
+
 install_aws_cli() {
   if [ ! -x /usr/local/bin/aws ]; then
     # From https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
@@ -232,6 +244,7 @@ install_fly_cli
 install_om_cli
 install_pivnet_cli
 install_terraform
+install_helm
 install_aws_cli
 install_luan_nvim
 install_zsh_autosuggestions

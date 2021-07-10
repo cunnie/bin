@@ -202,6 +202,7 @@ configure_zsh() {
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc
     echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~/.zshrc
     echo 'export EDITOR=nvim' >> ~/.zshrc
+    echo 'alias k=kubectl' >> ~/.zshrc
     echo "# Don't log me out of LastPass for 10 hours" >> ~/.zshrc
     echo 'export LPASS_AGENT_TIMEOUT=36000' >> ~/.zshrc
   fi

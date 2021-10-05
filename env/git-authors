@@ -7,6 +7,7 @@ authors:
   bu: Brian Upton; bupton
   cc: Charlotte Cunningham; mahgninnuc
   ch: Christopher Hunter; chunter
+  cs: Chris Selzo; cselzo
   ds: David Stevenson; stevensonda
   gl: Gary Liu; syslxg
   jh: Julian Hjortshoj; julian-hj
@@ -30,6 +31,7 @@ email_addresses:
   bmc-work: bcunnie@vmware.com
   bu: bupton@vmware.com
   ch: hunterch@vmware.com
+  cs: cselzo@vmware.com
   ds: stevensonda@vmware.com
   gl: garyliu@vmware.com
   jh: jhortshoj@vmware.com

@@ -7,6 +7,7 @@ authors:
   bu: Brian Upton; bupton
   cc: Charlotte Cunningham; mahgninnuc
   ch: Christopher Hunter; chunter
+  cl: Camila Londoño; camilalonart
   cs: Chris Selzo; cselzo
   dfo:  Daniel Felipe Ochoa; danielfor
   ds: David Stevenson; stevensonda
@@ -15,7 +16,6 @@ authors:
   jp: Joseph Palermo; jpalermo
   kl: Kenneth Lakin; klakin
   ln: Long Nguyen; lnguyen
-  mcl: Maria Camila Londoño; camilalonart
   mo: Michael Oleske
   mr: Maya Rosecrance; mrosecrance
   mariash: Maria Shaldybin; mariash
@@ -34,6 +34,7 @@ email_addresses:
   bmc-work: bcunnie@vmware.com
   bu: bupton@vmware.com
   ch: hunterch@vmware.com
+  cl: londonoc@vmware.com
   cs: cselzo@vmware.com
   dfo: danielfelipo@vmware.com
   ds: stevensonda@vmware.com
@@ -42,7 +43,6 @@ email_addresses:
   jp: jpalermo@vmware.com
   kl: klakin@vmware.com
   ln: nguyenlo@vmware.com
-  mcl: maria.londono@dell.com
   mo: moleske@vmware.com
   mr: mrosecrance@vmware.com
   mariash: mariash@vmware.com

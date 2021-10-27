@@ -84,7 +84,7 @@ brew "zsh-lovers"
 brew "zsh-syntax-highlighting"
 
 cask "adoptopenjdk11"
-cask "adoptopenjdk8"
+cask "adoptopenjdk/openjdk/adoptopenjdk8"
 cask "battle-net"
 cask "discord"
 cask "docker"

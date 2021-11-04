@@ -127,7 +127,7 @@ install_luan_nvim() {
 
 install_terraform() {
   if [ ! -x /usr/local/bin/terraform ]; then
-    curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip
+    curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.0.10/terraform_1.0.10_linux_amd64.zip
     unzip tf.zip
     sudo install terraform /usr/local/bin/
   fi

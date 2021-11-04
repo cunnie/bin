@@ -31,6 +31,7 @@ install_packages() {
     rubygems \
     socat \
     strace \
+    tcpdump \
     the_silver_searcher \
     tmux \
     util-linux-user \

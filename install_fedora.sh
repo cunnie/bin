@@ -15,6 +15,7 @@ install_packages() {
     htop \
     iproute \
     iputils \
+    jq \
     moby-engine \
     mysql-devel \
     neovim \
@@ -178,6 +179,14 @@ EOM
   fi
 }
 
+install_yq() {
+  if [ ! -x /usr/local/bin/yq ]; then
+    curl -o yq -L https://github.com/mikefarah/yq/releases/download/v4.14.1/yq_linux_amd64
+    chmod +x yq
+    sudo install yq /usr/local/bin/
+  fi
+}
+
 configure_direnv() {
   if ! grep -q "direnv hook zsh" ~/.zshrc; then
     echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
@@ -253,6 +262,7 @@ install_aws_cli
 install_luan_nvim
 install_zsh_autosuggestions
 install_gcloud
+install_yq
 use_pacific_time
 configure_direnv
 configure_docker

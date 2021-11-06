@@ -92,11 +92,18 @@ EOF
   fi
 }
 
+install_bin() {
+  if [ ! -d $HOME/bin ]; then
+    git clone git@github.com:cunnie/bin.git $HOME/bin
+    echo 'PATH="$HOME/bin:$PATH"' >> ~/.zshrc
+  fi
+}
+
+
 install_fly_cli() {
-  if [ ! -x /usr/local/bin/fly ]; then
-    curl -s -o /tmp/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
-    sudo install /tmp/fly /usr/local/bin
-    sudo chmod a+w /usr/local/bin
+  if [ ! -x $HOME/bin/fly ]; then
+    curl -s -o $HOME/bin/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
+    sudo chmod +x $HOME/bin/fly
   fi
 }
 
@@ -253,6 +260,7 @@ install_bosh_cli
 install_cf_cli
 install_chruby
 install_fasd
+install_bin
 install_fly_cli
 install_om_cli
 install_pivnet_cli

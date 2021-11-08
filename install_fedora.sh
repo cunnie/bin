@@ -9,6 +9,7 @@ install_packages() {
     btrfs-progs \
     cronie \
     direnv \
+    dnf-plugins-core \
     fd-find \
     git \
     golang \
@@ -191,6 +192,14 @@ install_yq() {
     curl -o yq -L https://github.com/mikefarah/yq/releases/download/v4.14.1/yq_linux_amd64
     chmod +x yq
     sudo install yq /usr/local/bin/
+    rm yq
+  fi
+}
+
+install_vault() {
+  if [ ! -x /usr/bin/vault ]; then
+    sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    sudo dnf -y install vault
   fi
 }
 
@@ -271,6 +280,7 @@ install_luan_nvim
 install_zsh_autosuggestions
 install_gcloud
 install_yq
+install_vault
 use_pacific_time
 configure_direnv
 configure_docker

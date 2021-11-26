@@ -5,7 +5,7 @@
 
 puts <<EOF
 $TTL 3h
-@ SOA vain.nono.io. yoyo.nono.io. 42 1d 12h 1w 3h
+@ SOA vain.nono.io. yoyo.nono.io. #{Time.now.to_i} 1d 12h 1w 3h
         ; Serial, Refresh, Retry, Expire, Neg. cache TTL
 
         NS      vain.nono.io.

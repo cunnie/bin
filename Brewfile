@@ -21,6 +21,7 @@ brew "cloudfoundry/tap/bosh-cli"
 brew "cloudfoundry/tap/cf-cli@7"
 brew "cloudfoundry/tap/credhub-cli"
 brew "cmake"
+brew "coreutils" # for `base32` for sslip.io
 brew "dependency-check"
 brew "direnv"
 brew "fasd"

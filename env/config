@@ -26,6 +26,12 @@ Host aasfmarin.nono.io
 	IdentityFile ~/.ssh/github
 	ForwardAgent yes
 
+Host atom atom.nono.io
+	HostName  atom.nono.io
+	Port 22
+	ForwardAgent yes
+	IdentityFile ~/.ssh/nono
+
 Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github

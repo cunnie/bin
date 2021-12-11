@@ -5,6 +5,7 @@ install_packages() {
   sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
     binutils \
+    bind-chroot \
     bind-utils \
     btrfs-progs \
     cronie \
@@ -263,6 +264,39 @@ configure_tmux() {
   fi
 }
 
+configure_bind() {
+  if ! sudo grep -q nono.io /etc/named.conf; then
+    sudo sed -i 's/listen-on port 53.*/listen-on port 53 { any; };/;
+      s/listen-on-v6 port 53.*/listen-on-v6 port 53 { any; };/;
+      s/allow-query.*/allow-query     { any; }; allow-query-cache { any; };/' /etc/named.conf
+    sudo tee -a /etc/named.conf << EOF
+zone "9.0.10.in-addr.arpa" {
+	type slave;
+	file "9.0.10.in-addr.arpa";
+	masters {
+		2601:646:100:69f0::a; // atom.nono.io
+	};
+};
+zone "nono.io" {
+	type slave;
+	file "nono.io";
+	masters {
+		2a01:4f8:c17:b8f::2; //shay.nono.io
+	};
+};
+EOF
+    sudo systemctl enable named-chroot
+    sudo systemctl start named-chroot
+  fi
+}
+
+disable_firewalld() {
+  # so that BIND can work
+  sudo systemctl stop firewalld
+  sudo systemctl disable firewalld
+}
+
+
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_bosh_cli
@@ -282,6 +316,8 @@ install_gcloud
 install_yq
 install_vault
 use_pacific_time
+disable_firewalld
+configure_bind
 configure_direnv
 configure_docker
 configure_git

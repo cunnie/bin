@@ -98,6 +98,7 @@ install_bin() {
   if [ ! -d $HOME/bin ]; then
     git clone git@github.com:cunnie/bin.git $HOME/bin
     echo 'PATH="$HOME/bin:$PATH"' >> ~/.zshrc
+    ln -s ~/bin/env/git-authors ~/.git-authors
   fi
 }
 
@@ -204,6 +205,17 @@ install_vault() {
   fi
 }
 
+install_git_duet() {
+  if [ ! -x /usr/local/bin/git-duet ]; then
+    mkdir -p /tmp/$$/git-duet
+    pushd /tmp/$$
+    curl -o git-duet.tgz -L https://github.com/git-duet/git-duet/releases/download/0.9.0/linux_amd64.tar.gz
+    tar -xzvf git-duet.tgz -C git-duet/
+    sudo install git-duet/* /usr/local/bin
+    popd
+  fi
+}
+
 configure_direnv() {
   if ! grep -q "direnv hook zsh" ~/.zshrc; then
     echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
@@ -303,6 +315,7 @@ install_bosh_cli
 install_cf_cli
 install_chruby
 install_fasd
+install_git_duet
 install_bin
 install_fly_cli
 install_om_cli

@@ -20,13 +20,11 @@ install_packages() {
     jq \
     moby-engine \
     mysql-devel \
-    neovim \
     net-tools \
     nmap-ncat \
     npm \
     openssl-devel \
     python \
-    python3-neovim \
     redhat-rpm-config \
     ripgrep \
     ruby \
@@ -123,6 +121,14 @@ install_pivnet_cli() {
     sudo install /tmp/pivnet /usr/local/bin
   fi
 }
+
+install_neovim() {
+  if [ ! -x /usr/bin/nvim ]; then
+    sudo dnf copr enable -y agriffis/neovim-nightly
+    sudo dnf install -y neovim python3-neovim
+  fi
+}
+
 
 install_luan_nvim() {
   if [ ! -d $HOME/.config/nvim ]; then
@@ -323,6 +329,7 @@ install_pivnet_cli
 install_terraform
 install_helm
 install_aws_cli
+install_neovim
 install_luan_nvim
 install_zsh_autosuggestions
 install_gcloud

@@ -17,6 +17,7 @@ install_packages() {
     btrfs-progs \
     cronie \
     direnv \
+    etcd \
     fd-find \
     git \
     golang \

@@ -26,6 +26,7 @@ install_packages() {
     ipset \
     iptables \
     iputils \
+    lastpass-cli \
     mysql-devel \
     neovim \
     net-tools \

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 set -eu -o pipefail
 
 install_packages() {
@@ -125,8 +125,9 @@ install_pivnet_cli() {
 install_neovim() {
   if [ ! -x /usr/bin/nvim ]; then
     sudo dnf copr enable -y agriffis/neovim-nightly
-    sudo dnf install -y neovim python3-neovim
+    sudo dnf install -y --reinstall neovim python3-neovim
   fi
+  sudo dnf reinstall -y neovim python3-neovim
 }
 
 
@@ -144,7 +145,7 @@ install_luan_nvim() {
 
 install_terraform() {
   if [ ! -x /usr/local/bin/terraform ]; then
-    curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.0.10/terraform_1.0.10_linux_amd64.zip
+    curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.1.3/terraform_1.1.3_linux_amd64.zip
     unzip tf.zip
     sudo install terraform /usr/local/bin/
   fi

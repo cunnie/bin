@@ -44,6 +44,19 @@ install_packages() {
 
 }
 
+install_azure_cli() {
+  if [ ! -x /usr/bin/az ]; then
+    sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+    echo -e "[azure-cli]
+name=Azure CLI
+baseurl=https://packages.microsoft.com/yumrepos/azure-cli
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/azure-cli.repo
+    sudo dnf install -y azure-cli
+  fi
+}
+
 install_bosh_cli() {
   if [ ! -x /usr/local/bin/bosh ]; then
     curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v6.4.1/bosh-cli-6.4.1-linux-amd64 -o /tmp/bosh
@@ -315,9 +328,9 @@ disable_firewalld() {
   sudo systemctl disable firewalld
 }
 
-
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
+install_azure_cli
 install_bosh_cli
 install_cf_cli
 install_chruby

@@ -57,6 +57,7 @@ brew "nodeenv"
 brew "npm"
 brew "om"
 brew "openssl"
+brew "openvpn" # to connect to Nimbus
 brew "pivnet-cli"
 brew "postgresql@11"
 brew "python3"

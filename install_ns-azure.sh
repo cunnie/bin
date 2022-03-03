@@ -18,6 +18,7 @@ install_packages() {
     build-essential \
     direnv \
     fasd \
+    fd-find \
     golang \
     lastpass-cli \
     neovim \
@@ -25,6 +26,8 @@ install_packages() {
     ntpsec \
     silversearcher-ag \
     socat \
+    tcpdump \
+    tree \
     unzip \
     zsh \
     zsh-syntax-highlighting \

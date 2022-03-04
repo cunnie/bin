@@ -71,6 +71,15 @@ install_cf_cli() {
   fi
 }
 
+install_rtr_cli() {
+  if [ ! -x /usr/local/bin/rtr ]; then
+    curl -sL https://github.com/cloudfoundry/routing-api-cli/releases/download/2.23.0/rtr-linux-amd64.tgz -o /tmp/rtr.tgz
+    pushd /tmp/
+    tar xzvf /tmp/rtr.tgz
+    sudo install rtr-linux-amd64 /usr/local/bin/rtr
+  fi
+}
+
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.7.0.tar.gz \
@@ -333,6 +342,7 @@ configure_zsh          # needs to come before install steps that modify .zshrc
 install_azure_cli
 install_bosh_cli
 install_cf_cli
+install_rtr_cli
 install_chruby
 install_fasd
 install_git_duet

@@ -48,11 +48,13 @@ create_user_cunnie() {
       --gecos="Brian Cunnie" \
       --disabled-password \
       cunnie
-    for GROUP in root adm sudo; do
+    for GROUP in root adm sudo www-data; do
 	    sudo adduser cunnie $GROUP
 	   done
+    sudo adduser $USER www-data
+    newgrp www-data
     sudo mkdir ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " > ~cunnie/.ssh/authorized_keys
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
     ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
     sudo chown -R cunnie:cunnie ~cunnie
     sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
@@ -225,6 +227,8 @@ install_sslip_io_dns() {
 }
 
 install_sslip_io_web() {
+  # Fix "conflicting server name "_" on 0.0.0.0:80, ignored"
+  [ -L /etc/nginx/sites-enabled/default ] && sudo rm /etc/nginx/sites-enabled/default
   sudo systemctl enable nginx
   sudo systemctl start nginx
   if [ ! -d ~/workspace/sslip.io ]; then
@@ -234,20 +238,23 @@ install_sslip_io_web() {
   if [ ! -d $HTML_DIR ]; then
     sudo mkdir -p $HTML_DIR
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root/ $HTML_DIR/
-    sudo chown -R www-data:www-data $HTML_DIR
+    sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io.conf
     sudo systemctl restart nginx # enable sslip.io HTTP
     sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
+    sudo chown -R www-data:www-data $HTML_DIR
   fi
 }
 
 install_tls() {
   TLS_DIR=/etc/pki/nginx
   if [ ! -d $TLS_DIR ]; then
-    PUBLIC_IPV4=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -4 | tr -d \")
-    PUBLIC_IPV6=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -6 | tr -d \")
+    HTML_DIR=/var/nginx/sslip.io
+    sudo chown -R $USER $HTML_DIR
+    PUBLIC_IPV4=$(dig @ns.sslip.io ip.sslip.io TXT +short -4 | tr -d \")
+    PUBLIC_IPV6=$(dig @ns.sslip.io ip.sslip.io TXT +short -6 | tr -d \")
     PUBLIC_IPV4_DASHES=${PUBLIC_IPV4//./-}
     PUBLIC_IPV6_DASHES=${PUBLIC_IPV6//:/-}
     curl https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
@@ -255,19 +262,24 @@ install_tls() {
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
+      --log \
       -w /var/nginx/sslip.io || true # it'll fail & exit if the cert's already issued, but we don't want to exit
-    sudo mkdir -p $TLS_DIR/private/
-    sudo touch $TLS_DIR/server.crt $TLS_DIR/private/server.key
-    sudo chown nginx:nginx $TLS_DIR
-    sudo chmod -R g+w $TLS_DIR
-    sudo chmod -R o-rwx $TLS_DIR/private
+    sudo mkdir -p $TLS_DIR
+    sudo chown -R $USER $TLS_DIR
+    mkdir -p $TLS_DIR/private/
+    touch $TLS_DIR/server.crt $TLS_DIR/private/server.key
+    chmod -R g+w $TLS_DIR
+    chmod -R o-rwx $TLS_DIR/private
+    sudo chown -R $USER $HTML_DIR
     ~/.acme.sh/acme.sh --install-cert \
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
       --key-file       $TLS_DIR/private/server.key  \
       --fullchain-file $TLS_DIR/server.crt \
-      --reloadcmd     "sudo systemctl restart nginx"
+      --reloadcmd     "sudo systemctl restart nginx" \
+      --log
+    sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io-https.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io-https.conf

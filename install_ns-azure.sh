@@ -52,12 +52,12 @@ create_user_cunnie() {
 	    sudo adduser cunnie $GROUP
 	   done
     sudo adduser $USER www-data
-    newgrp www-data
     sudo mkdir ~cunnie/.ssh
     echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
     ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
     sudo chown -R cunnie:cunnie ~cunnie
     sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
+    echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
   fi
 }
 

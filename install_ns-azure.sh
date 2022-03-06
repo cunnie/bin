@@ -289,6 +289,7 @@ install_tls() {
   fi
 }
 
+START_TIME=$(date +%s)
 ARCH=$(uname -i)
 export HOME=${HOME:-~cunnie}
 export USER=${USER:-cunnie}
@@ -316,3 +317,4 @@ install_tls # gets certs & updates nginx to include HTTPS
 
 sudo chown -R cunnie:cunnie ~cunnie
 git config --global url."git@github.com:".insteadOf "https://github.com/"
+echo "It took $(( $(date +%s) - START_TIME )) seconds to run"

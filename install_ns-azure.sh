@@ -228,11 +228,13 @@ install_sslip_io_dns() {
 
 install_sslip_io_web() {
   # Fix "conflicting server name "_" on 0.0.0.0:80, ignored"
-  [ -L /etc/nginx/sites-enabled/default ] && sudo rm /etc/nginx/sites-enabled/default
-  sudo systemctl enable nginx
-  sudo systemctl start nginx
-  if [ ! -d ~/workspace/sslip.io ]; then
-    git clone https://github.com/cunnie/sslip.io.git ~/workspace/sslip.io
+  if [ -L /etc/nginx/sites-enabled/default ]; then
+    sudo rm /etc/nginx/sites-enabled/default
+    sudo systemctl enable nginx
+    sudo systemctl start nginx
+    if [ ! -d ~/workspace/sslip.io ]; then
+      git clone https://github.com/cunnie/sslip.io.git ~/workspace/sslip.io
+    fi
   fi
   HTML_DIR=/var/nginx/sslip.io
   if [ ! -d $HTML_DIR ]; then

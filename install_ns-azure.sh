@@ -291,7 +291,7 @@ install_tls() {
 
 START_TIME=$(date +%s)
 ARCH=$(uname -i)
-export HOME=${HOME:-~cunnie}
+export HOME=${HOME:-/home/cunnie}
 export USER=${USER:-cunnie}
 export HOSTNAME=$(hostname)
 install_packages

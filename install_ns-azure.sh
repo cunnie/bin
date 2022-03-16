@@ -173,6 +173,7 @@ configure_git() {
   git config --global color.diff auto
   git config --global color.status auto
   git config --global core.editor nvim
+  git config --global url."git@github.com:".insteadOf "https://github.com/"
 
   mkdir -p $HOME/workspace # where we typically clone our repos
 }
@@ -289,32 +290,33 @@ install_tls() {
   fi
 }
 
+id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -i)
-export HOME=${HOME:-/home/cunnie}
-export USER=${USER:-cunnie}
 export HOSTNAME=$(hostname)
 install_packages
+configure_sudo
+configure_git
 create_user_cunnie
-mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
-configure_zsh          # needs to come before install steps that modify .zshrc
-install_chruby
-install_fly_cli
-install_terraform
-install_aws_cli
-install_luan_nvim
-install_zsh_autosuggestions
 use_pacific_time
 disable_selinux
-configure_direnv
-configure_git
-configure_sudo
-configure_tmux
-configure_ntp
-install_sslip_io_dns
-install_sslip_io_web # installs HTTP only
-install_tls # gets certs & updates nginx to include HTTPS
 
-sudo chown -R cunnie:cunnie ~cunnie
-git config --global url."git@github.com:".insteadOf "https://github.com/"
+if  [ $(id -u) != $(id -u cunnie) ]; then
+  mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
+  configure_zsh          # needs to come before install steps that modify .zshrc
+  install_chruby
+  install_fly_cli
+  install_terraform
+  install_aws_cli
+  install_luan_nvim
+  install_zsh_autosuggestions
+  configure_direnv
+  configure_tmux
+  configure_ntp
+  install_sslip_io_dns
+  install_sslip_io_web # installs HTTP only
+  install_tls # gets certs & updates nginx to include HTTPS
+
+  sudo chown -R cunnie:cunnie ~cunnie
+fi
 echo "It took $(( $(date +%s) - START_TIME )) seconds to run"

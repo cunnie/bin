@@ -14,6 +14,7 @@ tap "pivotal/tap"
 brew "automake"
 brew "awscli"
 brew "azure-cli" # for terraforming ns-azure
+brew "bat" # luan nvim dependency
 brew "bbl"
 brew "bison"
 brew "cfssl"

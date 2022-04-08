@@ -20,7 +20,6 @@ install_packages() {
     etcd \
     fd-find \
     git \
-    golang \
     htop \
     iproute \
     ipset \
@@ -307,6 +306,14 @@ install_tls() {
   fi
 }
 
+# Fedora is out-of-date at 1.16.5, should be 1.18; no ip.IsPrivate()
+install_go() {
+  if [ ! -x /usr/local/bin/go ]; then
+    curl -L https://go.dev/dl/go1.18.linux-arm64.tar.gz -o /tmp/go.tgz
+    sudo tar -C /usr/local -xzvf /tmp/go.tgz
+  fi
+}
+
 ARCH=$(uname -i)
 install_packages
 create_user_cunnie
@@ -318,6 +325,7 @@ configure_zsh          # needs to come before install steps that modify .zshrc
 install_chruby
 install_fasd
 install_fly_cli
+install_go
 install_terraform
 install_aws_cli
 install_luan_nvim

@@ -19,6 +19,7 @@ install_packages() {
   sudo apt-get -y upgrade
   sudo apt-get remove -y chrony || true
   sudo apt-get install -y \
+    bat \
     build-essential \
     direnv \
     etcd \
@@ -26,14 +27,22 @@ install_packages() {
     fd-find \
     golang \
     lastpass-cli \
+    lua5.4 \
     neovim \
     nginx \
+    nodejs \
     ntpsec \
+    python3 \
+    python3-dev \
+    python3-pip \
+    ripgrep \
+    ruby \
     silversearcher-ag \
     socat \
     tcpdump \
     tree \
     unzip \
+    yarnpkg \
     zsh \
     zsh-syntax-highlighting \
 
@@ -91,6 +100,15 @@ install_fly_cli() {
 
 install_luan_nvim() {
   if [ ! -d $HOME/.config/nvim ]; then
+    # Canonical renamed "bat" to "batcat" to avoid collision.
+    # We rename it back to "bat"
+    sudo mv -i /usr/bin/bat{cat,} || true
+    sudo mv -i /usr/share/man/man1/bat{cat,}.1.gz || true
+    # similarly with yarn
+    sudo mv -i /usr/bin/yarn{pkg,} || true
+    sudo mv -i /usr/share/man/man1/yarn{pkg,}.1.gz || true
+    pip3 install neovim pynvim
+    yarn global add neovim
     git clone https://github.com/luan/nvim $HOME/.config/nvim
   else
     echo "skipping Luan's config; it's already installed"

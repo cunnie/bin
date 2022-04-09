@@ -19,6 +19,7 @@ install_packages() {
   sudo apt-get install -y \
     build-essential \
     direnv \
+    etcd \
     fasd \
     fd-find \
     golang \

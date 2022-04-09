@@ -34,14 +34,6 @@ install_packages() {
     unzip \
     zsh \
     zsh-syntax-highlighting \
-
-  if ! grep grml /etc/apt/sources.list; then
-    echo "deb     http://deb.grml.org/ grml-stable  main" | sudo tee -a /etc/apt/sources.list
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21E0CA38EA2EA4AB
-    sudo apt-get update
-    sudo apt-get install -y \
-	    zsh-lovers
-  fi
 }
 
 create_user_cunnie() {

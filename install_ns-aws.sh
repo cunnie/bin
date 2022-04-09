@@ -215,8 +215,9 @@ EOF
 
 install_sslip_io_dns() {
   if [ ! -x /usr/bin/sslip.io-dns-server ]; then
-    GOLANG_ARCH=${ARCH/aarch64/arm64/}
-    GOLANG_ARCH=${ARCH/x86_64/amd64/}
+    GOLANG_ARCH=$ARCH
+    GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
+    GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
     curl -L https://github.com/cunnie/sslip.io/releases/download/2.5.1/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin

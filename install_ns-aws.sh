@@ -4,83 +4,73 @@
 # times in a row).
 
 # This script is meant to be run by the root user (via AWS's cloud-init /
-# terraform's user_data) with no ssh key, no USER or HOME variable, and also be
-# run by user cunnie, with ssh keys and environment variables set.
+# terraform's custom_data) with no ssh key, no USER or HOME variable, and also
+# be run by user cunnie, with ssh keys and environment variables set.
+
+# Output is in /var/log/cloud-init-output.log
 
 set -xeu -o pipefail
 
 install_packages() {
-  sudo dnf groupinstall -y "Development Tools"
-  sudo rpm -e chrony || true # chrony is good for a client, ntpsec is good for a server
-  sudo dnf install -y \
-    bind-utils \
-    btrfs-progs \
-    cronie \
+  sudo apt-get update
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt-get -y upgrade
+  sudo apt-get remove -y chrony || true
+  sudo apt-get install -y \
+    build-essential \
     direnv \
-    etcd \
+    fasd \
     fd-find \
-    git \
-    htop \
-    iproute \
-    ipset \
-    iptables \
-    iputils \
+    golang \
     lastpass-cli \
-    mysql-devel \
     neovim \
-    net-tools \
     nginx \
-    nmap-ncat \
-    npm \
     ntpsec \
-    openssl-devel \
-    policycoreutils-python-utils \
-    python \
-    python3-neovim \
-    redhat-rpm-config \
-    ripgrep \
-    ruby \
-    ruby-devel \
-    rubygems \
+    silversearcher-ag \
     socat \
-    strace \
     tcpdump \
-    the_silver_searcher \
-    tmux \
-    util-linux-user \
-    wget \
-    wireguard-tools \
-    zlib-devel \
+    tree \
+    unzip \
     zsh \
-    zsh-lovers \
     zsh-syntax-highlighting \
 
-  # don't use `dnf uninstall`; it removes the k8s dependencies
-  sudo rpm -e moby-engine || true # don't need docker; don't need cluttered iptables
+  if ! grep grml /etc/apt/sources.list; then
+    echo "deb     http://deb.grml.org/ grml-stable  main" | sudo tee -a /etc/apt/sources.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21E0CA38EA2EA4AB
+    sudo apt-get update
+    sudo apt-get install -y \
+	    zsh-lovers
+  fi
 }
 
 create_user_cunnie() {
   if ! id cunnie; then
     sudo adduser \
-      --create-home \
       --shell=/usr/bin/zsh \
-      --comment="Brian Cunnie" \
-      --groups=root,adm,wheel,systemd-journal,nginx \
+      --gecos="Brian Cunnie" \
+      --disabled-password \
       cunnie
-    mkdir ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " > ~cunnie/.ssh/authorized_keys
-    ssh-keyscan github.com > ~cunnie/.ssh/known_hosts
+    for GROUP in root adm sudo www-data; do
+      sudo adduser cunnie $GROUP
+    done
+    echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
+    sudo mkdir ~cunnie/.ssh
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
+    ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
+    sudo touch ~cunnie/.zshrc
+    sudo chmod -R go-rwx ~cunnie/.ssh
+    sudo git clone https://github.com/cunnie/bin.git ~cunnie/bin
+    sudo mkdir -p ~cunnie/.local/share # fixes `lpass login → Error: No such file or directory: mkdir(/home/cunnie/.local/share/lpass)`
     sudo chown -R cunnie:cunnie ~cunnie
-    sudo -u cunnie chmod -R go-rwx ~cunnie/.ssh
   fi
 }
 
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
-    wget -O ruby-install-0.7.0.tar.gz \
-      https://github.com/postmodern/ruby-install/archive/v0.7.0.tar.gz
-    tar -xzvf ruby-install-0.7.0.tar.gz
-    cd ruby-install-0.7.0/
+    wget -O ruby-install-0.8.3.tar.gz \
+      https://github.com/postmodern/ruby-install/archive/v0.8.3.tar.gz
+    tar -xzvf ruby-install-0.8.3.tar.gz
+    cd ruby-install-0.8.3/
     sudo make install
 
     wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
@@ -91,20 +81,6 @@ install_chruby() {
 
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
-EOF
-  fi
-}
-
-install_fasd() {
-  if [ ! -x /usr/local/bin/fasd ]; then
-    cd $HOME/workspace
-    git clone https://github.com/clvv/fasd.git
-    cd fasd
-    sudo make install
-    cat >> $HOME/.zshrc <<EOF
-
-eval "\$(fasd --init posix-alias zsh-hook)"
-alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 EOF
   fi
 }
@@ -124,7 +100,7 @@ install_luan_nvim() {
     echo "skipping Luan's config; it's already installed"
   fi
   # fix "missing dependencies (fd)!"
-  if [ ! -f /usr/bin/fd ]; then
+  if [ ! -L /usr/bin/fd ]; then
     sudo ln -s /usr/bin/fdfind /usr/bin/fd
   fi
 }
@@ -201,6 +177,7 @@ configure_git() {
   git config --global color.diff auto
   git config --global color.status auto
   git config --global core.editor nvim
+  git config --global url."git@github.com:".insteadOf "https://github.com/"
 
   mkdir -p $HOME/workspace # where we typically clone our repos
 }
@@ -216,7 +193,7 @@ configure_tmux() {
     echo "If you don't have an ugly magenta bottom of your tmux screen, if nvim is unusable, then"
     echo "you may need to run this command to completely install tmux configuration:"
     echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
-    su - cunnie zsh -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
   fi
 }
 
@@ -235,15 +212,16 @@ restrict -6 default limited kod nomodify notrap nopeer
 restrict 127.0.0.0 mask 255.0.0.0
 restrict -6 ::1
 EOF
-    sudo systemctl enable ntpd
-    sudo systemctl start ntpd
+    sudo systemctl enable ntpsec
+    sudo systemctl start ntpsec
   fi
 }
 
 install_sslip_io_dns() {
   if [ ! -x /usr/bin/sslip.io-dns-server ]; then
     GOLANG_ARCH=${ARCH/aarch64/arm64/}
-    curl -L https://github.com/cunnie/sslip.io/releases/download/2.1.2/sslip.io-dns-server-linux-$GOLANG_ARCH \
+    GOLANG_ARCH=${ARCH/x86_64/amd64/}
+    curl -L https://github.com/cunnie/sslip.io/releases/download/2.5.1/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.service \
@@ -255,30 +233,42 @@ install_sslip_io_dns() {
 }
 
 install_sslip_io_web() {
-  sudo semanage permissive -a httpd_t # fixes 403 Forbidden, allows certs to be acquired
-  sudo systemctl enable nginx
-  sudo systemctl start nginx
-  if [ ! -d ~/workspace/sslip.io ]; then
-    git clone https://github.com/cunnie/sslip.io.git ~/workspace/sslip.io
+  # Fix "conflicting server name "_" on 0.0.0.0:80, ignored"
+  if [ -L /etc/nginx/sites-enabled/default ]; then
+    sudo rm /etc/nginx/sites-enabled/default
+    sudo systemctl enable nginx
+    sudo systemctl start nginx
+    if [ ! -d ~/workspace/sslip.io ]; then
+      git clone https://github.com/cunnie/sslip.io.git ~/workspace/sslip.io
+    fi
   fi
   HTML_DIR=/var/nginx/sslip.io
   if [ ! -d $HTML_DIR ]; then
     sudo mkdir -p $HTML_DIR
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root/ $HTML_DIR/
-    sudo chown -R nginx:nginx $HTML_DIR
+    sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io.conf
     sudo systemctl restart nginx # enable sslip.io HTTP
     sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
+    sudo chown -R www-data:www-data $HTML_DIR
+  fi
+}
+
+delete_adminuser() {
+  if grep -q ^adminuser: /etc/passwd; then
+    sudo deluser --remove-home adminuser
   fi
 }
 
 install_tls() {
   TLS_DIR=/etc/pki/nginx
   if [ ! -d $TLS_DIR ]; then
-    PUBLIC_IPV4=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -4 | tr -d \")
-    PUBLIC_IPV6=$(dig @ns1.google.com o-o.myaddr.l.google.com TXT +short -6 | tr -d \")
+    HTML_DIR=/var/nginx/sslip.io
+    sudo chown -R $USER $HTML_DIR
+    PUBLIC_IPV4=$(dig @ns.sslip.io ip.sslip.io TXT +short -4 | tr -d \")
+    PUBLIC_IPV6=$(dig @ns.sslip.io ip.sslip.io TXT +short -6 | tr -d \")
     PUBLIC_IPV4_DASHES=${PUBLIC_IPV4//./-}
     PUBLIC_IPV6_DASHES=${PUBLIC_IPV6//:/-}
     curl https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
@@ -286,19 +276,24 @@ install_tls() {
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
+      --log \
       -w /var/nginx/sslip.io || true # it'll fail & exit if the cert's already issued, but we don't want to exit
-    sudo mkdir -p $TLS_DIR/private/
-    sudo touch $TLS_DIR/server.crt $TLS_DIR/private/server.key
-    sudo chown nginx:nginx $TLS_DIR
-    sudo chmod -R g+w $TLS_DIR
-    sudo chmod -R o-rwx $TLS_DIR/private
+    sudo mkdir -p $TLS_DIR
+    sudo chown -R $USER $TLS_DIR
+    mkdir -p $TLS_DIR/private/
+    touch $TLS_DIR/server.crt $TLS_DIR/private/server.key
+    chmod -R g+w $TLS_DIR
+    chmod -R o-rwx $TLS_DIR/private
+    sudo chown -R $USER $HTML_DIR
     ~/.acme.sh/acme.sh --install-cert \
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
       --key-file       $TLS_DIR/private/server.key  \
       --fullchain-file $TLS_DIR/server.crt \
-      --reloadcmd     "sudo systemctl restart nginx"
+      --reloadcmd     "sudo systemctl restart nginx" \
+      --log
+    sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io-https.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io-https.conf
@@ -306,40 +301,32 @@ install_tls() {
   fi
 }
 
-# Fedora is out-of-date at 1.16.5, should be 1.18; no ip.IsPrivate()
-install_go() {
-  if [ ! -x /usr/local/bin/go ]; then
-    curl -L https://go.dev/dl/go1.18.linux-arm64.tar.gz -o /tmp/go.tgz
-    sudo tar -C /usr/local -xzvf /tmp/go.tgz
-  fi
-}
-
+id # Who am I? for debugging purposes
+START_TIME=$(date +%s)
 ARCH=$(uname -i)
-install_packages
-create_user_cunnie
-export HOME=${HOME:-~cunnie}
-export USER=${USER:-cunnie}
 export HOSTNAME=$(hostname)
-mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
-configure_zsh          # needs to come before install steps that modify .zshrc
-install_chruby
-install_fasd
-install_fly_cli
-install_go
-install_terraform
-install_aws_cli
-install_luan_nvim
-install_zsh_autosuggestions
+install_packages
+configure_sudo
+create_user_cunnie
 use_pacific_time
 disable_selinux
-configure_direnv
-configure_git
-configure_sudo
-configure_tmux
-configure_ntp
-install_sslip_io_dns
-install_sslip_io_web # installs HTTP only
-install_tls # gets certs & updates nginx to include HTTPS
 
-sudo chown -R cunnie:cunnie ~cunnie
-git config --global url."git@github.com:".insteadOf "https://github.com/"
+if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
+  configure_git
+  mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
+  configure_zsh          # needs to come before install steps that modify .zshrc
+  install_chruby
+  install_fly_cli
+  install_terraform
+  install_aws_cli
+  install_luan_nvim
+  install_zsh_autosuggestions
+  configure_direnv
+  configure_tmux
+  configure_ntp
+  install_sslip_io_dns
+  install_sslip_io_web # installs HTTP only
+  # install_tls # gets certs & updates nginx to include HTTPS
+  # delete_adminuser # AWS cloud-init leaves an adminuser; delete it because passwd is in public .tfstate
+fi
+echo "It took $(( $(date +%s) - START_TIME )) seconds to run"

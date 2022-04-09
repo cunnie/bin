@@ -272,8 +272,8 @@ install_sslip_io_web() {
 }
 
 delete_adminuser() {
-  if grep -q ^adminuser: /etc/passwd; then
-    sudo deluser --remove-home adminuser
+  if grep -q ^ubuntu: /etc/passwd; then
+    sudo deluser --remove-home ubuntu
   fi
 }
 
@@ -341,7 +341,7 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_ntp
   install_sslip_io_dns
   install_sslip_io_web # installs HTTP only
-  # install_tls # gets certs & updates nginx to include HTTPS
-  # delete_adminuser # AWS cloud-init leaves an adminuser; delete it because passwd is in public .tfstate
+  install_tls # gets certs & updates nginx to include HTTPS
+  delete_adminuser # AMI includes an ubuntu user; delete it
 fi
 echo "It took $(( $(date +%s) - START_TIME )) seconds to run"

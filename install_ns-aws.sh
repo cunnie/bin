@@ -7,6 +7,8 @@
 # terraform's custom_data) with no ssh key, no USER or HOME variable, and also
 # be run by user cunnie, with ssh keys and environment variables set.
 
+# to troubleshoot: ssh -i ~/.ssh/aws ubuntu@ns-aws
+
 # Output is in /var/log/cloud-init-output.log
 
 set -xeu -o pipefail
@@ -34,6 +36,7 @@ install_packages() {
     unzip \
     zsh \
     zsh-syntax-highlighting \
+
 }
 
 create_user_cunnie() {

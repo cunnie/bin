@@ -287,10 +287,13 @@ install_tls() {
     PUBLIC_IPV4_DASHES=${PUBLIC_IPV4//./-}
     PUBLIC_IPV6_DASHES=${PUBLIC_IPV6//:/-}
     curl https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
-    ~/.acme.sh/acme.sh --issue \
+    ~/.acme.sh/acme.sh \
+      --issue \
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
+      --server    https://acme-v02.api.letsencrypt.org/directory \
+      --keylength ec-256  \
       --log \
       -w /var/nginx/sslip.io || true # it'll fail & exit if the cert's already issued, but we don't want to exit
     sudo mkdir -p $TLS_DIR
@@ -300,13 +303,16 @@ install_tls() {
     chmod -R g+w $TLS_DIR
     chmod -R o-rwx $TLS_DIR/private
     sudo chown -R $USER $HTML_DIR
-    ~/.acme.sh/acme.sh --install-cert \
+    ~/.acme.sh/acme.sh \
+      --install-cert \
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
+      --ecc \
       --key-file       $TLS_DIR/private/server.key  \
       --fullchain-file $TLS_DIR/server.crt \
-      --reloadcmd     "sudo systemctl restart nginx" \
+      --server         https://acme-v02.api.letsencrypt.org/directory \
+      --reloadcmd      "sudo systemctl restart nginx" \
       --log
     sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration

@@ -60,6 +60,7 @@ brew "neovim"
 brew "node" # Operations Manager
 brew "openssl@3"
 brew "openvpn" # to reach Nimbus VMs
+brew "postgresql@11" # needed for ruby-install 3.1.2 "configure: error: something wrong with LDFLAGS="-L/opt/homebrew/opt/postgresql@11/lib""
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python@3.8"
 brew "qrencode"

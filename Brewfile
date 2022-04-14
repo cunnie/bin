@@ -82,6 +82,7 @@ brew "watch"
 brew "wget"
 brew "yarn" # Operations Manager
 brew "youtube-dl"
+brew "yq" # alright, I'll give in: I'll install v4. But v3 was more prevalent, and I wish they didn't make it backwards-incompatible
 brew "zsh-autosuggestions"
 brew "zsh-completions"
 brew "zsh-git-prompt"

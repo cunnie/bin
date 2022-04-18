@@ -24,6 +24,7 @@ brew "bat" # luan nvim dependency
 brew "bbl"
 brew "bison"
 brew "libffi"
+brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found
 brew "cfssl"
 brew "chruby"
 brew "cloudfoundry/tap/bosh-cli"

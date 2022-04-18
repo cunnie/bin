@@ -13,7 +13,6 @@ install_packages() {
     dnf-plugins-core \
     fd-find \
     git \
-    golang \
     htop \
     iproute \
     iputils \
@@ -113,10 +112,18 @@ EOF
   fi
 }
 
+# Fedora is out-of-date at 1.16.5, should be 1.18; no ip.IsPrivate(), no cf-acceptance-tests
+install_go() {
+  if [ ! -d /usr/local/go ]; then
+    curl -L https://go.dev/dl/go1.18.1.linux-amd64.tar.gz -o /tmp/go.tgz
+    sudo tar -C /usr/local -xzvf /tmp/go.tgz
+  fi
+}
+
 install_bin() {
   if [ ! -d $HOME/bin ]; then
     git clone git@github.com:cunnie/bin.git $HOME/bin
-    echo 'PATH="$HOME/bin:$PATH"' >> ~/.zshrc
+    echo 'PATH="$HOME/bin:$PATH:/usr/local/go/bin"' >> ~/.zshrc
     ln -s ~/bin/env/git-authors ~/.git-authors
   fi
 }
@@ -345,6 +352,7 @@ install_rtr_cli
 install_chruby
 install_fasd
 install_git_duet
+install_go
 install_bin
 install_fly_cli
 install_om_cli

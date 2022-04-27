@@ -266,7 +266,7 @@ install_sslip_io_web() {
   HTML_DIR=/var/nginx/sslip.io
   if [ ! -d $HTML_DIR ]; then
     sudo mkdir -p $HTML_DIR
-    sudo rsync -avH ~/workspace/sslip.io/k8s/document_root/ $HTML_DIR/
+    sudo rsync -avH ~/workspace/sslip.io/k8s/document_root_sslip.io/ $HTML_DIR/
     sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.nginx.conf \

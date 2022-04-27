@@ -58,7 +58,7 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.re
 
 install_bosh_cli() {
   if [ ! -x /usr/local/bin/bosh ]; then
-    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v6.4.1/bosh-cli-6.4.1-linux-amd64 -o /tmp/bosh
+    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.0.0/bosh-cli-7.0.0-linux-amd64 -o /tmp/bosh
     sudo install /tmp/bosh /usr/local/bin
   fi
 }

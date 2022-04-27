@@ -11,6 +11,7 @@ install_packages() {
     cronie \
     direnv \
     dnf-plugins-core \
+    etcd \
     fd-find \
     git \
     htop \

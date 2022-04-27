@@ -324,10 +324,20 @@ install_tls() {
   fi
 }
 
+mount_persistent() {
+  if ! grep -q /dev/sdc1 /etc/fstab; then
+    sudo mkdir -p /var/lib/etcd
+    echo "/dev/sdc1 /var/lib/etcd ext4 rw,relatime 0 0" | sudo tee -a /etc/fstab
+    sudo mount -a
+  fi
+}
+
+
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -i)
 export HOSTNAME=$(hostname)
+mount_persistent # needs to be mounted before etcd is installed/started
 install_packages
 configure_sudo
 create_user_cunnie

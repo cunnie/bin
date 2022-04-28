@@ -242,7 +242,7 @@ install_sslip_io_dns() {
     GOLANG_ARCH=$ARCH
     GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
     GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
-    curl -L https://github.com/cunnie/sslip.io/releases/download/2.5.1/sslip.io-dns-server-linux-$GOLANG_ARCH \
+    curl -L https://github.com/cunnie/sslip.io/releases/download/2.5.3/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.service \
@@ -329,9 +329,14 @@ mount_persistent() {
     sudo mkdir -p /var/lib/etcd
     echo "/dev/sdc1 /var/lib/etcd ext4 rw,relatime 0 0" | sudo tee -a /etc/fstab
     sudo mount -a
+    sudo mkdir -p /var/lib/etcd/default
+    sudo chmod -R go-rwx /var/lib/etcd
   fi
 }
 
+chown_etcd_subdirs() {
+  sudo chown -R etcd:etcd /var/lib/etcd
+}
 
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
@@ -339,6 +344,7 @@ ARCH=$(uname -i)
 export HOSTNAME=$(hostname)
 mount_persistent # needs to be mounted before etcd is installed/started
 install_packages
+chown_etcd_subdirs
 configure_sudo
 create_user_cunnie
 use_pacific_time

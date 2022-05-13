@@ -4,9 +4,9 @@ set -eu -o pipefail
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
-    binutils \
     bind-chroot \
     bind-utils \
+    binutils \
     btrfs-progs \
     cronie \
     direnv \
@@ -20,6 +20,7 @@ install_packages() {
     jq \
     moby-engine \
     mysql-devel \
+    neovim \
     net-tools \
     nmap-ncat \
     npm \
@@ -151,18 +152,12 @@ install_pivnet_cli() {
   fi
 }
 
-install_neovim() {
-  if [ ! -x /usr/bin/nvim ]; then
-    sudo dnf copr enable -y agriffis/neovim-nightly
-    sudo dnf install -y --reinstall neovim python3-neovim
-  fi
-  sudo dnf reinstall -y neovim python3-neovim
-}
-
-
 install_luan_nvim() {
   if [ ! -d $HOME/.config/nvim ]; then
     git clone https://github.com/luan/nvim $HOME/.config/nvim
+    /usr/bin/python3 -m pip install pynvim
+    sudo yarn global add neovim
+    sudo yarn global add tree-sitter tree-sitter-cli
   else
     echo "skipping Luan's config; it's already installed"
   fi
@@ -361,7 +356,6 @@ install_pivnet_cli
 install_terraform
 install_helm
 install_aws_cli
-install_neovim
 install_luan_nvim
 install_zsh_autosuggestions
 install_gcloud

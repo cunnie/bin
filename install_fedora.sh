@@ -14,6 +14,7 @@ install_packages() {
     etcd \
     fd-find \
     git \
+    golang-x-tools-gopls \
     htop \
     iproute \
     iputils \
@@ -26,6 +27,7 @@ install_packages() {
     npm \
     openssl-devel \
     python \
+    python3-neovim \
     redhat-rpm-config \
     ripgrep \
     ruby \

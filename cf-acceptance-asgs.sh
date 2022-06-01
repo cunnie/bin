@@ -5,7 +5,7 @@ set -ex
 cf create-security-group cats-sg <(echo '[{"protocol":"tcp","destination":"10.0.244.255","ports":"80","description":"cats-sg"}]') || true
 
 while : ; do
-  SLEEP=$(( RANDOM % 40 ))
+  SLEEP=$(( RANDOM % 80 ))
   SUCCESS=0
   FAIL=0
   for COUNT in 1 2 3 4 5; do

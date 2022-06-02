@@ -28,6 +28,7 @@ install_packages() {
     openssl-devel \
     python \
     python3-neovim \
+    python3-numpy \
     redhat-rpm-config \
     ripgrep \
     ruby \

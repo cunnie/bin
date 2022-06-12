@@ -27,6 +27,7 @@ install_packages() {
     npm \
     openssl-devel \
     python \
+    python2 \
     python3-neovim \
     python3-numpy \
     redhat-rpm-config \

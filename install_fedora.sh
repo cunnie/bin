@@ -14,6 +14,7 @@ install_packages() {
     etcd \
     fd-find \
     git \
+    google-cloud-sdk-gke-gcloud-auth-plugin \
     golang-x-tools-gopls \
     htop \
     iproute \
@@ -279,6 +280,7 @@ configure_zsh() {
     echo 'alias k=kubectl' >> ~/.zshrc
     echo "# Don't log me out of LastPass for 10 hours" >> ~/.zshrc
     echo 'export LPASS_AGENT_TIMEOUT=36000' >> ~/.zshrc
+    echo 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True # fixes "WARNING: the gcp auth plugin is deprecated in v1.22+, unavailable in v1.25+;' >> ~/.zshrc
   fi
 }
 

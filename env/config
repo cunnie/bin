@@ -88,6 +88,11 @@ Host minikube minikube.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host morgoth
+	HostName morgoth.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host nas nas.nono.io
 	HostName nas.nono.io
 	User root

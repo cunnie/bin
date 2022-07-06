@@ -37,7 +37,7 @@ Host bitbucket.org
 	IdentityFile ~/.ssh/github
 
 Host bosh-vsphere
-	HostName  10.2.0.250
+	HostName  10.9.2.250
 	User jumpbox
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null

@@ -96,6 +96,7 @@ brew "git-duet/tap/git-duet"
 brew "golangci/tap/golangci-lint"
 brew "pivotal-cf/kiln/kiln"
 brew "pivotal-cf/om/om"
+brew "vmware-tanzu/carvel/ytt" # need ytt for pivotal/bosh-ecosystem-concourse/pipelines/configure.sh
 
 cask "adoptopenjdk11"
 cask "battle-net"

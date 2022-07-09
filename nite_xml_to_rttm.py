@@ -15,10 +15,10 @@ import xml.etree.ElementTree as ET
 xml_trees = []
 
 
+# 'meeting' label is given to the generated rttm file. Can be changed according to sys arg filename
 def print_rttm_line(start_time, end_time, speaker_num):
-    print("SPEAKER meeting\t1\t{}\t{}\t<NA>\t<NA>\tSpeaker_{}\t<NA>".format(start_time, end_time - start_time,
+    print("SPEAKER meeting 1 {:.3f} {:.3f} <NA> <NA> Speaker_{} <NA>".format(start_time, end_time - start_time,
                                                                             speaker_num))
-
 
 def convert_xml_to_rttm():
     xml_file = xml_files[xml_file_index]
@@ -42,6 +42,13 @@ def convert_xml_to_rttm():
     if not ((start_time is None) or (end_time is None)):
         print_rttm_line(start_time, end_time, speaker_num=xml_file_index)
 
+
+# check for file input
+if len(sys.argv) < 2:
+    print()
+    print("Please give AMI xml file as input. Download from http://groups.inf.ed.ac.uk/ami/AMICorpusAnnotations/ami_public_manual_1.6.2.zip")
+    print("USAGE: \n nite_xml_to_rttm.py ~/Downloads/ami_public_manual_1.6.2/words/ES2008a.*.words.xml | sort -n -k 4 > /tmp/ES2008a.rttm")
+    print()
 
 xml_files = sys.argv[1:]
 for xml_file_index in range(len(xml_files)):

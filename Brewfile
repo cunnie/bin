@@ -26,6 +26,7 @@ brew "chruby"
 brew "cmake"
 brew "dependency-check"
 brew "direnv"
+brew "docker" # CLI only
 brew "etcd" # for sslip.io backend database
 brew "fasd"
 brew "fd"

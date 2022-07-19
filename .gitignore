@@ -6,3 +6,4 @@
 __pycache__/
 Brewfile.lock.json
 fly
+avx

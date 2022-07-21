@@ -115,6 +115,7 @@ cask "istat-menus"
 cask "iterm2"
 cask "jetbrains-toolbox"
 cask "makemkv"
+cask "messenger" # Facebook messenger to sell things on FB Marketplace
 cask "microsoft-azure-storage-explorer"
 cask "powershell"
 cask "rancher"

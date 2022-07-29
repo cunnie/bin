@@ -81,6 +81,7 @@ brew "vim"
 brew "vips"
 brew "watch"
 brew "wget"
+brew "wireguard-tools" # need `wg` to generate public & private keys
 brew "yarn" # Operations Manager
 brew "youtube-dl"
 # brew "yq" # Ops Mgr depends on v3; don't install v4

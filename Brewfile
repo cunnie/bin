@@ -55,7 +55,8 @@ brew "libpq"
 brew "libyaml"
 brew "mysql"
 brew "neovim"
-brew "node" # Operations Manager
+brew "node@12" # Operations Manager
+brew "node@16" # Operations Manager
 brew "nodenv" # Operations Manager
 brew "openssl@1.1"
 brew "openssl@3"

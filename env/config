@@ -88,6 +88,11 @@ Host minikube minikube.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host mordred
+	HostName mordred.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host morgoth
 	HostName morgoth.nono.io
 	IdentityFile ~/.ssh/nono
@@ -97,6 +102,18 @@ Host nas nas.nono.io
 	HostName nas.nono.io
 	User root
 	IdentityFile ~/.ssh/nono
+
+Host nesxi-0
+	HostName nesxi-0.nono.io
+	User root
+
+Host nesxi-1
+	HostName nesxi-1.nono.io
+	User root
+
+Host nesxi-template
+	HostName nesxi-template.nono.io
+	User root
 
 Host ns-aws
 	HostName  ns-aws.nono.io

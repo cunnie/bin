@@ -186,6 +186,18 @@ disable_selinux() {
   fi
 }
 
+rsyslog_ignores_sslip() {
+  RSYSLOG_CONFIG=/etc/rsyslog.d/10-sslip.io.conf
+  if [ ! -f $RSYSLOG_CONFIG ]; then
+    sudo tee -a $RSYSLOG_CONFIG <<EOF
+# sslip.io-dns-server is too verbose, consumed 15G in /var/log
+# rely only on journalctl henceforth
+:programname, isequal, "sslip.io-dns-server" stop
+EOF
+    sudo systemctl restart syslog
+  fi
+}
+
 configure_git() {
   # https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
   git config --global user.name "Brian Cunnie"
@@ -349,6 +361,7 @@ configure_sudo
 create_user_cunnie
 use_pacific_time
 disable_selinux
+rsyslog_ignores_sslip
 
 if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_git

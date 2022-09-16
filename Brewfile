@@ -1,6 +1,5 @@
 # TKS and TKGI are installed from https://network.pivotal.io/products/pivotal-container-service/
 
-tap "adoptopenjdk/openjdk"
 tap "cloudfoundry/tap"
 tap "git-duet/tap"
 tap "golangci/tap"
@@ -101,7 +100,6 @@ brew "pivotal-cf/kiln/kiln"
 brew "pivotal-cf/om/om"
 brew "vmware-tanzu/carvel/ytt" # need ytt for pivotal/bosh-ecosystem-concourse/pipelines/configure.sh
 
-cask "adoptopenjdk11"
 cask "battle-net"
 cask "discord"
 cask "firefox"
@@ -128,7 +126,9 @@ cask "skype"
 cask "slack"
 cask "spotify"
 cask "steam"
+cask "temurin11" # Ops Mgr for UAA for running locally
 cask "tunnelblick"
+
 # cask "vagrant" # Docker has largely supplanted vagrant # This package requires Rosetta 2 to be installed.
 # cask "virtualbox" # Error: Cask virtualbox depends on hardware architecture being one of [{:type=>:intel, :bits=>64}], but you are running {:type=>:arm, :bits=>64}.
 cask "visual-studio-code"

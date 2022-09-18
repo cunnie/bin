@@ -14,7 +14,6 @@ install_packages() {
     etcd \
     fd-find \
     git \
-    google-cloud-sdk-gke-gcloud-auth-plugin \
     golang-x-tools-gopls \
     htop \
     iproute \
@@ -31,6 +30,7 @@ install_packages() {
     python2 \
     python3-neovim \
     python3-numpy \
+    python3-pip \
     redhat-rpm-config \
     ripgrep \
     ruby \
@@ -346,6 +346,7 @@ disable_firewalld() {
 }
 
 install_packages
+mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_azure_cli
 install_bosh_cli

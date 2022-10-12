@@ -19,6 +19,7 @@ install_packages() {
     iproute \
     iputils \
     jq \
+    lastpass-cli \
     moby-engine \
     mysql-devel \
     neovim \
@@ -65,7 +66,7 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.re
 
 install_bosh_cli() {
   if [ ! -x /usr/local/bin/bosh ]; then
-    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.0.0/bosh-cli-7.0.0-linux-amd64 -o /tmp/bosh
+    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.0.1/bosh-cli-7.0.1-linux-amd64 -o /tmp/bosh
     sudo install /tmp/bosh /usr/local/bin
   fi
 }
@@ -122,7 +123,7 @@ EOF
 # Fedora is out-of-date at 1.16.5, should be 1.18; no ip.IsPrivate(), no cf-acceptance-tests
 install_go() {
   if [ ! -d /usr/local/go ]; then
-    curl -L https://go.dev/dl/go1.18.1.linux-amd64.tar.gz -o /tmp/go.tgz
+    curl -L https://go.dev/dl/go1.19.2.linux-amd64.tar.gz -o /tmp/go.tgz
     sudo tar -C /usr/local -xzvf /tmp/go.tgz
   fi
 }
@@ -211,7 +212,7 @@ install_zsh_autosuggestions() {
 install_gcloud() {
   YUM_REPO_PATH=/etc/yum.repos.d/google-cloud-sdk.repo
   if [ ! -f $YUM_REPO_PATH ]; then
-    sudo tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
+    sudo tee -a $YUM_REPO_PATH << EOM
 [google-cloud-sdk]
 name=Google Cloud SDK
 baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
@@ -222,6 +223,23 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOM
     sudo dnf install -y google-cloud-sdk
+  fi
+}
+
+install_kubectl() {
+  # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+  YUM_REPO_PATH=/etc/yum.repos.d/kubernetes.repo
+  if [ ! -f $YUM_REPO_PATH ]; then
+    sudo tee -a $YUM_REPO_PATH << EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+    sudo dnf install -y kubectl
+    sudo dnf install -y google-cloud-sdk-gke-gcloud-auth-plugin
   fi
 }
 
@@ -348,26 +366,27 @@ disable_firewalld() {
 install_packages
 mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc
+install_aws_cli
 install_azure_cli
+install_bin
 install_bosh_cli
 install_cf_cli
-install_rtr_cli
 install_chruby
 install_fasd
+install_fly_cli
+install_gcloud
 install_git_duet
 install_go
-install_bin
-install_fly_cli
+install_helm
+install_kubectl
+install_luan_nvim
 install_om_cli
 install_pivnet_cli
+install_rtr_cli
 install_terraform
-install_helm
-install_aws_cli
-install_luan_nvim
-install_zsh_autosuggestions
-install_gcloud
-install_yq
 install_vault
+install_yq
+install_zsh_autosuggestions
 use_pacific_time
 disable_firewalld
 configure_bind

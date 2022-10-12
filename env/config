@@ -63,8 +63,8 @@ Host esxi-2
 	HostName esxi-2.nono.io
 	User root
 
-Host fedora
-	HostName fedora.nono.io
+Host fedora fed
+	HostName fed.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 

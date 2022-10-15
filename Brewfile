@@ -26,6 +26,7 @@ brew "cmake"
 brew "dependency-check"
 brew "direnv"
 brew "docker" # CLI only
+brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-credential-osxkeychain": executable file not found in $PATH"
 brew "etcd" # for sslip.io backend database
 brew "fasd"
 brew "fd"

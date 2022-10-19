@@ -78,6 +78,15 @@ install_cf_cli() {
   fi
 }
 
+install_credhub_cli() {
+  if [ ! -x /usr/local/bin/credhub ]; then
+    curl -sL https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.5/credhub-linux-2.9.5.tgz -o /tmp/credhub.tgz
+    pushd /tmp/
+    tar xzvf /tmp/credhub.tgz -- ./credhub
+    sudo install /tmp/credhub /usr/local/bin
+  fi
+}
+
 install_rtr_cli() {
   if [ ! -x /usr/local/bin/rtr ]; then
     curl -sL https://github.com/cloudfoundry/routing-api-cli/releases/download/2.23.0/rtr-linux-amd64.tgz -o /tmp/rtr.tgz
@@ -371,6 +380,7 @@ install_azure_cli
 install_bin
 install_bosh_cli
 install_cf_cli
+install_credhub_cli
 install_chruby
 install_fasd
 install_fly_cli

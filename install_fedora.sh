@@ -20,7 +20,6 @@ install_packages() {
     iputils \
     jq \
     lastpass-cli \
-    moby-engine \
     mysql-devel \
     neovim \
     net-tools \
@@ -291,10 +290,22 @@ configure_direnv() {
   done
 }
 
-configure_docker() {
-  # https://fedoramagazine.org/docker-and-fedora-32/
-  sudo systemctl enable docker
-  sudo usermod -aG docker $USER
+install_docker() {
+  if [ ! -x /usr/bin/docker ]; then
+    # https://docs.docker.com/engine/install/fedora/
+    sudo sudo dnf -y install dnf-plugins-core
+    sudo dnf config-manager \
+      --add-repo \
+      https://download.docker.com/linux/fedora/docker-ce.repo
+    sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+    # https://fedoramagazine.org/docker-and-fedora-32/
+    sudo systemctl enable docker
+    sudo systemctl start docker
+    sudo usermod -aG docker $USER
+    # fixes "ERROR: multiple platforms feature is currently not supported for docker driver."
+    docker buildx create --use
+  fi
 }
 
 configure_zsh() {
@@ -382,6 +393,7 @@ install_bosh_cli
 install_cf_cli
 install_credhub_cli
 install_chruby
+install_docker
 install_fasd
 install_fly_cli
 install_gcloud
@@ -401,6 +413,5 @@ use_pacific_time
 disable_firewalld
 configure_bind
 configure_direnv
-configure_docker
 configure_git
 configure_tmux

@@ -187,6 +187,11 @@ Host vcenter-70
 	User root
 	IdentityFile /dev/null
 
+Host vcenter-80
+	HostName vcenter-80.nono.io
+	User root
+	IdentityFile /dev/null
+
 # work
 #
 Host belinda

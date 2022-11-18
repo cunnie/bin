@@ -8,11 +8,13 @@ tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "homebrew/services"
-tap "vmware-tanzu/carvel"
+# Even though we don't use "k14s/tap", including it gets rid of this message when installing ytt:
+#   "Please use the fully-qualified name (e.g. k14s/tap/ytt) to refer to the formula."
+tap "k14s/tap"
 tap "pivotal-cf/kiln", "https://github.com/pivotal-cf/kiln"
 tap "pivotal-cf/om", "https://github.com/pivotal-cf/om"
 tap "pivotal/tap"
-
+tap "vmware-tanzu/carvel"
 brew "automake"
 brew "awscli"
 brew "azure-cli" # for terraforming ns-azure
@@ -45,7 +47,7 @@ brew "jq"
 brew "vmware-tanzu/carvel/kapp"
 brew "vmware-tanzu/carvel/kbld"
 brew "vmware-tanzu/carvel/vendir"
-brew "vmware-tanzu/carvel/ytt"
+brew "vmware-tanzu/carvel/ytt" # need ytt for pivotal/bosh-ecosystem-concourse/pipelines/configure.sh
 brew "kiln"
 brew "kubernetes-cli"
 brew "lastpass-cli"
@@ -99,7 +101,6 @@ brew "git-duet/tap/git-duet"
 brew "golangci/tap/golangci-lint"
 brew "pivotal-cf/kiln/kiln"
 brew "pivotal-cf/om/om"
-brew "vmware-tanzu/carvel/ytt" # need ytt for pivotal/bosh-ecosystem-concourse/pipelines/configure.sh
 
 cask "battle-net"
 cask "discord"

@@ -134,7 +134,7 @@ cask "tunnelblick"
 # cask "virtualbox" # Error: Cask virtualbox depends on hardware architecture being one of [{:type=>:intel, :bits=>64}], but you are running {:type=>:arm, :bits=>64}.
 cask "visual-studio-code"
 cask "vlc"
-cask "vmware-fusion-tech-preview" # Because it's cool
+cask "vmware-fusion" # Because it's cool
 cask "whatsapp"
 cask "wireshark"
 cask "xquartz"

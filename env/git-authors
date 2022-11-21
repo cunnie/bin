@@ -1,5 +1,6 @@
 authors:
   ac: Andrew Crump; acrmp
+  ag: Andrew Garner; abg
   ap: Aram Price; aramprice
   bec: Brendan Cunnie; saintbrendan
   bl: Belinda Liu; belinda-liu
@@ -35,6 +36,7 @@ email:
   domain: gmail.com
 email_addresses:
   ac: crumpan@vmware.com
+  ag: garnera@vmware.com
   ap: pricear@vmware.com
   bl: lbelinda@vmware.com
   bmc-work: bcunnie@vmware.com

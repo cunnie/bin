@@ -83,6 +83,11 @@ Host home
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host jammy
+	HostName jammy.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host minikube minikube.nono.io
 	HostName minikube.nono.io
 	IdentityFile ~/.ssh/nono

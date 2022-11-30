@@ -383,6 +383,18 @@ disable_firewalld() {
   sudo systemctl disable firewalld
 }
 
+configure_passwordless_sudo() {
+  SUDO_FILE=/etc/sudoers.d/passwordless
+  if ! sudo test -f $SUDO_FILE ; then
+    sudo tee $SUDO_FILE <<EOF
+# Ubuntu: Allow members of group sudo  to execute any command
+%sudo  ALL=(ALL) NOPASSWD: ALL
+# Fedora: Allow members of group wheel to execute any command
+%wheel ALL=(ALL) NOPASSWD: ALL
+EOF
+  fi
+}
+
 install_packages
 mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc
@@ -415,3 +427,4 @@ configure_bind
 configure_direnv
 configure_git
 configure_tmux
+configure_passwordless_sudo

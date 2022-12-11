@@ -13,6 +13,7 @@ install_packages() {
     dnf-plugins-core \
     etcd \
     fd-find \
+    gcc-g++ \
     git \
     golang-x-tools-gopls \
     htop \

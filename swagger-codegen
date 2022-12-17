@@ -12,7 +12,10 @@ for arg in $@; do
 done
 
 set -x
-docker run --rm \
+docker run \
+  --ulimit nofile=122880:122880 \
+  --user $(id -u) \
+  --rm \
   --mount type=bind,source="${PWD}",target=/local \
   swaggerapi/swagger-codegen-cli:2.4.19 \
   ${args[@]}

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# This is meant to replace swagger-codegen when running
+# The BOSH vSphere CPI `bundle exec rake`
+# because Docker is easier to use than installing
+# `swagger-codegen`
+
+for arg in $@; do
+  # prepend "/local" to everything that looks like a path
+  [[ "${arg}" =~ "/" ]] && arg="/local/${arg}"
+  args+=($arg)
+done
+
+set -x
+docker run --rm \
+  --mount type=bind,source="${PWD}",target=/local \
+  swaggerapi/swagger-codegen-cli:2.4.19 generate \
+  ${args[@]}

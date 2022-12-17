@@ -14,5 +14,5 @@ done
 set -x
 docker run --rm \
   --mount type=bind,source="${PWD}",target=/local \
-  swaggerapi/swagger-codegen-cli:2.4.19 generate \
+  swaggerapi/swagger-codegen-cli:2.4.19 \
   ${args[@]}

@@ -147,8 +147,9 @@ Host ns-gce
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
-Host ns-vultr
-	HostName ns-vultr.nono.io
+Host nsx
+	HostName  nsx.nono.io
+	User root
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 

@@ -116,6 +116,10 @@ Host nesxi-1
 	HostName nesxi-1.nono.io
 	User root
 
+Host nesxi-2
+	HostName nesxi-2.nono.io
+	User root
+
 Host nesxi-template
 	HostName nesxi-template.nono.io
 	User root

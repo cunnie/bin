@@ -167,21 +167,6 @@ install_pivnet_cli() {
   fi
 }
 
-install_luan_nvim() {
-  if [ ! -d $HOME/.config/nvim ]; then
-    git clone https://github.com/luan/nvim $HOME/.config/nvim
-    /usr/bin/python3 -m pip install pynvim
-    sudo yarn global add neovim
-    sudo yarn global add tree-sitter tree-sitter-cli
-  else
-    echo "skipping Luan's config; it's already installed"
-  fi
-  # fix "missing dependencies (fd)!"
-  if [ ! -f /usr/bin/fd ]; then
-    sudo ln -s /usr/bin/fdfind /usr/bin/fd
-  fi
-}
-
 install_terraform() {
   if [ ! -x /usr/local/bin/terraform ]; then
     curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.1.3/terraform_1.1.3_linux_amd64.zip
@@ -414,7 +399,6 @@ install_git_duet
 install_go
 install_helm
 install_kubectl
-install_luan_nvim
 install_om_cli
 install_pivnet_cli
 install_rtr_cli

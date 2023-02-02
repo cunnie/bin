@@ -104,27 +104,6 @@ install_fly_cli() {
   fi
 }
 
-install_luan_nvim() {
-  if [ ! -d $HOME/.config/nvim ]; then
-    # Canonical renamed "bat" to "batcat" to avoid collision.
-    # We rename it back to "bat"
-    sudo mv -i /usr/bin/bat{cat,} || true
-    sudo mv -i /usr/share/man/man1/bat{cat,}.1.gz || true
-    # similarly with yarn
-    sudo mv -i /usr/bin/yarn{pkg,} || true
-    sudo mv -i /usr/share/man/man1/yarn{pkg,}.1.gz || true
-    pip3 install neovim pynvim
-    yarn global add neovim
-    git clone https://github.com/luan/nvim $HOME/.config/nvim
-  else
-    echo "skipping Luan's config; it's already installed"
-  fi
-  # fix "missing dependencies (fd)!"
-  if [ ! -L /usr/bin/fd ]; then
-    sudo ln -s /usr/bin/fdfind /usr/bin/fd
-  fi
-}
-
 install_terraform() {
   if [ ! -x /usr/local/bin/terraform ]; then
     curl -o tf.zip -L https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
@@ -390,7 +369,6 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   install_fly_cli
   install_terraform
   install_aws_cli
-  install_luan_nvim
   install_zsh_autosuggestions
   install_docker
   configure_direnv

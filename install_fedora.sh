@@ -413,3 +413,4 @@ configure_direnv
 configure_git
 configure_tmux
 configure_passwordless_sudo
+[ ! -f /usr/lib64/libsqlite3.so ] && [ -f /usr/lib64/libsqlite3.so.0 ] && sudo ln -s /usr/lib64/libsqlite3.so.0 /usr/lib64/libsqlite3.so

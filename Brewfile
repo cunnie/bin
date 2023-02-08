@@ -110,6 +110,7 @@ cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"
 cask "google-drive"
+cask "graphviz" # Ruby profiling for OM 3.0
 cask "handbrake"
 cask "inkscape"
 cask "istat-menus"

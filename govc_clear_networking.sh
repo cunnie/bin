@@ -13,8 +13,8 @@
 # VMs and VMkernel network adapters that might be connected to the switch and
 # remove the switch.
 
-# The following loop prints out the existing port group info so youu can
-# reconnect your VMs' network connection after receating the DVswitch & port
+# The following loop prints out the existing port group info so you can
+# reconnect your VMs' network connection after recreating the DVswitch & port
 # groups (e.g. "dvportgroup-1036" → "guest")
 for VM in $(govc ls /dc/host/cl/esxi-1.nono.io); do
   echo $VM:

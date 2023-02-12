@@ -8,6 +8,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "homebrew/services"
+tap "homebrew/cask-fonts" # LunarVim
 # Even though we don't use "k14s/tap", including it gets rid of this message when installing ytt:
 #   "Please use the fully-qualified name (e.g. k14s/tap/ytt) to refer to the formula."
 tap "k14s/tap"
@@ -32,6 +33,7 @@ brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-crede
 brew "etcd" # for sslip.io backend database
 brew "fasd"
 brew "fd"
+brew "font-hack-nerd-font" # LunarVim, migh tneed to install manually to avoid 'Warning: 'font-hack-nerd-font' formula is unreadable: No available formula with the name "font-hack-nerd-font".'
 brew "gdbm"
 brew "git"
 brew "git-lfs"
@@ -39,6 +41,7 @@ brew "gnu-sed"
 brew "go"
 brew "govc"
 brew "gopls" # for Luan's nvim
+brew "graphviz" # Ruby profiling for OM 3.0
 brew "helm"
 brew "htop"
 brew "hub"
@@ -110,7 +113,6 @@ cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"
 cask "google-drive"
-cask "graphviz" # Ruby profiling for OM 3.0
 cask "handbrake"
 cask "inkscape"
 cask "istat-menus"
@@ -135,7 +137,7 @@ cask "tunnelblick"
 # cask "virtualbox" # Error: Cask virtualbox depends on hardware architecture being one of [{:type=>:intel, :bits=>64}], but you are running {:type=>:arm, :bits=>64}.
 cask "visual-studio-code"
 cask "vlc"
-cask "vmware-fusion" # Because it's cool
+# cask "vmware-fusion" # Because it's cool; install manually to avoid "chown: /Applications/VMware Fusion.app/Contents/CodeResources: Operation not permitted"
 cask "whatsapp"
 cask "wireshark"
 cask "xquartz"

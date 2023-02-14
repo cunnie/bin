@@ -33,7 +33,7 @@ brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-crede
 brew "etcd" # for sslip.io backend database
 brew "fasd"
 brew "fd"
-brew "font-hack-nerd-font" # LunarVim, migh tneed to install manually to avoid 'Warning: 'font-hack-nerd-font' formula is unreadable: No available formula with the name "font-hack-nerd-font".'
+# brew "font-hack-nerd-font" # LunarVim, migh tneed to install manually to avoid 'Warning: 'font-hack-nerd-font' formula is unreadable: No available formula with the name "font-hack-nerd-font".'
 brew "gdbm"
 brew "git"
 brew "git-lfs"
@@ -66,6 +66,7 @@ brew "nodenv" # Operations Manager
 brew "openssl@1.1"
 brew "openssl@3"
 brew "openvpn" # to reach Nimbus VMs
+# brew "pivotal/tap/pivnet-cli" # to use the PivNet CLI to download OM, TAS # The x86_64 architecture is required for this software.
 brew "postgresql@11" # needed for ruby-install 3.1.2 "configure: error: something wrong with LDFLAGS="-L/opt/homebrew/opt/postgresql@11/lib""
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python@3.8"
@@ -99,7 +100,7 @@ brew "zsh-syntax-highlighting"
 
 brew "cloudfoundry/tap/bosh-cli"
 brew "cloudfoundry/tap/cf-cli@7"
-brew "cloudfoundry/tap/credhub-cli" # The x86_64 architecture is required for this software.
+# brew "cloudfoundry/tap/credhub-cli" # The x86_64 architecture is required for this software.
 brew "git-duet/tap/git-duet"
 brew "golangci/tap/golangci-lint"
 brew "pivotal-cf/kiln/kiln"

@@ -129,10 +129,9 @@ EOF
   fi
 }
 
-# Fedora is out-of-date at 1.16.5, should be 1.18; no ip.IsPrivate(), no cf-acceptance-tests
 install_go() {
   if [ ! -d /usr/local/go ]; then
-    curl -L https://go.dev/dl/go1.19.2.linux-amd64.tar.gz -o /tmp/go.tgz
+    curl -L https://go.dev/dl/go1.20.1.linux-amd64.tar.gz -o /tmp/go.tgz
     sudo tar -C /usr/local -xzvf /tmp/go.tgz
   fi
 }

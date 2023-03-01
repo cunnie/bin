@@ -24,6 +24,7 @@ install_packages() {
     fasd \
     fd-find \
     golang \
+    jq \
     lastpass-cli \
     lua5.4 \
     neovim \

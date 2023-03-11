@@ -32,7 +32,7 @@ class OpenAPIChugger
 
   def definitions
     @endpoints.each do |endpoint|
-      iterate(@openapi['paths'][endpoint])  
+      iterate(@openapi['paths'][endpoint])
     end
   end
 
@@ -42,20 +42,32 @@ class OpenAPIChugger
     end
   end
 
-  def iterate(h)
-    h.each do |k, v|
+  def iterate_model(model)
+    return if @models.include?(model) # do we already have this model?
+
+    return unless @openapi['definitions'].key?(model) # Is this really a model or just some weird ENUM?
+
+    @models << model
+    iterate(@openapi['definitions'][model])
+  end
+
+  def iterate(hash_array_or_string)
+    hash_array_or_string.each do |k, v|
       # If v is nil, an array is being iterated and the value is k.
       # If v is not nil, a hash is being iterated and the value is v.
       value = v || k
 
-      if value.is_a?(Hash) || value.is_a?(Array)
+      if k == 'enum' && v.is_a?(Array) # 'enum' sometimes list necessary models
+        v.each do |model|
+          iterate_model(model)
+        end
+      elsif value.is_a?(Hash) || value.is_a?(Array)
+        iterate(value)
+      elsif value.is_a?(Array)
         iterate(value)
       elsif value.is_a?(String) && @re.match(value)
         model = @re.match(value)[1]
-        unless @models.include?(model)
-          @models << model
-          iterate(@openapi['definitions'][model])
-        end
+        iterate_model(model)
       end
     end
   end

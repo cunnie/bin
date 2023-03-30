@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # typical use:
-# dig @nono.io axfr nono.io. | a_to_ptr.rb > /usr/local/etc/namedb/master/9.9.10.in-addr.arpa
+# dig @nono.io axfr nono.io. | a_to_ptr.rb > /usr/local/etc/namedb/master/9.10.in-addr.arpa
 
 puts <<~AXFR
   $TTL 3h
@@ -17,9 +17,11 @@ $stdin.read.split("\n").each do |line|
 
   fields = line.split(' ')
   # p fields
-  if fields[4].match?(/^10\.9\.9\./)
-    octet = fields[4].split('.')[3].to_i
-    octet_to_record[octet] = "#{octet}\tPTR\t#{fields[0]}"
+  if fields[4].match?(/^10\.9\./)
+    third_octet = fields[4].split('.')[2].to_i
+    fourth_octet = fields[4].split('.')[3].to_i
+    octet = third_octet * 256 + fourth_octet
+    octet_to_record[octet] = "#{fourth_octet}.#{third_octet}\tPTR\t#{fields[0]}"
   end
 end
 

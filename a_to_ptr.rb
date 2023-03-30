@@ -17,6 +17,7 @@ $stdin.read.split("\n").each do |line|
 
   fields = line.split(' ')
   # p fields
+  fields[0].gsub!(/^\*\./,'') # '*' cause `named` to fail to load zone
   if fields[4].match?(/^10\.9\./)
     third_octet = fields[4].split('.')[2].to_i
     fourth_octet = fields[4].split('.')[3].to_i

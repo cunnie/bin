@@ -8,3 +8,5 @@ Brewfile.lock.json
 fly
 fly-*
 avx
+# Using Neovim on FreeBSD leaves this annoying file
+.nvimlog

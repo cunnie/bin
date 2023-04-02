@@ -2,6 +2,11 @@
 
 # typical use:
 # dig @nono.io axfr nono.io. | a_to_ptr.rb > /usr/local/etc/namedb/master/9.10.in-addr.arpa
+#
+# Typical axfr output:
+#
+# www.nono.io.		300	IN	A	78.46.204.247
+# www.nono.io.		300	IN	AAAA	2a01:4f8:c17:b8f::2
 
 puts <<~AXFR
   $TTL 3h
@@ -17,7 +22,7 @@ $stdin.read.split("\n").each do |line|
 
   fields = line.split(' ')
   # p fields
-  fields[0].gsub!(/^\*\./,'') # '*' cause `named` to fail to load zone
+  fields[0].gsub!(/^\*\./,'') # '*' (wildcards) cause `named` to fail to load zone
   if fields[4].match?(/^10\.9\./)
     third_octet = fields[4].split('.')[2].to_i
     fourth_octet = fields[4].split('.')[3].to_i

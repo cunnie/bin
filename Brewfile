@@ -34,6 +34,7 @@ brew "etcd" # for sslip.io backend database
 brew "fasd"
 brew "fd"
 # brew "font-hack-nerd-font" # LunarVim, migh tneed to install manually to avoid 'Warning: 'font-hack-nerd-font' formula is unreadable: No available formula with the name "font-hack-nerd-font".'
+brew "fzf" # Chris Selzo; enables `echo "" | fzf --preview 'jq {q} < roles.json'`
 brew "gdbm"
 brew "git"
 brew "git-lfs"
@@ -80,6 +81,7 @@ brew "swagger-codegen" # vSphere CPI
 brew "terraform"
 brew "the_silver_searcher"
 brew "tidy-html5"
+brew "tldr" # Chris Selzo likes this
 brew "tmux"
 brew "tree"
 brew "uaa-cli" # The x86_64 architecture is required for this software.

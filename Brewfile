@@ -108,7 +108,6 @@ brew "golangci/tap/golangci-lint"
 brew "pivotal-cf/kiln/kiln"
 brew "pivotal-cf/om/om"
 
-cask "battle-net"
 cask "discord"
 cask "firefox"
 cask "flycut"

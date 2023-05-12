@@ -161,7 +161,7 @@ install_om_cli() {
 
 install_pivnet_cli() {
   if [ ! -x /usr/local/bin/pivnet ]; then
-    curl -s -L -o /tmp/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v2.0.1/pivnet-linux-amd64-2.0.1
+    curl -s -L -o /tmp/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1
     sudo install /tmp/pivnet /usr/local/bin
   fi
 }

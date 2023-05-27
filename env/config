@@ -203,92 +203,17 @@ Host vcenter-80
 	IdentityFile /dev/null
 
 # work
-#
-Host belinda
-	HostName belinda.cli.fun
-	User rdloaner
-	ForwardAgent yes
-	IdentityFile ~/.ssh/github
-
-Host crhntr
-	HostName home.crhntr.com
-	User pivotal
-	ForwardAgent yes
-	IdentityFile ~/.ssh/github
-
-Host nimbus
-	HostName nimbus-gateway.eng.vmware.com
-	User bcunnie
-	ForwardAgent yes
-
-Host westminster
-	HostName westminster.la.pivotallabs.com
-	User pivotal
-	IdentityFile ~/.ssh/github
-	ForwardAgent yes
-
 Host sof2-dbc401.eng.vmware.com
   IdentityFile ~/.ssh/dbc
+
+Host wallaby-maas
+  Hostname 10.198.146.7
+  User vmware
 
 # append these entries to your local `ssh_config`
 #
 # GOTCHA: first ssh attempt will fail with `Connection closed by ....`, try again
 
-Host haas-200
-  HostName bosh-concourse.haas-200.pez.pivotal.io
-  User pivotal
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  RequestTTY force
-  RemoteCommand ssh ubuntu@opsmgr-01.haas-200.pez.pivotal.io
-
-Host haas-237
-  HostName bosh-concourse.haas-237.pez.pivotal.io
-  User pivotal
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  RequestTTY force
-  RemoteCommand ssh ubuntu@opsmgr-01.haas-237.pez.pivotal.io
-
-Host haas-241
-  HostName bosh-concourse.haas-241.pez.pivotal.io
-  User pivotal
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  RequestTTY force
-  RemoteCommand ssh ubuntu@opsmgr-01.haas-241.pez.pivotal.io
-
-Host haas-256
-  HostName bosh-concourse.haas-256.pez.pivotal.io
-  User pivotal
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  RequestTTY force
-  RemoteCommand ssh ubuntu@opsmgr-01.haas-256.pez.pivotal.io
-
-Host esxi-200
-  HostName sc2-host-b102-35.haas-200.pez.pivotal.io
-  User root
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-
-Host esxi-237
-  HostName sc2-host-b104-31.haas-237.pez.pivotal.io
-  User root
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-
-Host esxi-241
-  HostName sc2-host-b103-41.haas-241.pez.pivotal.io
-  User root
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-
-Host esxi-256
-  HostName sc2-host-b104-42.haas-256.pez.pivotal.io
-  User root
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
 
 # wildcards at bottom, otherwise they trump
 Host *.nono.io

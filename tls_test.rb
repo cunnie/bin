@@ -25,5 +25,5 @@ loop do
     puts e.message
   end
   puts "successful attempts: #{successful_attempts}; failed attempts: #{failed_attempts}; success rate: #{successful_attempts * 100 / (successful_attempts + failed_attempts)}%"
-  sleep 1
+  sleep 5
 end

@@ -27,6 +27,8 @@ install_packages() {
     nmap-ncat \
     npm \
     openssl-devel \
+    packer \
+    postgresql-devel \
     python \
     python2 \
     python3-neovim \
@@ -68,6 +70,13 @@ install_bosh_cli() {
   if [ ! -x /usr/local/bin/bosh ]; then
     curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.2.3/bosh-cli-7.2.3-linux-amd64 -o /tmp/bosh
     sudo install /tmp/bosh /usr/local/bin
+  fi
+}
+
+install_govc() {
+  if [ ! -x /usr/local/bin/govc ]; then
+    curl -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_$(uname -m).tar.gz" | tar xvzf - govc
+    sudo install govc /usr/local/bin
   fi
 }
 
@@ -405,6 +414,7 @@ install_terraform
 install_vault
 install_yq
 install_zsh_autosuggestions
+install_govc
 use_pacific_time
 disable_firewalld
 configure_bind

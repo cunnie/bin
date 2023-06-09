@@ -55,6 +55,10 @@ Host diarizer diarizer.com
 	ForwardAgent yes
 	IdentityFile ~/.ssh/nono
 
+Host esxi-0
+	HostName esxi-0.nono.io
+	User root
+
 Host esxi-1
 	HostName esxi-1.nono.io
 	User root

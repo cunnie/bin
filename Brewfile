@@ -69,6 +69,7 @@ brew "openssl@3"
 brew "openstackclient" # Lakin says we need it to manage our cluster
 brew "openvpn" # to reach Nimbus VMs
 # brew "pivotal/tap/pivnet-cli" # to use the PivNet CLI to download OM, TAS # The x86_64 architecture is required for this software.
+brew "packer" # needed for ops-manager/vm, to create OM VMs
 brew "postgresql@11" # needed for ruby-install 3.1.2 "configure: error: something wrong with LDFLAGS="-L/opt/homebrew/opt/postgresql@11/lib""
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python@3.8"

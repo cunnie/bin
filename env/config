@@ -97,6 +97,12 @@ Host minikube minikube.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host mordor mordor.nono.io
+	HostName  mordor.nono.io
+	Port 22
+	ForwardAgent yes
+	IdentityFile ~/.ssh/nono
+
 Host mordred
 	HostName mordred.nono.io
 	IdentityFile ~/.ssh/nono

@@ -25,6 +25,8 @@ install_packages() {
     etcd \
     fasd \
     fd-find \
+    git \
+    git-lfs \
     golang \
     jq \
     lastpass-cli \

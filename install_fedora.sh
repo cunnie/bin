@@ -15,6 +15,7 @@ install_packages() {
     fd-find \
     gcc-g++ \
     git \
+    git-lfs \
     golang-x-tools-gopls \
     htop \
     iproute \

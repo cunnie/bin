@@ -92,6 +92,11 @@ Host jammy
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host lunar
+	HostName lunar.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host minikube minikube.nono.io
 	HostName minikube.nono.io
 	IdentityFile ~/.ssh/nono

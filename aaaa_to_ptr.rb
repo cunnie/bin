@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # typical use:
-# dig @nono.io axfr nono.io. | aaaa_to_ptr.rb > /usr/local/etc/namedb/master/0.0.1.0.6.4.6.0.1.0.6.2.IP6.arpa
+# dig @nono.io axfr nono.io. | aaaa_to_ptr.rb > /usr/local/etc/namedb/primary/0.0.1.0.6.4.6.0.1.0.6.2.IP6.arpa
 #
 # Typical axfr output:
 #
@@ -12,7 +12,7 @@ require 'ipaddr'
 
 puts <<~AXFR
   $TTL 3h
-  @ SOA atom.nono.io. yoyo.nono.io. #{Time.now.to_i} 1d 12h 1w 3h
+  @ SOA mordor.nono.io. yoyo.nono.io. #{Time.now.to_i} 1d 12h 1w 3h
           ; Serial, Refresh, Retry, Expire, Neg. cache TTL
 
           NS      atom.nono.io.

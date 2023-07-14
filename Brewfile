@@ -73,6 +73,7 @@ brew "postgresql@11" # needed for ruby-install 3.1.2 "configure: error: somethin
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python@3.8"
 brew "python@3.9"
+brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "qrencode"
 brew "readline"
 brew "ripgrep"

@@ -44,6 +44,7 @@ end
 
 $stdin.read.force_encoding('Windows-1252').split("\n").each do |line|
   line.gsub!(/\r/, '') # get rid of DOS-terminated \r\n 0xd 0xa CR LF
+  line.encode!('UTF-8', 'Windows-1252')
   if line.match?(/^\d\d:\d\d:\d\d,\d\d\d --> \d\d:\d\d:\d\d,\d\d\d$/)
     start_time, end_time = line.split(' --> ')
     puts "#{twenty_four_twenty_fifths(start_time)} --> #{twenty_four_twenty_fifths(end_time)}"

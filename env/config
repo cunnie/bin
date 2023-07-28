@@ -14,43 +14,25 @@ Host nono.com nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host aasfmarin aasfmarin.org test.aasfmarin.org
-	HostName aasfmarin.org
-	User forge
-	IdentityFile ~/.ssh/github
-	ForwardAgent yes
-
-Host aasfmarin.nono.io
-	HostName aasfmarin.nono.io
-	User forge
-	IdentityFile ~/.ssh/github
-	ForwardAgent yes
-
-Host atom atom.nono.io
-	HostName  atom.nono.io
-	Port 22
-	ForwardAgent yes
-	IdentityFile ~/.ssh/nono
-
 Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
 
 Host bosh-vsphere
-	HostName  10.9.2.10
+	HostName 10.9.2.10
 	User jumpbox
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host bosh-lite
-	HostName  bosh-lite.nono.io
+	HostName bosh-lite.nono.io
 	User jumpbox
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host diarizer diarizer.com
-	HostName  diarizer.nono.io
+	HostName diarizer.nono.io
 	Port 22
 	ForwardAgent yes
 	IdentityFile ~/.ssh/nono
@@ -81,7 +63,7 @@ Host github.com
 	IdentityFile ~/.ssh/github
 
 Host home
-	HostName  home.nono.io
+	HostName home.nono.io
 	Port 2222
 	User cunnie
 	IdentityFile ~/.ssh/nono
@@ -103,7 +85,7 @@ Host minikube minikube.nono.io
 	ForwardAgent yes
 
 Host mordor mordor.nono.io
-	HostName  mordor.nono.io
+	HostName mordor.nono.io
 	Port 22
 	ForwardAgent yes
 	IdentityFile ~/.ssh/nono
@@ -140,34 +122,27 @@ Host nesxi-template
 	User root
 
 Host ns-aws
-	HostName  ns-aws.nono.io
+	HostName ns-aws.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host ns-azure
-	HostName  ns-azure.nono.io
+	HostName ns-azure.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host ns-digitalocean
-	HostName  ns-digitalocean.nono.io
+	HostName ns-digitalocean.nono.io
 	User freebsd
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host ns-gce
-	HostName  ns-gce.nono.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
 Host nsx
-	HostName  nsx.nono.io
+	HostName nsx.nono.io
 	User root
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
@@ -177,12 +152,6 @@ Host om om.tas.nono.io
 	User ubuntu
 	IdentityFile ~/.ssh/nono
 	UserKnownHostsFile /dev/null
-
-Host paris paris.nono.io
-	HostName paris.nono.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
 
 Host test test.diarizer.com
 	Hostname test.diarizer.com
@@ -201,29 +170,19 @@ Host unifi
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host vain
-	HostName vain.nono.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host vcenter-70
-	HostName vcenter-70.nono.io
-	User root
-	IdentityFile /dev/null
-
 Host vcenter-80
 	HostName vcenter-80.nono.io
 	User root
-	IdentityFile /dev/null
+	PreferredAuthentications password
+	PubkeyAuthentication no
 
 # work
 Host sof2-dbc401.eng.vmware.com
-  IdentityFile ~/.ssh/dbc
+	IdentityFile ~/.ssh/dbc
 
 Host wallaby-maas
-  Hostname 10.198.146.7
-  User vmware
+	Hostname 10.198.146.7
+	User vmware
 
 # append these entries to your local `ssh_config`
 #

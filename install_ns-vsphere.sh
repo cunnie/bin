@@ -37,6 +37,7 @@ install_packages() {
     python3 \
     python3-dev \
     python3-pip \
+    python3-venv \
     ripgrep \
     ruby \
     silversearcher-ag \
@@ -143,6 +144,7 @@ configure_zsh() {
     sed -i 's/robbyrussell/agnoster/' $HOME/.zshrc
     echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> $HOME/.zshrc
     echo 'export EDITOR=nvim' >> $HOME/.zshrc
+    echo '. $HOME/.venv/base/bin/activate' >> ~/.zshrc
   fi
 }
 
@@ -265,6 +267,15 @@ install_docker() {
   fi
 }
 
+configure_python_venv() {
+  VENV_DIR=$HOME/.venv/base
+  if [ ! -d $VENV_DIR ]; then
+    python3 -m venv $VENV_DIR
+    source $VENV_DIR/bin/activate
+    pip install tensorflow
+  fi
+}
+
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -i)
@@ -289,6 +300,7 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_direnv
   configure_tmux
   configure_ntp
+  configure_python_venv
   install_sslip_io_dns
   delete_adminuser # AMI includes an ubuntu user; delete it
 fi

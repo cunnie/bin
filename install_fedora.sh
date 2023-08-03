@@ -314,6 +314,7 @@ configure_zsh() {
     echo "# Don't log me out of LastPass for 10 hours" >> ~/.zshrc
     echo 'export LPASS_AGENT_TIMEOUT=36000' >> ~/.zshrc
     echo 'export USE_GKE_GCLOUD_AUTH_PLUGIN=True # fixes "WARNING: the gcp auth plugin is deprecated in v1.22+, unavailable in v1.25+;' >> ~/.zshrc
+    echo '. $HOME/.venv/base/bin/activate' >> ~/.zshrc
   fi
 }
 
@@ -390,6 +391,15 @@ EOF
   fi
 }
 
+configure_python_venv() {
+  VENV_DIR=$HOME/.venv/base
+  if [ ! -d $VENV_DIR ]; then
+    python3 -m venv $VENV_DIR
+    source $VENV_DIR/bin/activate
+    pip install tensorflow
+  fi
+}
+
 install_packages
 mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc
@@ -423,4 +433,5 @@ configure_direnv
 configure_git
 configure_tmux
 configure_passwordless_sudo
+configure_python_venv
 [ ! -f /usr/lib64/libsqlite3.so ] && [ -f /usr/lib64/libsqlite3.so.0 ] && sudo ln -s /usr/lib64/libsqlite3.so.0 /usr/lib64/libsqlite3.so

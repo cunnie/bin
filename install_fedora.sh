@@ -8,6 +8,7 @@ install_packages() {
     bind-utils \
     binutils \
     btrfs-progs \
+    cmake \
     cronie \
     direnv \
     dnf-plugins-core \
@@ -22,6 +23,8 @@ install_packages() {
     iputils \
     jq \
     lastpass-cli \
+    libxml2-devel \
+    libcurl-devel \
     mysql-devel \
     neovim \
     net-tools \

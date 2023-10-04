@@ -150,7 +150,7 @@ Host nsx
 Host om om.tas.nono.io
 	HostName om.tas.nono.io
 	User ubuntu
-	IdentityFile ~/.ssh/nono
+	IdentityFile ~/workspace/ops-manager/assets/bosh.pem
 	UserKnownHostsFile /dev/null
 
 Host test test.diarizer.com

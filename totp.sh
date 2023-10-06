@@ -8,6 +8,10 @@
 # e.g. lpass show --note totp.txt | totp.sh
 
 while read URL; do
-  [ -z "$URL" ] || qrencode -o - -t ANSI $URL
+  if [[ "${URL}" =~ "#" ]]; then
+    echo ignoring "${URL}"
+    continue
+  fi
+  echo QR code for $URL
+  [ -z "${URL}" ] || qrencode -o - -t ANSI "${URL}"
 done
-

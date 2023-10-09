@@ -80,6 +80,7 @@ brew "readline"
 brew "ripgrep"
 brew "ruby-install"
 brew "shepherd" # to create ops manager / TAS environments for testing
+brew "solargraph" # fix VS Code "Couldn't start client Ruby Language Server" "zsh:1: command not found: solargraph"
 brew "sshuttle"
 brew "swagger-codegen" # vSphere CPI
 brew "terraform"

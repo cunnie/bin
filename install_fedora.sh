@@ -181,7 +181,7 @@ install_pivnet_cli() {
 
 install_terraform() {
   if [ ! -x /usr/local/bin/terraform ]; then
-    curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.1.3/terraform_1.1.3_linux_amd64.zip
+    curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.6.3/terraform_1.6.3_linux_amd64.zip
     unzip tf.zip
     sudo install terraform /usr/local/bin/
   fi

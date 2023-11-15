@@ -199,6 +199,15 @@ configure_python_venv() {
   fi
 }
 
+fix_partitions() {
+  sudo parted --fix /dev/sda print
+  # Thanks Sunil Mohan https://bugs.launchpad.net/ubuntu/+source/parted/+bug/1270203/comments/6
+  echo -e "yes\n100%" | sudo parted /dev/sda ---pretend-input-tty unit % resizepart 5
+  sudo parted --fix /dev/sda print
+  sudo btrfs filesystem resize max /
+}
+
+fix_partitions
 install_packages
 mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc

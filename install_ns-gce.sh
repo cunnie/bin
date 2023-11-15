@@ -207,20 +207,57 @@ fix_partitions() {
   sudo btrfs filesystem resize max /
 }
 
+install_sslip_io_dns() {
+  if [ ! -x /usr/bin/sslip.io-dns-server ]; then
+    GOLANG_ARCH=$ARCH
+    GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
+    GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
+    curl -L https://github.com/cunnie/sslip.io/releases/download/3.0.0/sslip.io-dns-server-linux-$GOLANG_ARCH \
+      -o sslip.io-dns-server
+    sudo install sslip.io-dns-server /usr/bin
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.service \
+      -o /etc/systemd/system/sslip.io-dns.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable sslip.io-dns
+    sudo systemctl start sslip.io-dns
+  fi
+}
+
+rsyslog_ignores_sslip() {
+  RSYSLOG_CONFIG=/etc/rsyslog.d/10-sslip.io.conf
+  if [ ! -f $RSYSLOG_CONFIG ]; then
+    sudo tee -a $RSYSLOG_CONFIG <<EOF
+# sslip.io-dns-server is too verbose, consumed 15G in /var/log
+# rely only on journalctl henceforth
+:programname, isequal, "sslip.io-dns-server" stop
+EOF
+    sudo systemctl restart rsyslog
+  fi
+}
+
+id # Who am I? for debugging purposes
+START_TIME=$(date +%s)
+ARCH=$(uname -m) # `uname -i` returns "unknown" on GCP
+export HOSTNAME=$(hostname)
 fix_partitions
 install_packages
-mkdir -p ~/workspace
-configure_zsh          # needs to come before install steps that modify .zshrc
-install_bin
-install_chruby
-install_fasd
-install_git_duet
-install_terraform
-install_zsh_autosuggestions
 use_pacific_time
 disable_firewalld
-configure_direnv
-configure_git
-configure_tmux
-configure_passwordless_sudo
-configure_python_venv
+rsyslog_ignores_sslip
+
+if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
+  mkdir -p ~/workspace
+  configure_zsh          # needs to come before install steps that modify .zshrc
+  install_bin
+  install_chruby
+  install_fasd
+  install_git_duet
+  install_terraform
+  install_zsh_autosuggestions
+  install_sslip_io_dns
+  configure_direnv
+  configure_git
+  configure_tmux
+  configure_passwordless_sudo
+  configure_python_venv
+fi

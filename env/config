@@ -141,6 +141,13 @@ Host ns-digitalocean
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host ns-gce
+	HostName ns-gce.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
 Host nsx
 	HostName nsx.nono.io
 	User root

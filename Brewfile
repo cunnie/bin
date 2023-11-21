@@ -128,6 +128,7 @@ cask "jetbrains-toolbox"
 cask "makemkv"
 cask "messenger" # Facebook messenger to sell things on FB Marketplace
 cask "microsoft-azure-storage-explorer"
+cask "postman" # Used for troubleshooting SERC's n8n.io → PDK migration
 cask "powershell" # This package requires Rosetta 2 to be installed.
 cask "rancher"
 cask "rectangle"

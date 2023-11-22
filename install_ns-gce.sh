@@ -3,6 +3,7 @@ set -eu -o pipefail
 
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
+  sudo dnf remove -y chrony
   sudo dnf install -y \
     binutils \
     btrfs-progs \
@@ -28,6 +29,7 @@ install_packages() {
     net-tools \
     nmap-ncat \
     npm \
+    ntpsec \
     openssl-devel \
     postgresql-devel \
     python3-pip \
@@ -235,6 +237,26 @@ EOF
   fi
 }
 
+configure_ntp() {
+  if ! grep -q time1.google.com /etc/ntp.conf; then
+    cat <<EOF | sudo tee /etc/ntp.conf
+# Our upstream timekeepers; thank you Google
+server time1.google.com iburst
+server time2.google.com iburst
+server time3.google.com iburst
+server time4.google.com iburst
+# "Batten down the hatches!"
+# see http://support.ntp.org/bin/view/Support/AccessRestrictions
+restrict default limited kod nomodify notrap nopeer
+restrict -6 default limited kod nomodify notrap nopeer
+restrict 127.0.0.0 mask 255.0.0.0
+restrict -6 ::1
+EOF
+    sudo systemctl enable ntpd
+    sudo systemctl start ntpd
+  fi
+}
+
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -m) # `uname -i` returns "unknown" on GCP
@@ -255,6 +277,7 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   install_terraform
   install_zsh_autosuggestions
   install_sslip_io_dns
+  configure_ntp
   configure_direnv
   configure_git
   configure_tmux

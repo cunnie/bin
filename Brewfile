@@ -113,6 +113,7 @@ brew "golangci/tap/golangci-lint"
 brew "pivotal-cf/kiln/kiln"
 brew "pivotal-cf/om/om"
 
+cask "box-drive" # Broadcom likes Box drive
 cask "discord"
 cask "firefox"
 cask "flycut"

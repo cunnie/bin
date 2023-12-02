@@ -135,18 +135,18 @@ Host ns-azure
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
-Host ns-digitalocean
-	HostName ns-digitalocean.nono.io
-	User freebsd
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
 Host ns-gce
 	HostName ns-gce.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
+
+Host ns-vultr
+	HostName ns-vultr.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
 
 Host nsx
 	HostName nsx.nono.io

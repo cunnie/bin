@@ -115,6 +115,7 @@ brew "pivotal-cf/om/om"
 
 cask "box-drive" # Broadcom likes Box drive
 cask "discord"
+cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
 cask "flycut"
 cask "gimp"

@@ -4,9 +4,7 @@ tap "cloudfoundry/tap"
 tap "git-duet/tap"
 tap "golangci/tap"
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/cask-versions"
-tap "homebrew/core"
 tap "homebrew/services"
 tap "homebrew/cask-fonts" # LunarVim
 # Even though we don't use "k14s/tap", including it gets rid of this message when installing ytt:

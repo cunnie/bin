@@ -44,5 +44,5 @@ $stdin.read.split("\n").each do |line|
 end
 
 ipv6_hostnames.sort.each do |ip6|
-  puts "#{ip6.ip.ip6_arpa}\tPTR\t#{ip6.hostname}"
+  puts "#{ip6.ip.ip6_arpa}.\tPTR\t#{ip6.hostname}"
 end

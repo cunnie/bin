@@ -18,19 +18,31 @@ puts <<~AXFR
           NS      atom.nono.io.
 AXFR
 
-ptr_to_record = {}
+# For dumping out IPv6 reverse-lookup files
+class IPv6Hostname
+  attr_accessor :ip, :hostname
+
+  def initialize(ip, hostname)
+    @ip = ip
+    @hostname = hostname
+  end
+
+  def <=>(other)
+    @ip <=> other.ip
+  end
+end
+
+ipv6_hostnames = []
 $stdin.read.split("\n").each do |line|
   next unless line.match?(/\tAAAA\t/)
 
   fields = line.split(' ')
-  # p fields
-  fields[0].gsub!(/^\*\./,'') # '*' (wildcards) cause `named` to fail to load zone
-  if fields[4].match?(/^2601:646:100:/)
-    ipv6_ptr = IPAddr.new(fields[4]).ip6_arpa
-    ptr_to_record[ipv6_ptr] = "#{ipv6_ptr}.\tPTR\t#{fields[0]}"
-  end
+  next unless fields[4].match?(/^2601:646:100:/)
+
+  fields[0].gsub!(/^\*\./, '') # '*' (wildcards) cause `named` to fail to load zone
+  ipv6_hostnames << IPv6Hostname.new(IPAddr.new(fields[4]), fields[0])
 end
 
-ptr_to_record.keys.sort.each do |ptr|
-  puts ptr_to_record[ptr]
+ipv6_hostnames.sort.each do |ip6|
+  puts "#{ip6.ip.ip6_arpa}\tPTR\t#{ip6.hostname}"
 end

@@ -10,6 +10,7 @@ install_packages() {
     neovim \
     sudo \
     zsh \
+    zsh-autosuggestions \
 
 }
 
@@ -64,6 +65,7 @@ configure_zsh() {
   if [ ! -f ~cunnie/.zshrc ]; then
     echo "" | sudo -u cunnie zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i '' 's/robbyrussell/agnoster/' ~cunnie/.zshrc
+    echo "source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh" >> ~cunnie/.zshrc
     echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~cunnie/.zshrc
     echo "alias z='fasd_cd -d'" >> ~cunnie/.zshrc
     echo 'export EDITOR=nvim' >> ~cunnie/.zshrc
@@ -114,6 +116,12 @@ EOF
   fi
 }
 
+configure_ipv6() {
+  if ! grep ifconfig_vtnet0_alias1 /etc/rc.conf; then
+    echo 'ifconfig_vtnet0_alias1="inet6 2401:c080:1c00:29d6:: accept_rtadv -rxcsum6 -tso6"' >> /etc/rc.conf
+  fi
+}
+
 [ $(id -u) = 0 ] || ( echo "I need to be run as root"; exit 1 )
 install_packages
 configure_passwordless_sudo
@@ -121,4 +129,6 @@ adduser_cunnie
 configure_git
 configure_zsh
 configure_bind
+configure_ipv6
+sudo chown -R cunnie:cunnie ~cunnie
 echo "remember to set the passwords for root & cunnie"

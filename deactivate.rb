@@ -16,7 +16,13 @@
 #
 #  yoyo@nono.io
 #
+# - needs two environment variables
+#   PDK_CLIENT_ID=
+#   PDK_CLIENT_SECRET=
+#
 require 'json'
+require 'httparty'
+require 'base64'
 
 class Person
   attr_accessor :id, :first_name, :last_name, :email, :photo_url, :partition,
@@ -30,17 +36,27 @@ class Person
     end
   end
 
-  def to_hash
+  # Contains only the _required_ components of the PUT request
+  def to_h
     {
       firstName: @first_name,
       lastName: @last_name,
       partition: @partition,
       enabled: @enabled,
       activeDate: @active_date,
-      expireDate: @expireDate,
+      expireDate: @expire_date,
       pin: @pin,
-      duressPin: @duress_pin,
+      duressPin: @duress_pin
     }
+  end
+
+  # e.g. '02/03/2024 11:11:14'
+  def expire!
+    @expire_date ||= Time.now.strftime("%m/%d/%Y %H:%M:%S")
+  end
+
+  def to_json(*_args)
+    JSON.generate(to_h)
   end
 end
 
@@ -50,6 +66,21 @@ def to_snake_case(string)
 end
 
 raise 'Usage: deactivate.rb people.json deactivation_emails.txt' unless ARGV.length == 2
+raise 'Must `export PDK_CLIENT_ID=<your PDK client id>`' if ENV['PDK_CLIENT_ID'].nil?
+raise 'Must `export PDK_CLIENT_SECRET=<your PDK client secret>`' if ENV['PDK_CLIENT_SECRET'].nil?
+
+client_id_secret = "#{ENV['PDK_CLIENT_ID']}:#{ENV['PDK_CLIENT_SECRET']}"
+encoded_client_id_secret = Base64.strict_encode64(client_id_secret)
+response = HTTParty.post(
+  'https://accounts.pdk.io/oauth2/token',
+  headers: {
+    'Authorization' => "Basic #{encoded_client_id_secret}",
+    'Content-Type' => 'application/x-www-form-urlencoded'
+  },
+  body: 'grant_type=client_credentials'
+)
+
+puts response.body, response.code, response.message, response.headers.inspect
 
 people_hash = JSON.parse(File.read(ARGV[0]))
 people = people_hash.map do |person|
@@ -60,7 +91,9 @@ File.foreach(ARGV[1]) do |line|
   deactivation_email = line.chomp
   user = people.select { |person| person.email == deactivation_email }.first
   unless user.email.nil?
+    user.expire!
     p user
-    p user.to_hash
+    p "Expiring #{user.first_name} #{user.last_name} email: #{user.email} id: #{user.id}"
+    puts user.to_json
   end
 end

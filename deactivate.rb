@@ -136,7 +136,9 @@ people = people_hash.map do |person|
   Person.new(person)
 end
 
+puts 'Press enter to continue to next lock-out victim'
 File.foreach(ARGV[1]) do |line|
+  STDIN.gets
   deactivation_email = line.chomp
   users = people.select { |person| person.email == deactivation_email }
   if users.length < 1
@@ -144,12 +146,11 @@ File.foreach(ARGV[1]) do |line|
     next
   end
   if users.length > 1
-    puts "⛔️ email '#{deactivation_email}' has several users: " + users.map { |user| "#{user.first_name} #{user.last_name}" }.join(", ")
+    puts "⛔️ email '#{deactivation_email}' has several users: " +
+         users.map { |user| "#{user.first_name} #{user.last_name}" }.join(', ')
     next
   end
   user = users.first # by now we only have one user
   user.disable!
-  puts user.to_json
   puts lock_out(user, token)
-  sleep 1
 end

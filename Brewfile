@@ -9,10 +9,11 @@ tap "homebrew/services"
 tap "homebrew/cask-fonts" # LunarVim
 # Even though we don't use "k14s/tap", including it gets rid of this message when installing ytt:
 #   "Please use the fully-qualified name (e.g. k14s/tap/ytt) to refer to the formula."
-tap "k14s/tap"
+# tap "k14s/tap"
 tap "pivotal-cf/kiln", "https://github.com/pivotal-cf/kiln"
 tap "pivotal-cf/om", "https://github.com/pivotal-cf/om"
 tap "pivotal/tap"
+tap "tkareine/chnode"
 tap "vmware/internal", "git@gitlab.eng.vmware.com:homebrew/internal.git"
 tap "vmware-tanzu/carvel"
 brew "automake"
@@ -23,6 +24,7 @@ brew "bbl" # The x86_64 architecture is required for this software.
 brew "bison"
 brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found
 brew "cfssl"
+brew "chnode" # opsman
 brew "chruby"
 brew "cmake"
 brew "dependency-check"
@@ -61,7 +63,7 @@ brew "libyaml"
 brew "mysql"
 brew "neovim"
 brew "node@16" # Operations Manager
-brew "nodenv" # Operations Manager
+brew "node@18" # Operations Manager
 brew "openssl@1.1"
 brew "openssl@3"
 brew "openstackclient" # Lakin says we need it to manage our cluster

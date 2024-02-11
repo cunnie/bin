@@ -138,7 +138,6 @@ end
 
 puts 'Press enter to continue to next lock-out victim'
 File.foreach(ARGV[1]) do |line|
-  STDIN.gets
   deactivation_email = line.chomp
   users = people.select { |person| person.email == deactivation_email }
   if users.length < 1
@@ -151,6 +150,9 @@ File.foreach(ARGV[1]) do |line|
     next
   end
   user = users.first # by now we only have one user
+  puts "About to lock out #{user.first_name} #{user.last_name} #{user.email}"
+  puts `grep -i "#{user.last_name}" *.csv`
+  $stdin.gets
   user.disable!
   puts lock_out(user, token)
 end

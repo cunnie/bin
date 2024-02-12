@@ -136,7 +136,6 @@ people = people_hash.map do |person|
   Person.new(person)
 end
 
-puts 'Press enter to continue to next lock-out victim'
 File.foreach(ARGV[1]) do |line|
   deactivation_email = line.chomp
   users = people.select { |person| person.email == deactivation_email }
@@ -150,9 +149,13 @@ File.foreach(ARGV[1]) do |line|
     next
   end
   user = users.first # by now we only have one user
-  puts "About to lock out #{user.first_name} #{user.last_name} #{user.email}"
-  puts `grep -i "#{user.last_name}" *.csv`
-  $stdin.gets
-  user.disable!
-  puts lock_out(user, token)
+  puts "Should I lock out #{user.first_name} #{user.last_name} #{user.email}?"
+  puts `grep -i "#{user.last_name}" *.csv | sed 's/^/  /'`
+  response = $stdin.gets.chomp
+  if response.downcase.start_with?('y')
+    user.disable!
+    puts lock_out(user, token)
+  else
+    puts "⚠️  Skipping #{user.first_name} #{user.last_name} #{user.email}"
+  end
 end

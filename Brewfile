@@ -134,7 +134,6 @@ cask "postman" # Used for troubleshooting SERC's n8n.io → PDK migration
 cask "powershell" # This package requires Rosetta 2 to be installed.
 cask "rancher"
 cask "rectangle"
-cask "sequel-pro-nightly"
 cask "signal"
 cask "skype"
 cask "slack"

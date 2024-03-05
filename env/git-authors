@@ -1,71 +1,24 @@
 authors:
-  ac: Andrew Crump; acrmp
-  ag: Andrew Garner; abg
-  ap: Aram Price; aramprice
-  bec: Brendan Cunnie; saintbrendan
-  bl: Belinda Liu; belinda-liu
-  bmc-work: Brian Cunnie
-  bmc: Brian Cunnie; brian.cunnie
-  bu: Brian Upton; bupton
-  cc: Charlotte Cunningham; mahgninnuc
-  ch: Christopher Hunter; chunter
-  cl: Camila Londoño; camilalonart
-  cs: Chris Selzo; cselzo
-  ctl: Carson Long; ctlong
-  dfo:  Daniel Felipe Ochoa; danielfor
-  ds: David Stevenson; stevensonda
-  gl: Gary Liu; syslxg
-  jh: Julian Hjortshoj; julian-hj
-  jp: Joseph Palermo; jpalermo
-  kk: Konstantin Kiess; nouseforaname
-  kl: Kenneth Lakin; klakin
-  ln: Long Nguyen; lnguyen
-  ma: Manuel Alba; malba
-  mariash: Maria Shaldybin; mariash
-  mo: Michael Oleske
-  mr: Maya Rosecrance; mrosecrance
-  ms: Mark Stokan
-  mw: Meredith White
-  mx: Ming Xiao; mxiao
-  ra: Rajan Agaskar; ragaskar
-  rk: Ruben Koster; rkoster
-  rm: Ramon Makkelie; ramonskie
-  sb: Seth Boyles; sethboyles
-  sc: Sam Coward; scoward
-  tv: Tom Viehman
-  vk: Vibhas Kumar; vibhas
+  ap:  Aram Price; aram.price
+  bec: Brendan Cunnie
+  bmc-work: Brian Cunnie; brian.cunnie
+  bmc: Brian Cunnie
+  bu:  Brian Upton; brian.upton
+  cc:  Charlotte Cunningham
+  cs:  Chris Selzo; chris.selzo
+  dfo: Daniel Felipe Ochoa; daniel-felipe.ochoa
+  jp:  Joseph Palermo; joseph.palermo
+  kl:  Kenneth Lakin; kenneth.lakin
+  ln:  Long Nguyen; long.nguyen
+  ma:  Manuel Alba; manuel.alba
+  mr:  Maya Rosecrance; maya.rosecrance
+  ra:  Rajan Agaskar; rajan.agaskar
+  rk:  Ruben Koster; ruben.koster
+  rm:  Ramon Makkelie
 email:
-  domain: gmail.com
+  domain: broadcom.com
 email_addresses:
-  ac: crumpan@vmware.com
-  ag: garnera@vmware.com
-  ap: aram.price@broadcom.com
-  bl: lbelinda@vmware.com
-  bmc-work: brian.cunnie@broadcom.com
-  bu: brian.upton@broadcom.com
-  ch: hunterch@vmware.com
-  cl: londonoc@vmware.com
-  cs: chris.selzo@broadcom.com
-  ctl: lcarson@vmware.com
-  dfo: daniel-felipe.ochoa@broadcom.com
-  ds: stevensonda@vmware.com
-  gl: garyliu@vmware.com
-  jh: jhortshojj@vmware.com
-  jp: joseph.palermo@broadcom.com
-  kk: kkiess@vmware.com
-  kl: kenneth.lakin@broadcom.com
-  ln: long.nguyen@broadcom.com
-  ma: manuel.alba@broadcom.com
-  mariash: mariash@vmware.com
-  mo: moleske@vmware.com
-  mr: maya.rosecrance@broadcom.com
-  ms: stokanm@vmware.com
-  mw: wmeredith@vmware.com
-  mx: mxiao@vmware.com
-  ra: rajan.agaskar@broadcom.com
-  rk: ruben.koster@broadcom.com
+  bec: saintbrendan@gmail.com
+  bmc: brian.cunnie@gmail.com
+  cc: mahgninnuc@gmail.com
   rm: ramonmakkelie@gmail.com
-  sb: sboyles@vmware.com
-  sc: scoward@vmware.com
-  tv: tviehman@vmware.com
-  vk: vibhas@vmware.com

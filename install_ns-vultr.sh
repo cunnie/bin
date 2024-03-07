@@ -122,6 +122,18 @@ configure_ipv6() {
   fi
 }
 
+configure_pf() {
+    if ! grep pf_enable /etc/rc.conf; then
+      cat >> /etc/rc.conf <<EOF
+pf_enable="YES"
+EOF
+      cat > /etc/pf.conf <<EOF
+pass in quick inet proto tcp to port 22 flags S/SA keep state (max-src-conn 10, max-src-conn-rate 10/60)
+EOF
+      /etc/rc.d/pf start
+    fi
+}
+
 [ $(id -u) = 0 ] || ( echo "I need to be run as root"; exit 1 )
 install_packages
 configure_passwordless_sudo
@@ -130,5 +142,6 @@ configure_git
 configure_zsh
 configure_bind
 configure_ipv6
+configure_pf
 sudo chown -R cunnie:cunnie ~cunnie
 echo "remember to set the passwords for root & cunnie"

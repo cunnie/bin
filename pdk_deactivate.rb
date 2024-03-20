@@ -3,7 +3,7 @@
 
 # Usage:
 #
-#  ./deactivate.rb people.json deactivation_emails.txt
+#  ./pdk_deactivate.rb people.json deactivation_emails.txt
 #
 # where:
 #

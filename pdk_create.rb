@@ -19,6 +19,7 @@
 require 'json'
 require 'httparty'
 require 'base64'
+require 'csv'
 
 class Person
   attr_accessor :id, :first_name, :last_name, :email, :photo_url, :partition,
@@ -27,7 +28,7 @@ class Person
                 :metadata, :groups, :credentials
 
   def initialize(person)
-    person.keys.each do |key|
+    person.each_key do |key|
       instance_variable_set("@#{to_snake_case(key)}", person[key])
     end
   end
@@ -62,6 +63,10 @@ class Person
   def to_json(*_args)
     JSON.generate(to_h)
   end
+
+  def to_s
+    "#{first_name}\t#{last_name}\t#{email}"
+  end
 end
 
 def to_snake_case(string)
@@ -69,68 +74,115 @@ def to_snake_case(string)
   string.gsub(' ', '_').downcase
 end
 
-def id_token
-  client_id_secret = "#{ENV['PDK_CLIENT_ID']}:#{ENV['PDK_CLIENT_SECRET']}"
-  encoded_client_id_secret = Base64.strict_encode64(client_id_secret)
-  response = HTTParty.post(
-    'https://accounts.pdk.io/oauth2/token',
-    headers: {
-      'Authorization' => "Basic #{encoded_client_id_secret}",
-      'Content-Type' => 'application/x-www-form-urlencoded'
-    },
-    body: 'grant_type=client_credentials'
-  )
-  if response.code != 200
-    puts response.body, response.code, response.message, response.headers.inspect
-    raise "couldn't authenticate id_token!"
+class PDK
+  def initialize
+    @panel_id = '1071P6X'
+    @id_token = id_token
+    @panel_token = panel_token
   end
-  JSON.parse(response.body)['id_token']
+
+  def id_token
+    client_id_secret = "#{ENV['PDK_CLIENT_ID']}:#{ENV['PDK_CLIENT_SECRET']}"
+    encoded_client_id_secret = Base64.strict_encode64(client_id_secret)
+    response = HTTParty.post(
+      'https://accounts.pdk.io/oauth2/token',
+      headers: {
+        'Authorization' => "Basic #{encoded_client_id_secret}",
+        'Content-Type' => 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    )
+    if response.code != 200
+      puts response.body, response.code, response.message, response.headers.inspect
+      raise "couldn't authenticate id_token!"
+    end
+    JSON.parse(response.body)['id_token']
+  end
+
+  def panel_token
+    response = HTTParty.post(
+      "https://accounts.pdk.io/api/panels/#{@panel_id}/token",
+      headers: {
+        'Authorization' => "Bearer #{@id_token}"
+      },
+      body: 'grant_type=client_credentials'
+    )
+    if response.code != 200
+      puts response.body, response.code, response.message, response.headers.inspect
+      raise "couldn't authenticate panel_token!"
+    end
+    JSON.parse(response.body)['token']
+  end
+
+  def lock_out(user)
+    panel_id = '1071P6X'
+    response = HTTParty.put(
+      "https://panel-#{panel_id}.pdk.io/api/persons/#{user.id}",
+      headers: {
+        'Authorization' => "Bearer #{@panel_token}",
+        'Content-Type' => 'application/json'
+      },
+      body: user.to_json
+    )
+    if response.code == 204
+      "✅ Locked-out #{user.first_name} #{user.last_name} email: #{user.email} id: #{user.id}"
+    else
+      puts response.body, response.code, response.message, response.headers.inspect
+      "⛔️ Failed to lock-out #{user.first_name} #{user.last_name} email: #{user.email} id: #{user.id}"
+    end
+  end
+
+  def create_person(person)
+    response = HTTParty.post(
+      "https://panel-#{@panel_id}.pdk.io/api/persons",
+      headers: {
+        'Authorization' => "Bearer #{@panel_token}",
+        'Content-Type' => 'application/json'
+      },
+      body: person.to_json
+    )
+    if response.code != 200
+      puts response.body, response.code, response.message, response.headers.inspect
+      raise "⛔️ Failed to create #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+    end
+    return JSON.parse(response.body)['id'] # the numeric id of the created user
+  end
 end
 
-def panel_token
-  panel_id = '1071P6X'
-  response = HTTParty.post(
-    "https://accounts.pdk.io/api/panels/#{panel_id}/token",
-    headers: {
-      'Authorization' => "Bearer #{id_token}"
-    },
-    body: 'grant_type=client_credentials'
-  )
-  if response.code != 200
-    puts response.body, response.code, response.message, response.headers.inspect
-    raise "couldn't authenticate panel_token!"
-  end
-  JSON.parse(response.body)['token']
-end
-
-def lock_out(user, panel_token)
-  panel_id = '1071P6X'
-  response = HTTParty.put(
-    "https://panel-#{panel_id}.pdk.io/api/persons/#{user.id}",
-    headers: {
-      'Authorization' => "Bearer #{panel_token}",
-      'Content-Type' => 'application/json'
-    },
-    body: user.to_json
-  )
-  if response.code == 204
-    "✅ Locked-out #{user.first_name} #{user.last_name} email: #{user.email} id: #{user.id}"
-  else
-    puts response.body, response.code, response.message, response.headers.inspect
-    "⛔️ Failed to lock-out #{user.first_name} #{user.last_name} email: #{user.email} id: #{user.id}"
-  end
-end
-
-raise 'Usage: deactivate.rb people.json deactivation_emails.txt' unless ARGV.length == 2
+raise 'Usage: pdk_create.rb people.csv' unless ARGV.length == 1
 raise 'Must `export PDK_CLIENT_ID=<your PDK client id>`' if ENV['PDK_CLIENT_ID'].nil?
 raise 'Must `export PDK_CLIENT_SECRET=<your PDK client secret>`' if ENV['PDK_CLIENT_SECRET'].nil?
 
-token = panel_token
+people = []
+pdk = PDK.new
 
-people_hash = JSON.parse(File.read(ARGV[0]))
-people = people_hash.map do |person|
-  Person.new(person)
+CSV.foreach(ARGV[0]) do |row|
+  first_name = row[0]
+  last_name = row[1]
+  email = row[2]
+  person = Person.new(
+    'first_name' => first_name,
+    'last_name' => last_name,
+    'email' => email,
+    'partition' => 'Default',
+    'enabled' => true,
+    'active_date' => '2024-04-07T00:00:00',
+    'expire_date' => '2024-04-17T00:00:00'
+  )
+  puts person.to_json
+  people << person
+  puts "Should I add #{person.first_name} #{person.last_name} #{person.email}?"
+  response = $stdin.gets.chomp
+  if response.downcase.start_with?('y')
+    person.id = pdk.create_person(person)
+    puts "✅ Created #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+  else
+    puts "⚠️  Skipping #{person.first_name} #{person.last_name} #{person.email}"
+  end
 end
+
+puts people.sort_by(&:last_name)
+exit
 
 File.foreach(ARGV[1]) do |line|
   deactivation_email = line.chomp
@@ -145,7 +197,7 @@ File.foreach(ARGV[1]) do |line|
     next
   end
   user = users.first # by now we only have one user
-  puts "Should I lock out #{user.first_name} #{user.last_name} #{user.email}?"
+  puts "Should I create #{user.first_name} #{user.last_name} #{user.email}?"
   puts `grep -i "#{user.last_name}" *.csv | sed 's/^/  /'`
   response = $stdin.gets.chomp
   if response.downcase.start_with?('y')

@@ -143,9 +143,56 @@ class PDK
     )
     if response.code != 200
       puts response.body, response.code, response.message, response.headers.inspect
-      raise "⛔️ Failed to create #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+      puts "⛔️ Failed to create #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+      return null
     end
-    return JSON.parse(response.body)['id'] # the numeric id of the created user
+    JSON.parse(response.body)['id'] # the numeric id of the created user
+  end
+
+  def add_to_all_members(person)
+    response = HTTParty.put(
+      "https://panel-#{@panel_id}.pdk.io/api/persons/#{person.id}/groups",
+      headers: {
+        'Authorization' => "Bearer #{@panel_token}",
+        'Content-Type' => 'application/json'
+      },
+      body: '{"groups":[8]}'
+    )
+    return unless response.code != 204
+    puts response.body, response.code, response.message, response.headers.inspect
+    puts "⛔️ Failed to add #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id} to \"All Members\" group"
+  end
+
+  def create_credential(person)
+    response = HTTParty.post(
+      "https://panel-#{@panel_id}.pdk.io/api/persons/#{person.id}/credentials",
+      headers: {
+        'Authorization' => "Bearer #{@panel_token}",
+        'Content-Type' => 'application/json'
+      },
+      body: '{   "types": ["touch"],   "description": "Pending" }'
+    )
+    if response.code != 200
+      puts response.body, response.code, response.message, response.headers.inspect
+      puts "⛔️ Failed to create credential for #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+      return null
+    end
+    JSON.parse(response.body)['id'] # the numeric id of the created user
+  end
+
+  def email_credential(person,credential_id)
+    response = HTTParty.post(
+      "https://accounts.pdk.io/api/credentials/people",
+      headers: {
+        'Authorization' => "Bearer #{@id_token}",
+        'Content-Type' => 'application/json'
+      },
+      body: %Q<{"panelId":"1071P6X","personId":#{person.id},"credentialId":#{credential_id},"types":["touch"],"email":"#{person.email}"}>
+    )
+    if response.code != 200
+      puts response.body, response.code, response.message, response.headers.inspect
+      puts "⛔️ Failed to email credential for #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}, credential: #{credential_id}"
+    end
   end
 end
 
@@ -169,41 +216,23 @@ CSV.foreach(ARGV[0]) do |row|
     'active_date' => '2024-04-07T00:00:00',
     'expire_date' => '2024-04-17T00:00:00'
   )
-  puts person.to_json
   people << person
   puts "Should I add #{person.first_name} #{person.last_name} #{person.email}?"
   response = $stdin.gets.chomp
   if response.downcase.start_with?('y')
     person.id = pdk.create_person(person)
     puts "✅ Created #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+    pdk.add_to_all_members(person)
+    puts "✅ Added #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id} to group \"All Members\""
+    credential_id = pdk.create_credential(person)
+    puts "✅ Created credential for  #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
+    pdk.email_credential(person, credential_id)
+    puts "✅ Emailed credential for  #{person.first_name} #{person.last_name} email: #{person.email} id: #{person.id}"
   else
     puts "⚠️  Skipping #{person.first_name} #{person.last_name} #{person.email}"
   end
 end
 
-puts people.sort_by(&:last_name)
-exit
-
-File.foreach(ARGV[1]) do |line|
-  deactivation_email = line.chomp
-  users = people.select { |person| person.email == deactivation_email }
-  if users.length < 1
-    puts "⛔️ email '#{deactivation_email}' doesn't have any corresponding users!"
-    next
-  end
-  if users.length > 1
-    puts "⛔️ email '#{deactivation_email}' has several users: " +
-         users.map { |user| "#{user.first_name} #{user.last_name}" }.join(', ')
-    next
-  end
-  user = users.first # by now we only have one user
-  puts "Should I create #{user.first_name} #{user.last_name} #{user.email}?"
-  puts `grep -i "#{user.last_name}" *.csv | sed 's/^/  /'`
-  response = $stdin.gets.chomp
-  if response.downcase.start_with?('y')
-    user.disable!
-    puts lock_out(user, token)
-  else
-    puts "⚠️  Skipping #{user.first_name} #{user.last_name} #{user.email}"
-  end
+people.each do |person|
+  puts "#{person.first_name} #{person.last_name} <#{person.email}>"
 end

@@ -22,6 +22,7 @@ brew "azure-cli" # for terraforming ns-azure
 brew "bat" # luan nvim dependency
 brew "bbl" # The x86_64 architecture is required for this software.
 brew "bison"
+brew "bosh-cli"
 brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found
 brew "cfssl"
 brew "chnode" # opsman
@@ -105,8 +106,7 @@ brew "zsh-git-prompt"
 brew "zsh-lovers"
 brew "zsh-syntax-highlighting"
 
-brew "cloudfoundry/tap/bosh-cli"
-brew "cloudfoundry/tap/cf-cli@7"
+brew "cloudfoundry/tap/cf-cli@8"
 # brew "cloudfoundry/tap/credhub-cli" # The x86_64 architecture is required for this software.
 brew "git-duet/tap/git-duet"
 brew "golangci/tap/golangci-lint"

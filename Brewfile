@@ -20,9 +20,8 @@ brew "automake"
 brew "awscli"
 brew "azure-cli" # for terraforming ns-azure
 brew "bat" # luan nvim dependency
-brew "bbl" # The x86_64 architecture is required for this software.
 brew "bison"
-brew "bosh-cli"
+brew "bosh-cli" # commenting-out to avoid "Error: key not found: "cloudfoundry/tap/bosh-cli"
 brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found
 brew "cfssl"
 brew "chnode" # opsman
@@ -122,6 +121,7 @@ cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"
 cask "google-drive"
+cask "graphiql"
 cask "handbrake"
 cask "inkscape"
 cask "istat-menus"

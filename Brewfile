@@ -139,7 +139,7 @@ cask "skype"
 cask "slack"
 cask "spotify"
 cask "steam"
-cask "temurin11" # Ops Mgr for UAA for running locally
+cask "temurin@11" # Ops Mgr for UAA for running locally
 cask "tunnelblick"
 
 # cask "vagrant" # Docker has largely supplanted vagrant # This package requires Rosetta 2 to be installed.

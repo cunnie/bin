@@ -74,11 +74,6 @@ Host jammy
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host lunar
-	HostName lunar.nono.io
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
 Host minikube minikube.nono.io
 	HostName minikube.nono.io
 	IdentityFile ~/.ssh/nono
@@ -120,6 +115,11 @@ Host nesxi-2
 Host nesxi-template
 	HostName nesxi-template.nono.io
 	User root
+
+Host noble
+	HostName noble.nono.io
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
 
 Host ns-aws
 	HostName ns-aws.nono.io

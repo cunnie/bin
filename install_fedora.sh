@@ -87,7 +87,7 @@ install_govc() {
 install_cf_cli() {
   if [ ! -x /usr/bin/cf ]; then
     sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
-    sudo dnf install -y cf7-cli
+    sudo dnf install -y cf8-cli
   fi
 }
 

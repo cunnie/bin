@@ -14,6 +14,12 @@ Host nono.com nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host avalon
+  HostName avalon.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github

@@ -7,6 +7,7 @@ install_packages() {
     bind918 \
     fasd \
     git \
+    htop \
     neovim \
     sudo \
     zsh \

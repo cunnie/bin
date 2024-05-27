@@ -5,6 +5,8 @@ install_packages() {
   pkg install -y \
     bash \
     bind918 \
+    dhcp6 \
+    dhcpd \
     fasd \
     git \
     htop \

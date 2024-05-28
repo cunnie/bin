@@ -11,6 +11,7 @@ install_packages() {
     git \
     htop \
     neovim \
+    rsync \
     sudo \
     zsh \
     zsh-autosuggestions \

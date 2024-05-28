@@ -13,6 +13,7 @@ install_packages() {
     neovim \
     rsync \
     sudo \
+    wireguard-tools \
     zsh \
     zsh-autosuggestions \
 

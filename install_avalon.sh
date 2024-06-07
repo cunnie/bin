@@ -10,6 +10,7 @@ install_packages() {
     fasd \
     git \
     htop \
+    iperf3 \
     neovim \
     rsync \
     sudo \

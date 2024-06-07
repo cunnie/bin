@@ -19,6 +19,7 @@ install_packages() {
     git-lfs \
     golang-x-tools-gopls \
     htop \
+    iperf3 \
     iproute \
     iputils \
     jq \

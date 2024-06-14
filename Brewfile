@@ -9,6 +9,7 @@ tap "homebrew/services"
 #   "Please use the fully-qualified name (e.g. k14s/tap/ytt) to refer to the formula."
 # tap "k14s/tap"
 tap "pivotal-cf/om", "https://github.com/pivotal-cf/om"
+brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
 brew "azure-cli" # for terraforming ns-azure
@@ -51,6 +52,7 @@ brew "openstackclient" # Lakin says we need it to manage our cluster
 brew "packer" # needed for ops-manager/vm, to create OM VMs
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python"
+brew "python@3.8" # needed for Google Cloud SDK https://cloud.google.com/sdk/gcloud/reference/topic/startup
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "qrencode"
 brew "readline"

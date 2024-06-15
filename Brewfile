@@ -26,7 +26,6 @@ brew "docker" # CLI only
 brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-credential-osxkeychain": executable file not found in $PATH"
 brew "etcd" # for sslip.io backend database
 brew "fd"
-# brew "font-hack-nerd-font" # LunarVim, migh tneed to install manually to avoid 'Warning: 'font-hack-nerd-font' formula is unreadable: No available formula with the name "font-hack-nerd-font".'
 brew "git"
 brew "git-lfs"
 brew "gnu-sed"
@@ -70,7 +69,7 @@ brew "watch"
 brew "wget"
 brew "wireguard-tools" # need `wg` to generate public & private keys
 brew "youtube-dl"
-# brew "yq" # Ops Mgr depends on v3; don't install v4
+brew "yq"
 brew "zsh-autosuggestions"
 brew "zsh-completions"
 brew "zsh-git-prompt"
@@ -86,6 +85,7 @@ brew "pivotal-cf/om/om"
 cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
 cask "flycut"
+cask "font-hack-nerd-font"
 cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"

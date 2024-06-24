@@ -20,7 +20,6 @@ install_packages() {
     bat \
     build-essential \
     direnv \
-    etcd \
     fasd \
     fd-find \
     git \

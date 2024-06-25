@@ -80,10 +80,10 @@ create_user_cunnie() {
 
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
-    wget -O ruby-install-0.8.3.tar.gz \
-      https://github.com/postmodern/ruby-install/archive/v0.8.3.tar.gz
-    tar -xzvf ruby-install-0.8.3.tar.gz
-    cd ruby-install-0.8.3/
+    wget -O ruby-install-0.9.3.tar.gz \
+      https://github.com/postmodern/ruby-install/releases/download/v0.9.3/ruby-install-0.9.3.tar.gz
+    tar -xzvf ruby-install-0.9.3.tar.gz
+    cd ruby-install-0.9.3/
     sudo make install
 
     wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
@@ -103,14 +103,6 @@ install_fly_cli() {
     curl -s -o /tmp/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
     sudo install /tmp/fly /usr/local/bin
     sudo chmod a+w /usr/local/bin
-  fi
-}
-
-install_terraform() {
-  if [ ! -x /usr/local/bin/terraform ]; then
-    curl -o tf.zip -L https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
-    unzip tf.zip
-    sudo install terraform /usr/local/bin/
   fi
 }
 
@@ -197,17 +189,6 @@ configure_git() {
 
 configure_sudo() {
   sudo sed -i 's/# %wheel/%wheel/' /etc/sudoers
-}
-
-configure_tmux() {
-  # https://github.com/luan/tmuxfiles, to clear, `rm -rf ~/.tmux.conf ~/.tmux`
-  if [ ! -f $HOME/.tmux.conf ]; then
-    echo "WARNING: If this scripts fails with \"unknown variable: TMUX_PLUGIN_MANAGER_PATH\""
-    echo "If you don't have an ugly magenta bottom of your tmux screen, if nvim is unusable, then"
-    echo "you may need to run this command to completely install tmux configuration:"
-    echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
-  fi
 }
 
 configure_ntp() {
@@ -353,12 +334,10 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_zsh          # needs to come before install steps that modify .zshrc
   install_chruby
   install_fly_cli
-  install_terraform
   install_aws_cli
   install_zsh_autosuggestions
   install_docker
   configure_direnv
-  configure_tmux
   configure_ntp
   install_sslip_io_dns
   install_sslip_io_web # installs HTTP only

@@ -98,23 +98,6 @@ EOF
   fi
 }
 
-install_fly_cli() {
-  if [ ! -x /usr/local/bin/fly ]; then
-    curl -s -o /tmp/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
-    sudo install /tmp/fly /usr/local/bin
-    sudo chmod a+w /usr/local/bin
-  fi
-}
-
-install_aws_cli() {
-  if [ ! -x /usr/local/bin/aws ]; then
-    # From https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
-    unzip awscliv2.zip
-    sudo ./aws/install
-  fi
-}
-
 install_zsh_autosuggestions() {
   if [ ! -d $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions ]; then
       git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
@@ -333,8 +316,6 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
   configure_zsh          # needs to come before install steps that modify .zshrc
   install_chruby
-  install_fly_cli
-  install_aws_cli
   install_zsh_autosuggestions
   install_docker
   configure_direnv

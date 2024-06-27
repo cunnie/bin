@@ -1,5 +1,5 @@
 #!/bin/bash -x
-set -eu -o pipefail
+set -xeu -o pipefail
 
 install_packages() {
   sudo dnf groupinstall -y "Development Tools"
@@ -53,16 +53,17 @@ install_packages() {
 
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
-    wget -O ruby-install-0.8.3.tar.gz https://github.com/postmodern/ruby-install/archive/v0.8.3.tar.gz
-    tar -xzvf ruby-install-0.8.3.tar.gz
-    cd ruby-install-0.8.3/
+    wget -O ruby-install-0.9.3.tar.gz \
+      https://github.com/postmodern/ruby-install/releases/download/v0.9.3/ruby-install-0.9.3.tar.gz
+    tar -xzvf ruby-install-0.9.3.tar.gz
+    cd ruby-install-0.9.3/
     sudo make install
 
     wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
     tar -xzvf chruby-0.3.9.tar.gz
     cd chruby-0.3.9/
     sudo make install
-    cat >> ~/.zshrc <<EOF
+    cat >> $HOME/.zshrc <<EOF
 
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh

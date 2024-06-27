@@ -29,22 +29,18 @@ install_packages() {
     golang \
     jq \
     lastpass-cli \
-    lua5.4 \
     neovim \
     nginx \
-    nodejs \
     ntpsec \
     python3 \
     python3-dev \
     python3-pip \
     ripgrep \
     ruby \
-    silversearcher-ag \
     socat \
     tcpdump \
     tree \
     unzip \
-    yarnpkg \
     zsh \
     zsh-syntax-highlighting \
 
@@ -196,7 +192,7 @@ install_sslip_io_dns() {
     curl -L https://github.com/cunnie/sslip.io/releases/download/3.1.0/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io.service \
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \
       -o /etc/systemd/system/sslip.io-dns.service
     sudo systemctl daemon-reload
     sudo systemctl enable sslip.io-dns
@@ -220,7 +216,7 @@ install_sslip_io_web() {
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root_sslip.io/ $HTML_DIR/
     sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
-    for CONF in {sslip.io,phishing}{,-https}.nginx.conf; do
+    for CONF in {sslip.io,phishing}.nginx.conf; do
       sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/$CONF \
         -o /etc/nginx/conf.d/$CONF
     done
@@ -275,28 +271,11 @@ install_tls() {
       --log
     sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/master/terraform/aws/sslip.io-vm/sslip.io-https.nginx.conf \
-      -o /etc/nginx/conf.d/sslip.io-https.conf
+    for CONF in {sslip.io,phishing}-https.nginx.conf; do
+      sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/$CONF \
+        -o /etc/nginx/conf.d/$CONF
+    done
     sudo systemctl restart nginx # enable sslip.io HTTPS
-  fi
-}
-
-install_docker() {
-  # https://docs.docker.com/engine/install/ubuntu/
-  if [ ! -x /usr/bin/docker ]; then
-    sudo apt-get install \
-      ca-certificates \
-      curl \
-      gnupg \
-      lsb-release
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-    sudo adduser cunnie docker
   fi
 }
 
@@ -317,7 +296,6 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_zsh          # needs to come before install steps that modify .zshrc
   install_chruby
   install_zsh_autosuggestions
-  install_docker
   configure_direnv
   configure_ntp
   install_sslip_io_dns

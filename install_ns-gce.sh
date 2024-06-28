@@ -184,14 +184,6 @@ EOF
   fi
 }
 
-fix_partitions() {
-  sudo parted --fix /dev/sda print
-  # Thanks Sunil Mohan https://bugs.launchpad.net/ubuntu/+source/parted/+bug/1270203/comments/6
-  echo -e "yes\n100%" | sudo parted /dev/sda ---pretend-input-tty unit % resizepart 5
-  sudo parted --fix /dev/sda print
-  sudo btrfs filesystem resize max /
-}
-
 install_sslip_io_dns() {
   if [ ! -x /usr/bin/sslip.io-dns-server ]; then
     GOLANG_ARCH=$ARCH
@@ -291,7 +283,6 @@ id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -m) # `uname -i` returns "unknown" on GCP
 export HOSTNAME=$(hostname)
-fix_partitions
 install_packages
 configure_sudo
 create_user_cunnie

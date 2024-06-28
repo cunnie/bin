@@ -3,11 +3,11 @@
 # This script is meant to be an idempotent script (you can run it multiple
 # times in a row).
 
-# This script is meant to be run by the root user (via AWS's cloud-init /
+# This script is meant to be run by the root user (via GCP's cloud-init /
 # terraform's custom_data) with no ssh key, no USER or HOME variable, and also
 # be run by user cunnie, with ssh keys and environment variables set.
 
-# to troubleshoot: ssh -i ~/.ssh/aws ubuntu@ns-gce
+# gcloud compute ssh --zone "us-central1-a" "ns-gce" --project "blabbertabber"
 
 # Output is in /var/log/cloud-init-output.log
 
@@ -44,6 +44,14 @@ install_packages() {
     zsh \
     zsh-syntax-highlighting \
 
+  # the following repo only works on amd64 architectures
+  if ! grep grml /etc/apt/sources.list; then
+    echo "deb     http://deb.grml.org/ grml-stable  main" | sudo tee -a /etc/apt/sources.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21E0CA38EA2EA4AB
+    sudo apt-get update
+    sudo apt-get install -y \
+	    zsh-lovers
+  fi
 }
 
 create_user_cunnie() {
@@ -216,10 +224,8 @@ install_sslip_io_web() {
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root_sslip.io/ $HTML_DIR/
     sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
-    for CONF in {sslip.io,phishing}.nginx.conf; do
-      sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/$CONF \
-        -o /etc/nginx/conf.d/$CONF
-    done
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io.nginx.conf \
+      -o /etc/nginx/conf.d/sslip.io.conf
     sudo systemctl restart nginx # enable sslip.io HTTP
     sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
     sudo chown -R www-data:www-data $HTML_DIR
@@ -271,10 +277,8 @@ install_tls() {
       --log
     sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration
-    for CONF in {sslip.io,phishing}-https.nginx.conf; do
-      sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/$CONF \
-        -o /etc/nginx/conf.d/$CONF
-    done
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io-https.nginx.conf \
+      -o /etc/nginx/conf.d/sslip.io-https.conf
     sudo systemctl restart nginx # enable sslip.io HTTPS
   fi
 }
@@ -301,6 +305,6 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   install_sslip_io_dns
   install_sslip_io_web # installs HTTP only
   # install_tls # gets certs & updates nginx to include HTTPS
-  delete_adminuser # AMI includes an ubuntu user; delete it
+  # delete_adminuser # AMI includes an ubuntu user; delete it
 fi
 echo "It took $(( $(date +%s) - START_TIME )) seconds to run"

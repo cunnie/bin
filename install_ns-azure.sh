@@ -7,6 +7,8 @@
 # terraform's custom_data) with no ssh key, no USER or HOME variable, and also
 # be run by user cunnie, with ssh keys and environment variables set.
 
+# to troubleshoot: ssh adminuser@ns-azure
+
 # Output is in /var/log/cloud-init-output.log
 
 set -xeu -o pipefail
@@ -125,17 +127,6 @@ configure_zsh() {
 
 use_pacific_time() {
   sudo timedatectl set-timezone America/Los_Angeles
-}
-
-disable_selinux() {
-  # does not take effect until reboot, and we can't reboot halfway through the script
-  # because we can't easily pick up where we left off
-  if grep -q SELINUX=enforcing /etc/selinux/config; then
-    printf "disabling SELINUX and firewall"
-    sudo sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
-    # The following really, truly disables selinux
-    sudo grubby --update-kernel ALL --args selinux=0
-  fi
 }
 
 rsyslog_ignores_sslip() {
@@ -285,7 +276,6 @@ install_packages
 configure_sudo
 create_user_cunnie
 use_pacific_time
-disable_selinux
 rsyslog_ignores_sslip
 
 if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then

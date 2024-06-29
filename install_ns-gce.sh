@@ -54,13 +54,10 @@ install_packages() {
   fi
 }
 
-create_user_cunnie() {
-  if ! id cunnie; then
-    sudo adduser \
-      --shell=/usr/bin/zsh \
-      --gecos="Brian Cunnie" \
-      --disabled-password \
-      cunnie
+configure_user_cunnie() {
+  # on gcloud this userid is already created
+  if [ ! -f ~cunnie/.zshrc ]; then
+    sudo chsh -s /usr/bin/zsh cunnie
     for GROUP in root adm sudo www-data; do
       sudo adduser cunnie $GROUP
     done
@@ -278,7 +275,7 @@ ARCH=$(uname -m) # `uname -i` returns "unknown" on GCP
 export HOSTNAME=$(hostname)
 install_packages
 configure_sudo
-create_user_cunnie
+configure_user_cunnie
 use_pacific_time
 rsyslog_ignores_sslip
 

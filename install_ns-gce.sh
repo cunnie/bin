@@ -224,6 +224,14 @@ delete_adminuser() {
   fi
 }
 
+delete_weird_google_users() {
+  for WEIRDO in bosh vcap evanbrown; do
+    if grep -q ^$WEIRDO: /etc/passwd; then
+      sudo deluser --remove-home $WEIRDO
+    fi
+  done
+}
+
 install_tls() {
   TLS_DIR=/etc/pki/nginx
   if [ ! -d $TLS_DIR ]; then
@@ -289,7 +297,9 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_ntp
   install_sslip_io_dns
   install_sslip_io_web # installs HTTP only
+  # don't bother with TLS, "Invalid identifiers requested :: Cannot issue for \"2600-1900-4000-4d12--.sslip.io\": Domain name contains an invalid character"
   # install_tls # gets certs & updates nginx to include HTTPS
-  # delete_adminuser # AMI includes an ubuntu user; delete it
+  delete_adminuser # AMI includes an ubuntu user; delete it
+  delete_weird_google_users
 fi
 echo "It took $(( $(date +%s) - START_TIME )) seconds to run"

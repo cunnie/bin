@@ -65,7 +65,7 @@ create_user_cunnie() {
       sudo adduser cunnie $GROUP
     done
     echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
-    sudo mkdir ~cunnie/.ssh
+    sudo mkdir -p ~cunnie/.ssh
     echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
     ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
     sudo touch ~cunnie/.zshrc

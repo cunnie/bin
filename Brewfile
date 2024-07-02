@@ -8,18 +8,18 @@ tap "homebrew/services"
 # Even though we don't use "k14s/tap", including it gets rid of this message when installing ytt:
 #   "Please use the fully-qualified name (e.g. k14s/tap/ytt) to refer to the formula."
 # tap "k14s/tap"
-tap "pivotal-cf/om", "https://github.com/pivotal-cf/om"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
 brew "azure-cli" # for terraforming ns-azure
-brew "bat" # luan nvim dependency
 brew "bison"
+brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "bosh-cli" # commenting-out to avoid "Error: key not found: "cloudfoundry/tap/bosh-cli"
 brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found
 brew "cfssl"
 brew "chruby"
 brew "cmake"
+brew "credhub-cli"
 brew "dependency-check"
 brew "direnv"
 brew "docker" # CLI only
@@ -48,7 +48,6 @@ brew "mysql"
 brew "neovim"
 brew "openssl@1.1"
 brew "openssl@3"
-brew "openstackclient" # Lakin says we need it to manage our cluster
 brew "packer" # needed for ops-manager/vm, to create OM VMs
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python"
@@ -58,9 +57,7 @@ brew "qrencode"
 brew "readline"
 brew "ripgrep"
 brew "ruby-install"
-brew "sshuttle"
 brew "terraform"
-brew "the_silver_searcher"
 brew "tidy-html5"
 brew "tmux"
 brew "tree"
@@ -105,12 +102,8 @@ cask "skype"
 cask "slack"
 cask "steam"
 
-# cask "vagrant" # Docker has largely supplanted vagrant # This package requires Rosetta 2 to be installed.
-# cask "virtualbox" # Error: Cask virtualbox depends on hardware architecture being one of [{:type=>:intel, :bits=>64}], but you are running {:type=>:arm, :bits=>64}.
 cask "visual-studio-code"
 cask "vlc"
-# cask "vmware-fusion" # Because it's cool; install manually to avoid "chown: /Applications/VMware Fusion.app/Contents/CodeResources: Operation not permitted"
 cask "whatsapp"
 cask "wireshark"
-cask "xquartz"
 cask "zoom"

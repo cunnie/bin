@@ -78,6 +78,16 @@ install_bosh_cli() {
   fi
 }
 
+install_bitwarden() {
+  if [ ! -x /usr/local/bin/bw ]; then
+    pushd /tmp/
+    curl -sL "https://vault.bitwarden.com/download/?app=cli&platform=linux" -o bw.zip
+    unzip -o bw.zip
+    sudo install bw /usr/local/bin
+    popd
+  fi
+}
+
 install_govc() {
   if [ ! -x /usr/local/bin/govc ]; then
     curl -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_$(uname -m).tar.gz" | tar xvzf - govc
@@ -404,12 +414,14 @@ configure_python_venv() {
   fi
 }
 
+[ $(id -u) = 0 ] && ( echo "Do NOT run as root"; exit 1 )
 install_packages
 mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_aws_cli
 install_azure_cli
 install_bin
+install_bitwarden
 install_bosh_cli
 install_cf_cli
 install_credhub_cli

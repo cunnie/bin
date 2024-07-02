@@ -250,10 +250,10 @@ install_kubectl() {
     sudo tee -a $YUM_REPO_PATH << EOF
 [kubernetes]
 name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+baseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/
 enabled=1
 gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+gpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key
 EOF
     sudo dnf install -y kubectl
     sudo dnf install -y google-cloud-sdk-gke-gcloud-auth-plugin

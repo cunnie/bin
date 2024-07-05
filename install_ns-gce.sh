@@ -44,14 +44,6 @@ install_packages() {
     zsh \
     zsh-syntax-highlighting \
 
-  # the following repo only works on amd64 architectures
-  if ! grep grml /etc/apt/sources.list; then
-    echo "deb     http://deb.grml.org/ grml-stable  main" | sudo tee -a /etc/apt/sources.list
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21E0CA38EA2EA4AB
-    sudo apt-get update
-    sudo apt-get install -y \
-	    zsh-lovers
-  fi
 }
 
 configure_user_cunnie() {

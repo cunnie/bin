@@ -25,6 +25,7 @@ install_packages() {
     direnv \
     fasd \
     fd-find \
+    ffmpeg \
     git \
     git-lfs \
     golang \

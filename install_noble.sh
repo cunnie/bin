@@ -33,6 +33,7 @@ install_packages() {
     lastpass-cli \
     neovim \
     nginx \
+    nvidia-cuda-toolkit \
     python3 \
     python3-dev \
     python3-pip \

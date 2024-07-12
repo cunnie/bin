@@ -2,21 +2,16 @@ authors:
   ap:  Aram Price; aram.price
   bec: Brendan Cunnie
   bmc: Brian Cunnie
-  bmc-work: Brian Cunnie; brian.cunnie
+  bmc-work: Brian Cunnie
   bu:  Brian Upton; brian.upton
-  cc:  Charlotte Cunningham
   cs:  Chris Selzo; chris.selzo
-  dfo: Daniel Felipe Ochoa; daniel-felipe.ochoa
   gm:  Greg Meyer; greg.meyer
   jp:  Joseph Palermo; joseph.palermo
   kl:  Kenneth Lakin; kenneth.lakin
   ln:  Long Nguyen; long.nguyen
-  ma:  Manuel Alba; manuel.alba
   mr:  Maya Rosecrance; maya.rosecrance
   mx:  Ming Xiao; ming.xiao
-  nz:  Nader Ziada; nader.ziada
   rja: Rajan Agaskar; rajan.agaskar
-  ra:  Rajath Agasthya; rajath.agasthya
   rm:  Ramon Makkelie
   rk:  Ruben Koster; ruben.koster
 email:
@@ -24,5 +19,6 @@ email:
 email_addresses:
   bec: saintbrendan@gmail.com
   bmc: brian.cunnie@gmail.com
+  bmc-work: cunnie@majestic-labs.ai
   cc: mahgninnuc@gmail.com
   rm: ramonmakkelie@gmail.com

@@ -26,6 +26,7 @@ brew "docker" # CLI only
 brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-credential-osxkeychain": executable file not found in $PATH"
 brew "etcd" # for sslip.io backend database
 brew "fd"
+brew "gh" # GitHub CLI, needed to delete many of my no-longer-needed forked repos
 brew "git"
 brew "git-lfs"
 brew "gnu-sed"

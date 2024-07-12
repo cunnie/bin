@@ -1,13 +1,8 @@
-# TKS and TKGI are installed from https://network.pivotal.io/products/pivotal-container-service/
-
 tap "cloudfoundry/tap"
 tap "git-duet/tap"
 tap "golangci/tap"
 tap "homebrew/bundle"
 tap "homebrew/services"
-# Even though we don't use "k14s/tap", including it gets rid of this message when installing ytt:
-#   "Please use the fully-qualified name (e.g. k14s/tap/ytt) to refer to the formula."
-# tap "k14s/tap"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
@@ -79,7 +74,6 @@ brew "cloudfoundry/tap/cf-cli@8"
 # brew "cloudfoundry/tap/credhub-cli" # The x86_64 architecture is required for this software.
 brew "git-duet/tap/git-duet"
 brew "golangci/tap/golangci-lint"
-brew "pivotal-cf/om/om"
 
 cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
@@ -102,7 +96,6 @@ cask "rectangle"
 cask "skype"
 cask "slack"
 cask "steam"
-
 cask "visual-studio-code"
 cask "vlc"
 cask "whatsapp"

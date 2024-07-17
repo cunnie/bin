@@ -22,6 +22,8 @@ install_packages() {
     bat \
     build-essential \
     chrony \
+    clang \
+    cmake \
     direnv \
     fasd \
     fd-find \

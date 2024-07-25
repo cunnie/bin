@@ -48,6 +48,7 @@ brew "packer" # needed for ops-manager/vm, to create OM VMs
 brew "postgresql@13", restart_service: true # Operations Manager
 brew "python"
 brew "python@3.8" # needed for Google Cloud SDK https://cloud.google.com/sdk/gcloud/reference/topic/startup
+brew "python@3.11" # needed for vLLM
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "qrencode"
 brew "readline"

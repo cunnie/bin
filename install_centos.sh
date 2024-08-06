@@ -70,6 +70,8 @@ configure_zsh() {
     echo 'export EDITOR=nvim' >> ~/.zshrc
     echo '. $HOME/.venv/base/bin/activate' >> ~/.zshrc
     echo '. /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
+    echo 'export PATH=/usr/local/cuda/bin:$PATH'  >> ~/.zshrc
+    echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.zshrc
   fi
 }
 
@@ -85,6 +87,11 @@ configure_git() {
   git config --global color.diff auto
   git config --global color.status auto
   git config --global core.editor nvim
+}
+
+disable_firewalld() {
+  sudo systemctl stop firewalld
+  sudo systemctl disable firewalld
 }
 
 configure_python_venv() {

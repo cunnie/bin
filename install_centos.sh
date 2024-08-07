@@ -2,9 +2,12 @@
 set -eu -o pipefail
 
 install_packages() {
+  sudo dnf install -y \
+    https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
   sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
     binutils \
+    clang \
     cmake \
     dnf-plugins-core \
     fd-find \
@@ -16,31 +19,28 @@ install_packages() {
     iproute \
     iputils \
     jq \
+    llvm \
     neovim \
     net-tools \
     nmap-ncat \
+    pciutils \
     python \
     python3-pip \
+    python3-devel \
+    python3-numpy \
+    qemu-kvm \
     redhat-rpm-config \
     ripgrep \
     socat \
     strace \
     tcpdump \
-    the_silver_searcher \
     tmux \
+    util-linux-user \
     wget \
     zsh \
     zsh-autosuggestions \
-    zsh-syntax-highlighting \
+    zsh-syntax-highlighting
 
-}
-
-install_fzf() {
-  if ! grep -q fzf ~/.zshrc; then
-    cat >> ~/.zshrc <<EOF
-source <(fzf --zsh)
-EOF
-  fi
 }
 
 install_bin() {
@@ -99,6 +99,7 @@ configure_python_venv() {
   if [ ! -d $VENV_DIR ]; then
     python3 -m venv $VENV_DIR
     source $VENV_DIR/bin/activate
+    $VENV_DIR/base/bin/python3 -m pip install --upgrade pip
     pip install tensorflow
   fi
 }
@@ -106,9 +107,9 @@ configure_python_venv() {
 [ $(id -u) = 0 ] && ( echo "Do NOT run as root"; exit 1 )
 # install_packages # should already been installed
 mkdir -p ~/workspace
+install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_bin
-install_fzf
 install_git_duet
 disable_firewalld
 configure_git

@@ -37,6 +37,12 @@ Host bosh-lite
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
+Host centos
+  HostName centos.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host diarizer diarizer.com
 	HostName diarizer.nono.io
 	Port 22

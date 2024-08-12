@@ -66,6 +66,24 @@ install_git_duet() {
   fi
 }
 
+install_docker() {
+  if [ ! -x /usr/bin/docker ]; then
+    # https://docs.docker.com/engine/install/fedora/
+    sudo sudo dnf -y install dnf-plugins-core
+    sudo dnf config-manager \
+      --add-repo \
+      https://download.docker.com/linux/centos/docker-ce.repo
+    sudo dnf install -y docker-ce
+
+    # https://fedoramagazine.org/docker-and-fedora-32/
+    sudo systemctl enable docker
+    sudo systemctl start docker
+    sudo usermod -aG docker $USER
+    # fixes "ERROR: multiple platforms feature is currently not supported for docker driver."
+    docker buildx create --use
+  fi
+}
+
 configure_zsh() {
   if [ ! -f $HOME/.zshrc ]; then
     sudo chsh -s /usr/bin/zsh $USER
@@ -114,6 +132,7 @@ mkdir -p ~/workspace
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_bin
+install_docker
 install_git_duet
 disable_firewalld
 configure_git

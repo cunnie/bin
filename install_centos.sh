@@ -12,6 +12,7 @@ install_packages() {
     cmake \
     dnf-plugins-core \
     fd-find \
+    fzf \
     gcc-g++ \
     git \
     git-lfs \
@@ -26,6 +27,8 @@ install_packages() {
     nmap-ncat \
     pciutils \
     python \
+    python3-devel \
+    python3-numpy \
     python3-pip \
     python3-devel \
     python3-numpy \

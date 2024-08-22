@@ -7,6 +7,7 @@ brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
 brew "azure-cli" # for terraforming ns-azure
+brew "berkeley-db@5" # for Python module gutenberg
 brew "bison"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "bosh-cli" # commenting-out to avoid "Error: key not found: "cloudfoundry/tap/bosh-cli"

@@ -14,6 +14,7 @@ brew "bosh-cli" # commenting-out to avoid "Error: key not found: "cloudfoundry/t
 brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found
 brew "cfssl"
 brew "chruby"
+brew "cloc" # count lines of code to figure out how much code we'll need to write
 brew "cmake"
 brew "credhub-cli"
 brew "dependency-check"

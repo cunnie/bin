@@ -30,28 +30,11 @@ Host bosh-vsphere
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
-Host bosh-lite
-	HostName bosh-lite.nono.io
-	User jumpbox
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
 Host centos
   HostName centos.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-
-Host diarizer diarizer.com
-	HostName diarizer.nono.io
-	Port 22
-	ForwardAgent yes
-	IdentityFile ~/.ssh/nono
-
-Host esxi-0
-	HostName esxi-0.nono.io
-	User root
 
 Host esxi-1
 	HostName esxi-1.nono.io
@@ -81,22 +64,6 @@ Host home
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host jammy
-	HostName jammy.nono.io
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host minikube minikube.nono.io
-	HostName minikube.nono.io
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host mordor mordor.nono.io
-	HostName mordor.nono.io
-	Port 22
-	ForwardAgent yes
-	IdentityFile ~/.ssh/nono
-
 Host mordred
 	HostName mordred.nono.io
 	IdentityFile ~/.ssh/nono
@@ -111,22 +78,6 @@ Host nas nas.nono.io
 	HostName nas.nono.io
 	User root
 	IdentityFile ~/.ssh/nono
-
-Host nesxi-0
-	HostName nesxi-0.nono.io
-	User root
-
-Host nesxi-1
-	HostName nesxi-1.nono.io
-	User root
-
-Host nesxi-2
-	HostName nesxi-2.nono.io
-	User root
-
-Host nesxi-template
-	HostName nesxi-template.nono.io
-	User root
 
 Host noble
 	HostName noble.nono.io
@@ -160,26 +111,9 @@ Host ns-vultr
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host nsx
-	HostName nsx.nono.io
-	User root
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host om om.tas.nono.io
-	HostName om.tas.nono.io
-	User ubuntu
-	IdentityFile ~/workspace/ops-manager/assets/bosh.pem
-	UserKnownHostsFile /dev/null
-
-Host test test.diarizer.com
-	Hostname test.diarizer.com
+Host riscv
+	HostName riscv.nono.io
 	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host tetra
-	HostName tetra.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
@@ -194,19 +128,6 @@ Host vcenter-80
 	User root
 	PreferredAuthentications password
 	PubkeyAuthentication no
-
-# work
-Host sof2-dbc401.eng.vmware.com
-	IdentityFile ~/.ssh/dbc
-
-Host wallaby-maas
-	Hostname 10.198.146.7
-	User vmware
-
-# append these entries to your local `ssh_config`
-#
-# GOTCHA: first ssh attempt will fail with `Connection closed by ....`, try again
-
 
 # wildcards at bottom, otherwise they trump
 Host *.nono.io

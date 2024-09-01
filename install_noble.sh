@@ -20,6 +20,7 @@ install_packages() {
   # sudo apt-get remove -y chrony || true
   sudo apt-get install -y \
     bat \
+    bison \
     build-essential \
     chrony \
     clang \
@@ -28,6 +29,7 @@ install_packages() {
     fasd \
     fd-find \
     ffmpeg \
+    flex \
     git \
     git-lfs \
     golang \
@@ -35,7 +37,6 @@ install_packages() {
     lastpass-cli \
     neovim \
     nginx \
-    nvidia-cuda-toolkit \
     python3 \
     python3-dev \
     python3-pip \
@@ -48,6 +49,10 @@ install_packages() {
     zsh \
     zsh-syntax-highlighting \
 
+  if [ "$(uname -m)" = x86_64 ]; then
+    sudo apt-get install -y \
+      nvidia-cuda-toolkit
+  fi
 }
 
 create_user_cunnie() {

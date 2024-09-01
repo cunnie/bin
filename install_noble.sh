@@ -35,6 +35,7 @@ install_packages() {
     golang \
     jq \
     lastpass-cli \
+    libssl-dev \
     neovim \
     nginx \
     python3 \

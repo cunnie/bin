@@ -36,11 +36,15 @@ install_packages() {
     jq \
     lastpass-cli \
     libssl-dev \
+    lldb \
+    llvm \
     neovim \
+    ninja-build \
     nginx \
     python3 \
     python3-dev \
     python3-pip \
+    python3-venv \
     ripgrep \
     ruby \
     socat \

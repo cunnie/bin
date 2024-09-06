@@ -18,23 +18,24 @@ install_packages() {
     git \
     git-lfs \
     golang-x-tools-gopls \
+    hdf5-devel \
     htop \
     iperf3 \
     iproute \
     iputils \
     jq \
     lastpass-cli \
-    libxml2-devel \
     libcurl-devel \
+    libxml2-devel \
     mysql-devel \
     neovim \
     net-tools \
     nmap-ncat \
     npm \
     openssl-devel \
-    packer \
     postgresql-devel \
     python \
+    python-devel \
     python2 \
     python3-neovim \
     python3-numpy \
@@ -56,6 +57,10 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
+  if [ "$(uname -m)" = x86_64 ]; then
+    sudo dnf install -y \
+      packer
+  fi
 }
 
 install_azure_cli() {
@@ -90,7 +95,9 @@ install_bitwarden() {
 
 install_govc() {
   if [ ! -x /usr/local/bin/govc ]; then
-    curl -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_$(uname -m).tar.gz" | tar xvzf - govc
+    ARCH=$(uname -m)
+    ARCH=${ARCH/aarch64/arm64}
+    curl -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_${ARCH}.tar.gz" | tar xvzf - govc
     sudo install govc /usr/local/bin
   fi
 }
@@ -227,9 +234,10 @@ install_zsh_autosuggestions() {
 }
 
 install_gcloud() {
-  YUM_REPO_PATH=/etc/yum.repos.d/google-cloud-sdk.repo
-  if [ ! -f $YUM_REPO_PATH ]; then
-    sudo tee -a $YUM_REPO_PATH << EOM
+  if [ "$(uname -m)" = x86_64 ]; then
+    YUM_REPO_PATH=/etc/yum.repos.d/google-cloud-sdk.repo
+    if [ ! -f $YUM_REPO_PATH ]; then
+      sudo tee -a $YUM_REPO_PATH << EOM
 [google-cloud-sdk]
 name=Google Cloud SDK
 baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
@@ -239,7 +247,8 @@ repo_gpgcheck=0
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOM
-    sudo dnf install -y google-cloud-sdk
+      sudo dnf install -y google-cloud-sdk
+    fi
   fi
 }
 

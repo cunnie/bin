@@ -105,6 +105,13 @@ Host ns-gce
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
+Host ns-ovh
+	HostName ns-ovh.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
 Host ns-vultr
 	HostName ns-vultr.nono.io
 	User cunnie

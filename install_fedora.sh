@@ -10,6 +10,7 @@ install_packages() {
     btrfs-progs \
     cmake \
     cronie \
+    damo \
     direnv \
     dnf-plugins-core \
     etcd \
@@ -17,6 +18,7 @@ install_packages() {
     gcc-g++ \
     git \
     git-lfs \
+    gnuplot \
     golang-x-tools-gopls \
     hdf5-devel \
     htop \
@@ -33,6 +35,7 @@ install_packages() {
     nmap-ncat \
     npm \
     openssl-devel \
+    perf \
     postgresql-devel \
     python \
     python-devel \
@@ -102,28 +105,12 @@ install_govc() {
   fi
 }
 
-install_cf_cli() {
-  if [ ! -x /usr/bin/cf ]; then
-    sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
-    sudo dnf install -y cf8-cli
-  fi
-}
-
 install_credhub_cli() {
   if [ ! -x /usr/local/bin/credhub ]; then
     curl -sL https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.5/credhub-linux-2.9.5.tgz -o /tmp/credhub.tgz
     pushd /tmp/
     tar xzvf /tmp/credhub.tgz -- ./credhub
     sudo install /tmp/credhub /usr/local/bin
-  fi
-}
-
-install_rtr_cli() {
-  if [ ! -x /usr/local/bin/rtr ]; then
-    curl -sL https://github.com/cloudfoundry/routing-api-cli/releases/download/2.23.0/rtr-linux-amd64.tgz -o /tmp/rtr.tgz
-    pushd /tmp/
-    tar xzvf /tmp/rtr.tgz
-    sudo install rtr-linux-amd64 /usr/local/bin/rtr
   fi
 }
 
@@ -183,20 +170,6 @@ install_fly_cli() {
   fi
 }
 
-install_om_cli() {
-  if [ ! -x /usr/local/bin/om ]; then
-    curl -s -L -o /tmp/om https://github.com/pivotal-cf/om/releases/download/6.3.0/om-linux-6.3.0
-    sudo install /tmp/om /usr/local/bin
-  fi
-}
-
-install_pivnet_cli() {
-  if [ ! -x /usr/local/bin/pivnet ]; then
-    curl -s -L -o /tmp/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1
-    sudo install /tmp/pivnet /usr/local/bin
-  fi
-}
-
 install_terraform() {
   if [ ! -x /usr/local/bin/terraform ]; then
     curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.6.3/terraform_1.6.3_linux_amd64.zip
@@ -248,24 +221,16 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOM
       sudo dnf install -y google-cloud-sdk
+      gcloud components install google-cloud-cli-gke-gcloud-auth-plugin
     fi
   fi
 }
 
 install_kubectl() {
   # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-  YUM_REPO_PATH=/etc/yum.repos.d/kubernetes.repo
-  if [ ! -f $YUM_REPO_PATH ]; then
-    sudo tee -a $YUM_REPO_PATH << EOF
-[kubernetes]
-name=Kubernetes
-baseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/
-enabled=1
-gpgcheck=1
-gpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key
-EOF
-    sudo dnf install -y kubectl
-    sudo dnf install -y google-cloud-sdk-gke-gcloud-auth-plugin
+  if [ ! -f /usr/local/bin/kubectl ]; then
+	  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"
+	  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   fi
 }
 
@@ -415,7 +380,7 @@ EOF
 }
 
 configure_python_venv() {
-  VENV_DIR=$HOME/.venv/base
+  VENV_DIR=$HOME/venv
   if [ ! -d $VENV_DIR ]; then
     python3 -m venv $VENV_DIR
     source $VENV_DIR/bin/activate
@@ -432,7 +397,6 @@ install_azure_cli
 install_bin
 install_bitwarden
 install_bosh_cli
-install_cf_cli
 install_credhub_cli
 install_chruby
 install_docker
@@ -443,9 +407,6 @@ install_git_duet
 install_go
 install_helm
 install_kubectl
-install_om_cli
-install_pivnet_cli
-install_rtr_cli
 install_terraform
 install_vault
 install_yq

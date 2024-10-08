@@ -119,7 +119,7 @@ Host ns-vultr
 	ForwardAgent yes
 
 Host riscv
-	HostName riscv.nono.io
+	HostName riscv.majestic-labs.ai
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

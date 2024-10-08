@@ -164,7 +164,7 @@ configure_git() {
 }
 
 configure_sudo() {
-  sudo sed -i 's/# %wheel/%wheel/' /etc/sudoers
+  sudo sed -i 's/\(%sudo.*ALL.\) ALL$/\1 NOPASSWD: ALL/' /etc/sudoers
 }
 
 configure_ntp() {

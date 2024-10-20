@@ -54,6 +54,9 @@ install_packages() {
     zsh \
     zsh-syntax-highlighting \
 
+  # install NVIDIA drivers if NVIDIA card
+  sudo ubuntu-drivers autoinstall
+
   if [ "$(uname -m)" = x86_64 ]; then
     sudo apt-get install -y \
       nvidia-cuda-toolkit

@@ -38,6 +38,7 @@ install_packages() {
     libssl-dev \
     lldb \
     llvm \
+    msr-tools \
     neovim \
     ninja-build \
     nginx \
@@ -49,6 +50,7 @@ install_packages() {
     ruby \
     socat \
     tcpdump \
+    ubuntu-drivers-common \
     tree \
     unzip \
     zsh \

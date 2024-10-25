@@ -51,6 +51,7 @@ install_packages() {
     socat \
     tcpdump \
     ubuntu-drivers-common \
+    tidy \
     tree \
     unzip \
     zsh \

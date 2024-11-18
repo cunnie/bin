@@ -85,28 +85,35 @@ Host noble
 	ForwardAgent yes
 
 Host ns-aws
-	HostName ns-aws.nono.io
+	HostName ns-aws.sslip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host ns-azure
-	HostName ns-azure.nono.io
+	HostName ns-azure.sslip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host ns-gce
-	HostName ns-gce.nono.io
+	HostName ns-gce.sslip.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
+Host ns-hetzner
+	HostName ns-hetzner.sslip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
 Host ns-ovh
-	HostName ns-ovh.nono.io
+	HostName ns-ovh.sslip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

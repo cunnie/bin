@@ -48,6 +48,7 @@ install_packages() {
     python3-venv \
     ripgrep \
     ruby \
+    rustc \
     socat \
     tcpdump \
     ubuntu-drivers-common \

@@ -2,7 +2,7 @@
 set -eu -o pipefail
 
 install_packages() {
-  sudo dnf groupinstall -y "Development Tools"
+  sudo dnf group install -y development-tools
   sudo dnf install -y \
     bind-chroot \
     bind-utils \
@@ -82,7 +82,7 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.re
 
 install_bosh_cli() {
   if [ ! -x /usr/local/bin/bosh ]; then
-    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.2.3/bosh-cli-7.2.3-linux-amd64 -o /tmp/bosh
+    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.8.2/bosh-cli-7.8.2-linux-amd64 -o /tmp/bosh
     sudo install /tmp/bosh /usr/local/bin
   fi
 }

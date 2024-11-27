@@ -29,6 +29,7 @@ install_packages() {
     lastpass-cli \
     libcurl-devel \
     libxml2-devel \
+    msr-tools \
     mysql-devel \
     neovim \
     net-tools \

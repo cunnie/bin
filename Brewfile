@@ -57,6 +57,7 @@ brew "readline"
 brew "ripgrep"
 brew "ruby-install"
 brew "rust" # needed by Python package tiktoken for evaluation LLM chess models
+brew "stockfish" # needed for evaluation LLM chess models
 brew "terraform"
 brew "tidy-html5"
 brew "tmux"

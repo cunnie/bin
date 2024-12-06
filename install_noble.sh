@@ -22,6 +22,7 @@ install_packages() {
     bat \
     bison \
     build-essential \
+    cargo \
     chrony \
     clang \
     cmake \

@@ -33,7 +33,6 @@ brew "mysql"
 brew "neovim"
 brew "openssl@3"
 brew "python"
-brew "python@3.8" # needed for Google Cloud SDK https://cloud.google.com/sdk/gcloud/reference/topic/startup
 brew "python@3.11" # needed for vLLM
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "qrencode"
@@ -44,7 +43,6 @@ brew "rust" # needed by Python package tiktoken for evaluation LLM chess models
 brew "terraform"
 brew "tmux"
 brew "tree"
-brew "vault"
 brew "vim"
 brew "watch"
 brew "wget"

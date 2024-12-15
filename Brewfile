@@ -1,4 +1,3 @@
-tap "git-duet/tap"
 tap "golangci/tap"
 tap "homebrew/bundle"
 tap "homebrew/services"
@@ -54,7 +53,6 @@ brew "zsh-git-prompt"
 brew "zsh-lovers"
 brew "zsh-syntax-highlighting"
 
-brew "git-duet/tap/git-duet"
 brew "golangci/tap/golangci-lint"
 
 cask "disk-inventory-x" # who's using up all my space?

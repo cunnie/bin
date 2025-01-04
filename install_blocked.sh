@@ -121,18 +121,6 @@ use_pacific_time() {
   sudo timedatectl set-timezone America/Los_Angeles
 }
 
-rsyslog_ignores_sslip() {
-  RSYSLOG_CONFIG=/etc/rsyslog.d/10-sslip.io.conf
-  if [ ! -f $RSYSLOG_CONFIG ]; then
-    sudo tee -a $RSYSLOG_CONFIG <<EOF
-# sslip.io-dns-server is too verbose, consumed 15G in /var/log
-# rely only on journalctl henceforth
-:programname, isequal, "sslip.io-dns-server" stop
-EOF
-    sudo systemctl restart syslog
-  fi
-}
-
 configure_git() {
   # https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
   git config --global user.name "Brian Cunnie"
@@ -170,22 +158,6 @@ restrict -6 ::1
 EOF
     sudo systemctl enable ntpsec
     sudo systemctl start ntpsec
-  fi
-}
-
-install_sslip_io_dns() {
-  if [ ! -x /usr/bin/sslip.io-dns-server ]; then
-    GOLANG_ARCH=$ARCH
-    GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
-    GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
-    curl -L https://github.com/cunnie/sslip.io/releases/download/3.2.5/sslip.io-dns-server-linux-$GOLANG_ARCH \
-      -o sslip.io-dns-server
-    sudo install sslip.io-dns-server /usr/bin
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \
-      -o /etc/systemd/system/sslip.io-dns.service
-    sudo systemctl daemon-reload
-    sudo systemctl enable sslip.io-dns
-    sudo systemctl start sslip.io-dns
   fi
 }
 
@@ -276,7 +248,6 @@ install_packages
 configure_sudo
 create_user_cunnie
 use_pacific_time
-rsyslog_ignores_sslip
 
 if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   configure_git
@@ -286,7 +257,6 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   install_zsh_autosuggestions
   configure_direnv
   configure_ntp
-  install_sslip_io_dns
   install_sslip_io_web # installs HTTP only
   install_tls # gets certs & updates nginx to include HTTPS
   delete_adminuser # AMI includes an ubuntu user; delete it

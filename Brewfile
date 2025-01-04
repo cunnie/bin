@@ -4,7 +4,6 @@ tap "homebrew/services"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
-brew "azure-cli" # for terraforming ns-azure
 brew "bison"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "cdrtools" # ln -s $(brew --prefix)/bin/{mkisofs,genisoimage} # fixes 127 -sh: genisoimage: command not found

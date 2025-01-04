@@ -3,14 +3,6 @@
 # This script is meant to be an idempotent script (you can run it multiple
 # times in a row).
 
-# This script is meant to be run by the root user (via Azure's cloud-init /
-# terraform's custom_data) with no ssh key, no USER or HOME variable, and also
-# be run by user cunnie, with ssh keys and environment variables set.
-
-# to troubleshoot: ssh adminuser@ns-azure
-
-# Output is in /var/log/cloud-init-output.log
-
 set -xeu -o pipefail
 
 install_packages() {

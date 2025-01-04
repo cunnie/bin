@@ -103,13 +103,6 @@ Host ns-aws
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 
-Host ns-azure
-	HostName ns-azure.sslip.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
 Host ns-gce
 	HostName ns-gce.sslip.io
 	User cunnie

@@ -54,6 +54,7 @@ brew "zsh-syntax-highlighting"
 
 brew "golangci/tap/golangci-lint"
 
+cask "cursor" # VS Code + AI - $20 / month
 cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
 cask "flycut"

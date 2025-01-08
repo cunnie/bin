@@ -24,6 +24,13 @@ Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
 
+Host blocked ns-aws
+	HostName blocked.sslip.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	UserKnownHostsFile /dev/null
+
 Host bosh-vsphere
 	HostName 10.9.16.10
 	User jumpbox
@@ -95,13 +102,6 @@ Host noble
 	HostName noble.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-
-Host ns-aws
-	HostName ns-aws.sslip.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
 
 Host ns-gce
 	HostName ns-gce.sslip.io

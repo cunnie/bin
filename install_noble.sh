@@ -19,6 +19,7 @@ install_packages() {
     clang \
     cmake \
     direnv \
+    espeak-ng \
     fasd \
     fd-find \
     ffmpeg \

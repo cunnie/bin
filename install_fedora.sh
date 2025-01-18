@@ -40,8 +40,6 @@ install_packages() {
     postgresql-devel \
     python \
     python-devel \
-    python2 \
-    python3-neovim \
     python3-numpy \
     python3-pip \
     redhat-rpm-config \
@@ -61,10 +59,6 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
-  if [ "$(uname -m)" = x86_64 ]; then
-    sudo dnf install -y \
-      packer
-  fi
 }
 
 install_azure_cli() {

@@ -4,6 +4,7 @@ set -eu -o pipefail
 install_packages() {
   sudo dnf group install -y development-tools
   sudo dnf install -y \
+    autojump-zsh \
     bind-chroot \
     bind-utils \
     binutils \
@@ -124,20 +125,6 @@ install_chruby() {
 
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
-EOF
-  fi
-}
-
-install_fasd() {
-  if [ ! -x /usr/local/bin/fasd ]; then
-    cd ~/workspace
-    git clone git@github.com:clvv/fasd.git
-    cd fasd
-    sudo make install
-    cat >> ~/.zshrc <<EOF
-
-eval "\$(fasd --init posix-alias zsh-hook)"
-alias z='fasd_cd -d'     # cd, same functionality as j in autojump
 EOF
   fi
 }
@@ -291,7 +278,8 @@ configure_zsh() {
     sudo chsh -s /usr/bin/zsh $USER
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc
-    echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~/.zshrc
+    echo '[ -s /etc/profile.d/autojump.sh ] && . /etc/profile.d/autojump.sh' >> ~/.zshrc
+    echo 'alias z=j' >> ~/.zshrc
     echo 'export EDITOR=nvim' >> ~/.zshrc
     echo 'alias k=kubectl' >> ~/.zshrc
     echo "# Don't log me out of LastPass for 10 hours" >> ~/.zshrc
@@ -395,7 +383,6 @@ install_bosh_cli
 install_credhub_cli
 install_chruby
 install_docker
-install_fasd
 install_fly_cli
 install_gcloud
 install_git_duet

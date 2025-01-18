@@ -240,7 +240,7 @@ install_yq() {
 
 install_vault() {
   if [ ! -x /usr/bin/vault ]; then
-    sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    sudo dnf-3 config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
     sudo dnf -y install vault
   fi
 }
@@ -272,7 +272,7 @@ install_docker() {
   if [ ! -x /usr/bin/docker ]; then
     # https://docs.docker.com/engine/install/fedora/
     sudo sudo dnf -y install dnf-plugins-core
-    sudo dnf config-manager \
+    sudo dnf-3 config-manager \
       --add-repo \
       https://download.docker.com/linux/fedora/docker-ce.repo
     sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin

@@ -283,7 +283,7 @@ configure_zsh() {
     echo 'alias k=kubectl' >> ~/.zshrc
     echo "# Don't log me out of LastPass for 10 hours" >> ~/.zshrc
     echo 'export LPASS_AGENT_TIMEOUT=36000' >> ~/.zshrc
-    echo '. $HOME/.venv/base/bin/activate' >> ~/.zshrc
+    echo '. $HOME/venv/bin/activate' >> ~/.zshrc
   fi
 }
 
@@ -365,7 +365,7 @@ configure_python_venv() {
   if [ ! -d $VENV_DIR ]; then
     python3 -m venv $VENV_DIR
     source $VENV_DIR/bin/activate
-    pip install tensorflow
+    pip install --upgrade pip
   fi
 }
 

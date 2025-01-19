@@ -136,6 +136,12 @@ Host riscv
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host runner
+	HostName runner.nono.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host unifi
 	HostName unifi.nono.io
 	User cunnie

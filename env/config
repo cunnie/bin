@@ -68,6 +68,12 @@ Host fedora fed
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host fpga
+	HostName fpga.majestic-labs.ai
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+	User ubuntu
+
 Host gist.github.com
 	User git
 	IdentityFile ~/.ssh/github

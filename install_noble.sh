@@ -32,7 +32,6 @@ install_packages() {
     libssl-dev \
     lldb \
     llvm \
-    msr-tools \
     neovim \
     ninja-build \
     nginx \

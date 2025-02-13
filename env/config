@@ -55,12 +55,6 @@ Host demo-small small-demo
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host einstein
-  HostName einstein.majestic-labs.ai
-	User ubuntu
-	IdentityFile ~/.ssh/majestic-wide
-	ForwardAgent yes
-
 Host esxi-1
 	HostName esxi-1.nono.io
 	User root
@@ -79,6 +73,12 @@ Host fpga
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 	User ubuntu
+
+# "hamilton", as in Margaret, formerly "einstein"
+Host hamilton einstein
+  HostName hamilton.majestic-labs.ai
+	IdentityFile ~/.ssh/majestic-wide
+	ForwardAgent yes
 
 Host gist.github.com
 	User git

@@ -44,7 +44,7 @@ Host centos
 	ForwardAgent yes
 
 Host demo
-  HostName demo.majestic-labs.ai
+  HostName demo-equinix.majestic-labs.ai
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

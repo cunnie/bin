@@ -55,6 +55,12 @@ Host demo-small small-demo
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host einstein
+  HostName einstein.majestic-labs.ai
+	User ubuntu
+	IdentityFile ~/.ssh/majestic-wide
+	ForwardAgent yes
+
 Host esxi-1
 	HostName esxi-1.nono.io
 	User root

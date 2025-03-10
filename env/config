@@ -20,6 +20,12 @@ Host avalon
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host big-demo
+  HostName 35.208.141.225
+	User cunnie
+	IdentityFile ~/.ssh/github
+	ForwardAgent yes
+
 Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
@@ -28,12 +34,6 @@ Host blocked ns-aws
 	HostName blocked.sslip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	UserKnownHostsFile /dev/null
-
-Host bosh-vsphere
-	HostName 10.9.16.10
-	User jumpbox
 	ForwardAgent yes
 	UserKnownHostsFile /dev/null
 

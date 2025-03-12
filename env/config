@@ -90,7 +90,6 @@ Host github.com
 
 Host home
 	HostName home.nono.io
-	Port 2222
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

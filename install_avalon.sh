@@ -13,6 +13,7 @@ install_packages() {
     iperf3 \
     neovim \
     rsync \
+    ruby \
     sudo \
     tmux \
     wireguard-tools \

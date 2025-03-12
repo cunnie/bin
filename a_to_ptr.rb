@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # typical use:
-# dig @nono.io axfr nono.io. | a_to_ptr.rb > /usr/local/etc/namedb/primary/9.10.in-addr.arpa
+# dig @nono.io axfr nono.io. | a_to_ptr.rb | sudo tee /usr/local/etc/namedb/primary/9.10.in-addr.arpa
 #
 # Typical axfr output:
 #

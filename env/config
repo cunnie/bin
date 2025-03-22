@@ -49,12 +49,6 @@ Host demo
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host demo-small small-demo
-  HostName small-demo.majestic-labs.ai
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
 Host esxi-1
 	HostName esxi-1.nono.io
 	User root

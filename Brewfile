@@ -21,6 +21,7 @@ brew "hugo"
 brew "iperf3"
 brew "jq"
 brew "neovim"
+brew "powerlevel10k" # zsh prompt
 brew "python"
 brew "python@3.11" # needed for vLLM
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
@@ -50,6 +51,7 @@ cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
 cask "flycut"
 cask "font-hack-nerd-font"
+cask "font-meslo-for-powerlevel10k" # needed for zsh prompt
 cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"

@@ -21,7 +21,7 @@ Host avalon
 	ForwardAgent yes
 
 Host big-demo
-  HostName 35.208.141.225
+  HostName demo-google.majestic-labs.ai
 	User cunnie
 	IdentityFile ~/.ssh/github
 	ForwardAgent yes
@@ -44,7 +44,7 @@ Host centos
 	ForwardAgent yes
 
 Host demo
-  HostName demo-equinix.majestic-labs.ai
+  HostName demo.majestic-labs.ai
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

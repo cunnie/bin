@@ -63,7 +63,6 @@ create_user_cunnie() {
     sudo touch ~cunnie/.zshrc
     sudo chmod -R go-rwx ~cunnie/.ssh
     sudo git clone https://github.com/cunnie/bin.git ~cunnie/bin
-    sudo mkdir -p ~cunnie/.local/share # fixes `lpass login → Error: No such file or directory: mkdir(/home/cunnie/.local/share/lpass)`
     sudo chown -R cunnie:cunnie ~cunnie
   fi
 }

@@ -77,8 +77,6 @@ configure_zsh() {
     echo 'eval "$(fasd --init posix-alias zsh-hook)"' >> ~cunnie/.zshrc
     echo "alias z='fasd_cd -d'" >> ~cunnie/.zshrc
     echo 'export EDITOR=nvim' >> ~cunnie/.zshrc
-    echo "# Don't log me out of LastPass for 10 hours" >> ~cunnie/.zshrc
-    echo 'export LPASS_AGENT_TIMEOUT=36000' >> ~cunnie/.zshrc
     echo 'export GIT_DISCOVERY_ACROSS_FILESYSTEM=1' >> ~cunnie/.zshrc
   fi
 }

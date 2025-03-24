@@ -27,7 +27,6 @@ install_packages() {
     iproute \
     iputils \
     jq \
-    lastpass-cli \
     libcurl-devel \
     libxml2-devel \
     msr-tools \
@@ -281,8 +280,6 @@ configure_zsh() {
     echo 'alias z=j' >> ~/.zshrc
     echo 'export EDITOR=nvim' >> ~/.zshrc
     echo 'alias k=kubectl' >> ~/.zshrc
-    echo "# Don't log me out of LastPass for 10 hours" >> ~/.zshrc
-    echo 'export LPASS_AGENT_TIMEOUT=36000' >> ~/.zshrc
     echo '. $HOME/venv/bin/activate' >> ~/.zshrc
   fi
 }

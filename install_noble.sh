@@ -28,7 +28,6 @@ install_packages() {
     git-lfs \
     golang \
     jq \
-    lastpass-cli \
     libssl-dev \
     lldb \
     llvm \

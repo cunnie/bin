@@ -3,11 +3,11 @@
 # This script is meant to be an idempotent script (you can run it multiple
 # times in a row).
 
-# This script is meant to be run by the root user (via AWS's cloud-init /
+# This script is meant to be run by the root user
 # terraform's custom_data) with no ssh key, no USER or HOME variable, and also
 # be run by user cunnie, with ssh keys and environment variables set.
 
-# to troubleshoot: ssh -i ~/.ssh/aws ubuntu@ns-aws
+# to troubleshoot: ssh ubuntu@ns-vsphere
 
 # Output is in /var/log/cloud-init-output.log
 
@@ -28,10 +28,8 @@ install_packages() {
     git-lfs \
     golang \
     jq \
-    lua5.4 \
     neovim \
     nginx \
-    nodejs \
     ntpsec \
     python3 \
     python3-dev \
@@ -39,12 +37,10 @@ install_packages() {
     python3-venv \
     ripgrep \
     ruby \
-    silversearcher-ag \
     socat \
     tcpdump \
     tree \
     unzip \
-    yarnpkg \
     zsh \
     zsh-syntax-highlighting \
 
@@ -61,7 +57,7 @@ create_user_cunnie() {
       sudo adduser cunnie $GROUP
     done
     echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
-    sudo mkdir ~cunnie/.ssh
+    sudo mkdir -p ~cunnie/.ssh
     echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
     ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
     sudo touch ~cunnie/.zshrc
@@ -73,10 +69,10 @@ create_user_cunnie() {
 
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
-    wget -O ruby-install-0.8.3.tar.gz \
-      https://github.com/postmodern/ruby-install/archive/v0.8.3.tar.gz
-    tar -xzvf ruby-install-0.8.3.tar.gz
-    cd ruby-install-0.8.3/
+    wget -O ruby-install-0.9.3.tar.gz \
+      https://github.com/postmodern/ruby-install/releases/download/v0.9.3/ruby-install-0.9.3.tar.gz
+    tar -xzvf ruby-install-0.9.3.tar.gz
+    cd ruby-install-0.9.3/
     sudo make install
 
     wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
@@ -88,14 +84,6 @@ install_chruby() {
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
 EOF
-  fi
-}
-
-install_fly_cli() {
-  if [ ! -x /usr/local/bin/fly ]; then
-    curl -s -o /tmp/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
-    sudo install /tmp/fly /usr/local/bin
-    sudo chmod a+w /usr/local/bin
   fi
 }
 
@@ -193,17 +181,6 @@ configure_sudo() {
   sudo sed -i 's/# %wheel/%wheel/' /etc/sudoers
 }
 
-configure_tmux() {
-  # https://github.com/luan/tmuxfiles, to clear, `rm -rf ~/.tmux.conf ~/.tmux`
-  if [ ! -f $HOME/.tmux.conf ]; then
-    echo "WARNING: If this scripts fails with \"unknown variable: TMUX_PLUGIN_MANAGER_PATH\""
-    echo "If you don't have an ugly magenta bottom of your tmux screen, if nvim is unusable, then"
-    echo "you may need to run this command to completely install tmux configuration:"
-    echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
-  fi
-}
-
 configure_ntp() {
   if ! grep -q time1.google.com /etc/ntp.conf; then
     cat <<EOF | sudo tee /etc/ntp.conf
@@ -274,6 +251,18 @@ configure_python_venv() {
   fi
 }
 
+install_p10k() {
+  if [ ! -e ~/.p10k.zsh ]; then
+    cp ~/bin/env/p10k.zsh ~/.p10k.zsh
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+    cat >> $HOME/.zshrc <<EOF
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run "p10k configure" or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+EOF
+  fi
+}
+
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -i)
@@ -290,13 +279,12 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
   configure_zsh          # needs to come before install steps that modify .zshrc
   install_chruby
-  install_fly_cli
   install_terraform
   install_aws_cli
   install_zsh_autosuggestions
   install_docker
   configure_direnv
-  configure_tmux
+  install_p10k
   configure_ntp
   configure_python_venv
   install_sslip_io_dns

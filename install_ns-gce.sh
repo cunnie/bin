@@ -34,6 +34,7 @@ install_packages() {
     python3 \
     python3-dev \
     python3-pip \
+    python3-venv \
     ripgrep \
     ruby \
     socat \
@@ -267,6 +268,18 @@ install_tls() {
   fi
 }
 
+install_p10k() {
+  if [ ! -e ~/.p10k.zsh ]; then
+    cp ~/bin/env/p10k.zsh ~/.p10k.zsh
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+    cat >> $HOME/.zshrc <<EOF
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run "p10k configure" or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+EOF
+  fi
+}
+
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -m) # `uname -i` returns "unknown" on GCP
@@ -284,6 +297,7 @@ if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
   install_chruby
   install_zsh_autosuggestions
   configure_direnv
+  install_p10k
   configure_ntp
   install_sslip_io_dns
   install_sslip_io_web # installs HTTP only

@@ -34,8 +34,6 @@ install_packages() {
     neovim \
     ninja-build \
     nginx \
-    nodejs \
-    npm \
     python3 \
     python3-dev \
     python3-pip \

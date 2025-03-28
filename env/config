@@ -5,7 +5,7 @@ ServerAliveInterval 60
 TCPKeepAlive yes
 StrictHostKeyChecking no
 
-Host 10.* 172.* 192.168.* ci.nono.io
+Host 10.* 172.* 192.168.*
 	UserKnownHostsFile /dev/null
 
 # personal
@@ -94,13 +94,8 @@ Host home
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host mordred
-	HostName mordred.nono.io
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host morgoth
-	HostName morgoth.nono.io
+Host melkor
+	HostName melkor.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
@@ -138,6 +133,11 @@ Host ns-ovh
 Host ns-vultr
 	HostName ns-vultr.nono.io
 	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
+Host nuada
+	HostName nuada.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 

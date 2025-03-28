@@ -266,9 +266,9 @@ install_tls() {
 install_p10k() {
   if [ ! -e ~/.p10k.zsh ]; then
     cp ~/bin/env/p10k.zsh ~/.p10k.zsh
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/workspace/powerlevel10k
     cat >> $HOME/.zshrc <<EOF
-source ~/powerlevel10k/powerlevel10k.zsh-theme
+source ~/workspace/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run "p10k configure" or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 EOF

@@ -49,6 +49,12 @@ Host centos
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host cunnie
+  HostName cunnie.majestic-labs.ai
+	User cunnie
+	IdentityFile ~/.ssh/github
+	ForwardAgent yes
+
 Host demo
   HostName demo.majestic-labs.ai
 	User cunnie

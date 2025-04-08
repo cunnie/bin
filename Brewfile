@@ -5,6 +5,7 @@ brew "automake"
 brew "awscli"
 brew "bison"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
+brew "boost" # needed for Freedom Studio
 brew "cmake"
 brew "direnv"
 brew "docker" # CLI only

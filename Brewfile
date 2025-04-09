@@ -63,7 +63,6 @@ cask "iterm2"
 cask "messenger" # Facebook messenger to sell things on FB Marketplace
 cask "postman" # Used for troubleshooting SERC's n8n.io → PDK migration
 cask "rancher"
-cask "skype"
 cask "visual-studio-code"
 cask "whatsapp"
 cask "wireshark"

@@ -8,11 +8,11 @@ install_packages() {
   sudo dnf groupinstall -y "Development Tools"
   sudo dnf install -y \
     binutils \
+    btop \
     clang \
     cmake \
     dnf-plugins-core \
     fd-find \
-    fzf \
     gcc-g++ \
     git \
     git-lfs \
@@ -30,7 +30,6 @@ install_packages() {
     python3-devel \
     python3-numpy \
     python3-pip \
-    qemu-kvm \
     redhat-rpm-config \
     ripgrep \
     socat \
@@ -84,11 +83,6 @@ configure_git() {
   git config --global core.editor nvim
 }
 
-disable_firewalld() {
-  sudo systemctl stop firewalld
-  sudo systemctl disable firewalld
-}
-
 configure_python_venv() {
   VENV_DIR=$HOME/.venv/base
   if [ ! -d $VENV_DIR ]; then
@@ -117,7 +111,6 @@ mkdir -p ~/workspace
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_bin
-disable_firewalld
 configure_git
 configure_python_venv
 install_p10k

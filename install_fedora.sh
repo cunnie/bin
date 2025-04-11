@@ -276,10 +276,15 @@ configure_zsh() {
     sudo chsh -s /usr/bin/zsh $USER
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc
+    echo 'export EDITOR=nvim' >> ~/.zshrc
+    echo '. /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
+    echo ' # CUDA, if installed'  >> ~/.zshrc
+    echo 'export PATH=/usr/local/cuda/bin:$PATH'  >> ~/.zshrc
+    echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.zshrc
+    echo ' # autojump, because `fasd` is abandonware' >> ~/.zshrc
     echo '[ -s /etc/profile.d/autojump.sh ] && . /etc/profile.d/autojump.sh' >> ~/.zshrc
     echo 'alias z=j' >> ~/.zshrc
-    echo 'export EDITOR=nvim' >> ~/.zshrc
-    echo 'alias k=kubectl' >> ~/.zshrc
+    echo " # Python, use a venv because you'll need to as soon as you install a module" >> ~/.zshrc
     echo '. $HOME/venv/bin/activate' >> ~/.zshrc
   fi
 }
@@ -366,6 +371,18 @@ configure_python_venv() {
   fi
 }
 
+install_p10k() {
+  if [ ! -e ~/.p10k.zsh ]; then
+    cp ~/bin/env/p10k.zsh ~/.p10k.zsh
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/workspace/powerlevel10k
+    cat >> $HOME/.zshrc <<EOF
+source ~/workspace/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run "p10k configure" or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+EOF
+  fi
+}
+
 [ $(id -u) = 0 ] && ( echo "Do NOT run as root"; exit 1 )
 install_packages
 mkdir -p ~/workspace
@@ -397,4 +414,5 @@ configure_git
 configure_tmux
 configure_passwordless_sudo
 configure_python_venv
+install_p10k
 [ ! -f /usr/lib64/libsqlite3.so ] && [ -f /usr/lib64/libsqlite3.so.0 ] && sudo ln -s /usr/lib64/libsqlite3.so.0 /usr/lib64/libsqlite3.so

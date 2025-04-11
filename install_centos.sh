@@ -30,8 +30,6 @@ install_packages() {
     python3-devel \
     python3-numpy \
     python3-pip \
-    python3-devel \
-    python3-numpy \
     qemu-kvm \
     redhat-rpm-config \
     ripgrep \
@@ -43,7 +41,7 @@ install_packages() {
     wget \
     zsh \
     zsh-autosuggestions \
-    zsh-syntax-highlighting
+    zsh-syntax-highlighting \
 
 }
 
@@ -51,36 +49,6 @@ install_bin() {
   if [ ! -d $HOME/bin ]; then
     git clone git@github.com:cunnie/bin.git $HOME/bin
     echo 'PATH="$HOME/bin:$PATH:/usr/local/go/bin"' >> ~/.zshrc
-    ln -s ~/bin/env/git-authors ~/.git-authors
-  fi
-}
-
-install_git_duet() {
-  if [ ! -x /usr/local/bin/git-duet ]; then
-    mkdir -p /tmp/$$/git-duet
-    pushd /tmp/$$
-    curl -o git-duet.tgz -L https://github.com/git-duet/git-duet/releases/download/0.9.0/linux_amd64.tar.gz
-    tar -xzvf git-duet.tgz -C git-duet/
-    sudo install git-duet/* /usr/local/bin
-    popd
-  fi
-}
-
-install_docker() {
-  if [ ! -x /usr/bin/docker ]; then
-    # https://docs.docker.com/engine/install/fedora/
-    sudo sudo dnf -y install dnf-plugins-core
-    sudo dnf config-manager \
-      --add-repo \
-      https://download.docker.com/linux/centos/docker-ce.repo
-    sudo dnf install -y docker-ce
-
-    # https://fedoramagazine.org/docker-and-fedora-32/
-    sudo systemctl enable docker
-    sudo systemctl start docker
-    sudo usermod -aG docker $USER
-    # fixes "ERROR: multiple platforms feature is currently not supported for docker driver."
-    docker buildx create --use
   fi
 }
 
@@ -90,10 +58,15 @@ configure_zsh() {
     echo "" | SHELL=/usr/bin/zsh zsh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     sed -i 's/robbyrussell/agnoster/' ~/.zshrc
     echo 'export EDITOR=nvim' >> ~/.zshrc
-    echo '. $HOME/.venv/base/bin/activate' >> ~/.zshrc
     echo '. /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
+    echo ' # CUDA, if installed'  >> ~/.zshrc
     echo 'export PATH=/usr/local/cuda/bin:$PATH'  >> ~/.zshrc
     echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.zshrc
+    echo ' # autojump, because `fasd` is abandonware' >> ~/.zshrc
+    echo '[ -s /etc/profile.d/autojump.sh ] && . /etc/profile.d/autojump.sh' >> ~/.zshrc
+    echo 'alias z=j' >> ~/.zshrc
+    echo " # Python, use a venv because you'll need to as soon as you install a module" >> ~/.zshrc
+    echo '. $HOME/venv/bin/activate' >> ~/.zshrc
   fi
 }
 
@@ -126,14 +99,25 @@ configure_python_venv() {
   fi
 }
 
+install_p10k() {
+  if [ ! -e ~/.p10k.zsh ]; then
+    cp ~/bin/env/p10k.zsh ~/.p10k.zsh
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/workspace/powerlevel10k
+    cat >> $HOME/.zshrc <<EOF
+source ~/workspace/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run "p10k configure" or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+EOF
+  fi
+}
+
 [ $(id -u) = 0 ] && ( echo "Do NOT run as root"; exit 1 )
 # install_packages # should already been installed
 mkdir -p ~/workspace
 install_packages
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_bin
-install_docker
-install_git_duet
 disable_firewalld
 configure_git
 configure_python_venv
+install_p10k

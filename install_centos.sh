@@ -1,6 +1,9 @@
 #!/bin/bash -x
 set -eu -o pipefail
 
+# Source common functions
+source "$(dirname "$0")/install_common.sh"
+
 install_packages() {
   sudo dnf update -y
   sudo dnf install -y \
@@ -113,4 +116,5 @@ configure_zsh          # needs to come before install steps that modify .zshrc
 install_bin
 configure_git
 configure_python_venv
+redhat_install_google_cloud_cli
 install_p10k

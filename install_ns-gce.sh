@@ -13,6 +13,9 @@
 
 set -xeu -o pipefail
 
+# Source common functions
+source "$(dirname "$0")/install_common.sh"
+
 install_packages() {
   sudo apt-get update
   export DEBIAN_FRONTEND=noninteractive

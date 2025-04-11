@@ -1,40 +1,40 @@
 #!/bin/bash -x
 
-# This script is meant to be an idempotent script (you can run it multiple
-# times in a row).
-
-# This script is meant to be run by the root user (via AWS's cloud-init /
-# terraform's custom_data) with no ssh key, no USER or HOME variable, and also
-# be run by user cunnie, with ssh keys and environment variables set.
-
-# to troubleshoot: ssh ubuntu@ns-aws
-
-# Output is in /var/log/cloud-init-output.log
+# Common functions used by installation scripts
+# This file should be sourced by the installation scripts
 
 set -xeu -o pipefail
 
-# Source common functions
-source "$(dirname "$0")/install_common.sh"
-
-create_user_cunnie() {
-  if ! id cunnie; then
-    sudo adduser \
-      --shell=/usr/bin/zsh \
-      --gecos="Brian Cunnie" \
-      --disabled-password \
-      cunnie
-    for GROUP in root adm sudo www-data; do
-      sudo adduser cunnie $GROUP
-    done
-    echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
-    sudo mkdir -p ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
-    ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
-    sudo touch ~cunnie/.zshrc
-    sudo chmod -R go-rwx ~cunnie/.ssh
-    sudo git clone https://github.com/cunnie/bin.git ~cunnie/bin
-    sudo chown -R cunnie:cunnie ~cunnie
-  fi
+install_packages() {
+  sudo apt-get update
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt-get -y upgrade
+  sudo apt-get remove -y chrony || true
+  sudo apt-get install -y \
+    bat \
+    build-essential \
+    direnv \
+    fasd \
+    fd-find \
+    git \
+    git-lfs \
+    golang \
+    jq \
+    neovim \
+    nginx \
+    ntpsec \
+    python3 \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    ripgrep \
+    ruby \
+    socat \
+    tcpdump \
+    tree \
+    unzip \
+    zsh \
+    zsh-syntax-highlighting
 }
 
 install_chruby() {
@@ -90,6 +90,18 @@ use_pacific_time() {
   sudo timedatectl set-timezone America/Los_Angeles
 }
 
+rsyslog_ignores_sslip() {
+  RSYSLOG_CONFIG=/etc/rsyslog.d/10-sslip.io.conf
+  if [ ! -f $RSYSLOG_CONFIG ]; then
+    sudo tee -a $RSYSLOG_CONFIG <<EOF
+# sslip.io-dns-server is too verbose, consumed 15G in /var/log
+# rely only on journalctl henceforth
+:programname, isequal, "sslip.io-dns-server" stop
+EOF
+    sudo systemctl restart syslog
+  fi
+}
+
 configure_git() {
   # https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
   git config --global user.name "Brian Cunnie"
@@ -130,6 +142,22 @@ EOF
   fi
 }
 
+install_sslip_io_dns() {
+  if [ ! -x /usr/bin/sslip.io-dns-server ]; then
+    GOLANG_ARCH=$ARCH
+    GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
+    GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
+    curl -L https://github.com/cunnie/sslip.io/releases/download/3.2.6/sslip.io-dns-server-linux-$GOLANG_ARCH \
+      -o sslip.io-dns-server
+    sudo install sslip.io-dns-server /usr/bin
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \
+      -o /etc/systemd/system/sslip.io-dns.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable sslip.io-dns
+    sudo systemctl start sslip.io-dns
+  fi
+}
+
 install_sslip_io_web() {
   # Fix "conflicting server name "_" on 0.0.0.0:80, ignored"
   if [ -L /etc/nginx/sites-enabled/default ]; then
@@ -146,10 +174,8 @@ install_sslip_io_web() {
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root_sslip.io/ $HTML_DIR/
     sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
-    for CONF in {sslip.io,phishing}.nginx.conf; do
-      sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/$CONF \
-        -o /etc/nginx/conf.d/$CONF
-    done
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io.nginx.conf \
+      -o /etc/nginx/conf.d/sslip.io.conf
     sudo systemctl restart nginx # enable sslip.io HTTP
     sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
     sudo chown -R www-data:www-data $HTML_DIR
@@ -201,10 +227,8 @@ install_tls() {
       --log
     sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration
-    for CONF in {sslip.io,phishing}-https.nginx.conf; do
-      sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/$CONF \
-        -o /etc/nginx/conf.d/$CONF
-    done
+    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io-https.nginx.conf \
+      -o /etc/nginx/conf.d/sslip.io-https.conf
     sudo systemctl restart nginx # enable sslip.io HTTPS
   fi
 }
@@ -219,28 +243,4 @@ source ~/workspace/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 EOF
   fi
-}
-
-id # Who am I? for debugging purposes
-START_TIME=$(date +%s)
-ARCH=$(uname -i)
-export HOSTNAME=$(hostname)
-install_packages
-configure_sudo
-create_user_cunnie
-use_pacific_time
-
-if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
-  configure_git
-  mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
-  configure_zsh          # needs to come before install steps that modify .zshrc
-  install_chruby
-  install_zsh_autosuggestions
-  configure_direnv
-  install_p10k
-  configure_ntp
-  install_sslip_io_web # installs HTTP only
-  install_tls # gets certs & updates nginx to include HTTPS
-  delete_adminuser # AMI includes an ubuntu user; delete it
-fi
-echo "It took $(( $(date +%s) - START_TIME )) seconds to run"
+} 

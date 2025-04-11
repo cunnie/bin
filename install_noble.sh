@@ -286,7 +286,7 @@ EOF
 
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
-ARCH=$(uname -i)
+ARCH=$(uname -m)
 export HOSTNAME=$(hostname)
 install_packages
 configure_sudo

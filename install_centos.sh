@@ -84,11 +84,11 @@ configure_git() {
 }
 
 configure_python_venv() {
-  VENV_DIR=$HOME/.venv/base
+  VENV_DIR=$HOME/venv
   if [ ! -d $VENV_DIR ]; then
-    python3 -m venv $VENV_DIR
+    python3 -m venv $VENV_DIR --prompt homedir
     source $VENV_DIR/bin/activate
-    $VENV_DIR/base/bin/python3 -m pip install --upgrade pip
+    $VENV_DIR/bin/python3 -m pip install --upgrade pip
     pip install tensorflow
   fi
 }

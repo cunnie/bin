@@ -9,6 +9,7 @@ install_packages() {
   sudo dnf install -y \
     https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
   sudo dnf groupinstall -y "Development Tools"
+  sudo dnf groupinstall "GNOME" -y
   sudo dnf install -y \
     binutils \
     btop \
@@ -38,6 +39,7 @@ install_packages() {
     socat \
     strace \
     tcpdump \
+    tigervnc-server \
     tmux \
     util-linux-user \
     wget \

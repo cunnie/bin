@@ -5,7 +5,7 @@
 
 set -xeu -o pipefail
 
-install_packages() {
+ubuntu_install_packages() {
   sudo apt-get update
   export DEBIAN_FRONTEND=noninteractive
   sudo apt-get -y upgrade
@@ -13,6 +13,8 @@ install_packages() {
   sudo apt-get install -y \
     bat \
     build-essential \
+    clang \
+    cmake \
     direnv \
     fasd \
     fd-find \
@@ -35,6 +37,16 @@ install_packages() {
     unzip \
     zsh \
     zsh-syntax-highlighting
+}
+
+ubuntu_install_nvidia_packages() {
+  # install NVIDIA drivers if NVIDIA card
+  sudo ubuntu-drivers autoinstall
+
+  if [ "$(uname -m)" = x86_64 ]; then
+    sudo apt-get install -y \
+      nvidia-cuda-toolkit
+  fi
 }
 
 install_chruby() {

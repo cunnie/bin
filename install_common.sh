@@ -49,6 +49,20 @@ ubuntu_install_nvidia_packages() {
   fi
 }
 
+ubuntu_install_gcloud() {
+  if ! gcloud config get project ; then
+    sudo apt-get install -y \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      gnupg \
+
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    sudo apt-get update && sudo apt-get install -y google-cloud-cli
+  fi
+}
+
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.9.3.tar.gz \

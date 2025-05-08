@@ -237,6 +237,7 @@ START_TIME=$(date +%s)
 ARCH=$(uname -m)
 export HOSTNAME=$(hostname)
 ubuntu_install_packages
+ubuntu_install_gcloud
 configure_sudo
 create_user_cunnie
 use_pacific_time

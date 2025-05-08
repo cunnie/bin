@@ -244,6 +244,7 @@ use_pacific_time
 rsyslog_ignores_sslip
 
 if id -u cunnie && [ $(id -u) == $(id -u cunnie) ]; then
+  ubuntu_install_vnc
   configure_git
   mkdir -p $HOME/workspace # sometimes run as root via terraform user_data, no HOME
   configure_zsh          # needs to come before install steps that modify .zshrc

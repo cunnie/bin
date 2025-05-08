@@ -63,6 +63,29 @@ ubuntu_install_gcloud() {
   fi
 }
 
+ubuntu_install_vnc() {
+  if [ ! -d /etc/tigervnc ]; then
+    sudo apt-get install -y \
+      tigervnc-standalone-server \
+      ubuntu-desktop \
+
+    printf "\n:1=$USER\n" | \
+      sudo tee -a /etc/tigervnc/vncserver.users
+    printf '\n$localhost = "yes";\n$geometry = "2000x1200";\n' | \
+      sudo tee -a /etc/tigervnc/vncserver-config-defaults
+    sudo cp -i /usr/lib/systemd/system/tigervncserver@.service \
+      /etc/systemd/system/vncserver@:1.service
+    sudo -u ${USER} mkdir -p ~${USER}/.vnc
+    sudo systemctl daemon-reload
+    sudo systemctl enable vncserver@:1
+    sudo systemctl restart vncserver@:1
+    printf "---------"
+    printf "Remember to run 'tigervncpasswd'"
+    printf "Remember to run 'sudo passwd $USER'"
+    printf "---------"
+  fi
+}
+
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.9.3.tar.gz \

@@ -11,6 +11,8 @@ ubuntu_install_packages() {
   sudo apt-get -y upgrade
   sudo apt-get remove -y chrony || true
   sudo apt-get install -y \
+    autoconf \
+    automake \
     bat \
     build-essential \
     clang \
@@ -22,6 +24,7 @@ ubuntu_install_packages() {
     git-lfs \
     golang \
     jq \
+    libtool \
     neovim \
     nginx \
     ntpsec \

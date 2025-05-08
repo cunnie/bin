@@ -17,6 +17,7 @@ ubuntu_install_packages() {
     build-essential \
     clang \
     cmake \
+    device-tree-compiler \
     direnv \
     fasd \
     fd-find \
@@ -24,20 +25,31 @@ ubuntu_install_packages() {
     git-lfs \
     golang \
     jq \
+    libftdi1 \
+    libglib2.0-0 \
+    libgmp10 \
+    libhidapi-hidraw0 \
+    libpixman-1-0 \
     libtool \
     neovim \
     nginx \
+    ninja-build \
     ntpsec \
+    pkg-config \
     python3 \
     python3-dev \
     python3-pip \
+    python3-setuptools \
     python3-venv \
+    python3-wheel \
     ripgrep \
     ruby \
     socat \
+    swig \
     tcpdump \
     tree \
     unzip \
+    wget \
     zsh \
     zsh-syntax-highlighting
 }

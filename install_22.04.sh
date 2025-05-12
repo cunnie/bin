@@ -5,6 +5,13 @@
 
 set -xeu -o pipefail
 
+ubuntu_install_packages_jammy() {
+  sudo apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv
+}
+
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.9.3.tar.gz \
@@ -176,6 +183,7 @@ START_TIME=$(date +%s)
 ARCH=$(uname -m)
 export HOSTNAME=$(hostname)
 ubuntu_install_packages
+ubuntu_install_packages_jammy
 ubuntu_install_gcloud
 configure_sudo
 create_user_cunnie

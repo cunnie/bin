@@ -14,6 +14,7 @@ ubuntu_install_packages() {
     autoconf \
     automake \
     bat \
+    btop \
     build-essential \
     clang \
     cmake \

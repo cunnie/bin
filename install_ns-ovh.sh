@@ -16,27 +16,6 @@ set -xeu -o pipefail
 # Source common functions
 source "$(dirname "$0")/install_common.sh"
 
-create_user_cunnie() {
-  if ! id cunnie; then
-    sudo adduser \
-      --shell=/usr/bin/zsh \
-      --gecos="Brian Cunnie" \
-      --disabled-password \
-      cunnie
-    for GROUP in root adm sudo www-data; do
-      sudo adduser cunnie $GROUP
-    done
-    echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
-    sudo mkdir -p ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
-    ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
-    sudo touch ~cunnie/.zshrc
-    sudo chmod -R go-rwx ~cunnie/.ssh
-    sudo git clone https://github.com/cunnie/bin.git ~cunnie/bin
-    sudo chown -R cunnie:cunnie ~cunnie
-  fi
-}
-
 id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -m)

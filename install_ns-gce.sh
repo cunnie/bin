@@ -16,57 +16,6 @@ set -xeu -o pipefail
 # Source common functions
 source "$(dirname "$0")/install_common.sh"
 
-install_packages() {
-  sudo apt-get update
-  export DEBIAN_FRONTEND=noninteractive
-  sudo apt-get -y upgrade
-  sudo apt-get remove -y chrony || true
-  sudo apt-get install -y \
-    bat \
-    build-essential \
-    direnv \
-    fasd \
-    fd-find \
-    git \
-    git-lfs \
-    golang \
-    jq \
-    neovim \
-    nginx \
-    ntpsec \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
-    ripgrep \
-    ruby \
-    socat \
-    tcpdump \
-    tree \
-    unzip \
-    zsh \
-    zsh-syntax-highlighting \
-
-}
-
-configure_user_cunnie() {
-  # on gcloud this userid is already created
-  if [ ! -f ~cunnie/.zshrc ]; then
-    sudo chsh -s /usr/bin/zsh cunnie
-    for GROUP in root adm sudo www-data; do
-      sudo adduser cunnie $GROUP
-    done
-    echo "cunnie ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/99-cunnie
-    sudo mkdir -p ~cunnie/.ssh
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWiAzxc4uovfaphO0QVC2w00YmzrogUpjAzvuqaQ9tD cunnie@nono.io " | sudo tee -a ~cunnie/.ssh/authorized_keys
-    ssh-keyscan github.com | sudo tee -a ~cunnie/.ssh/known_hosts
-    sudo touch ~cunnie/.zshrc
-    sudo chmod -R go-rwx ~cunnie/.ssh
-    sudo git clone https://github.com/cunnie/bin.git ~cunnie/bin
-    sudo chown -R cunnie:cunnie ~cunnie
-  fi
-}
-
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.9.3.tar.gz \
@@ -287,7 +236,7 @@ id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -m) # `uname -i` returns "unknown" on GCP
 export HOSTNAME=$(hostname)
-install_packages
+ubuntu_install_packages
 configure_sudo
 configure_user_cunnie
 use_pacific_time

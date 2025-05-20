@@ -115,8 +115,20 @@ Host noble
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+# 146.190.110.69
+# 2400:6180:0:d2:0:1:da21:d000
+Host ns-do-sg
+	# HostName ns-do-sg.sslip.io
+	HostName 146.190.110.69
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
+# 104.155.144.4
+# 2600:1900:4000:4d12::
 Host ns-gce
-	HostName ns-gce.sslip.io
+	# HostName ns-gce.sslip.io
+	HostName  104.155.144.4
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
@@ -127,14 +139,20 @@ Host ns-hetzner
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-	UserKnownHostsFile /dev/null
 
 Host ns-ovh
 	HostName ns-ovh.sslip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-	UserKnownHostsFile /dev/null
+
+# 51.79.178.89
+# 2402:1f00:8001:d59::1
+Host ns-ovh-sg
+	HostName ns-ovh-sg.sslip.io
+	User cunnie
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
 
 Host ns-vultr
 	HostName ns-vultr.nono.io

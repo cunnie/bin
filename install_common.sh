@@ -73,7 +73,7 @@ ubuntu_install_gcloud() {
       curl \
       gnupg \
 
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+    curl -f https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     sudo apt-get update && sudo apt-get install -y google-cloud-cli
   fi
@@ -212,10 +212,10 @@ install_sslip_io_dns() {
     GOLANG_ARCH=$ARCH
     GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
     GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
-    curl -L https://github.com/cunnie/sslip.io/releases/download/3.2.7/sslip.io-dns-server-linux-$GOLANG_ARCH \
+    curl -fL https://github.com/cunnie/sslip.io/releases/download/3.2.7/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \
+    sudo curl -fL https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \
       -o /etc/systemd/system/sslip.io-dns.service
     sudo systemctl daemon-reload
     sudo systemctl enable sslip.io-dns
@@ -239,7 +239,7 @@ install_sslip_io_web() {
     sudo rsync -avH ~/workspace/sslip.io/k8s/document_root_sslip.io/ $HTML_DIR/
     sudo chown -R $USER $HTML_DIR
     sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io.nginx.conf \
+    sudo curl -fL https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io.conf
     sudo systemctl restart nginx # enable sslip.io HTTP
     sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
@@ -277,7 +277,7 @@ install_tls() {
     PUBLIC_IPV6=$(dig @ns.sslip.io ip.sslip.io TXT +short -6 | tr -d \")
     PUBLIC_IPV4_DASHES=${PUBLIC_IPV4//./-}
     PUBLIC_IPV6_DASHES=${PUBLIC_IPV6//:/-}
-    curl https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
+    curl -f https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
     ~/.acme.sh/acme.sh \
       --issue \
       -d $PUBLIC_IPV4.sslip.io \
@@ -307,7 +307,7 @@ install_tls() {
       --log
     sudo chown -R www-data:www-data $TLS_DIR $HTML_DIR
     # Now that we have a cert we can safely load nginx's HTTPS configuration
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io-https.nginx.conf \
+    sudo curl -fL https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io-https.nginx.conf \
       -o /etc/nginx/conf.d/sslip.io-https.conf
     sudo systemctl restart nginx # enable sslip.io HTTPS
   fi

@@ -225,7 +225,7 @@ id # Who am I? for debugging purposes
 START_TIME=$(date +%s)
 ARCH=$(uname -i)
 export HOSTNAME=$(hostname)
-install_packages
+ubuntu_install_packages
 configure_sudo
 create_user_cunnie
 use_pacific_time

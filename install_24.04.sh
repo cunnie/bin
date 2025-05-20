@@ -110,46 +110,6 @@ EOF
   fi
 }
 
-install_sslip_io_dns() {
-  if [ ! -x /usr/bin/sslip.io-dns-server ]; then
-    GOLANG_ARCH=$ARCH
-    GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
-    GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
-    curl -L https://github.com/cunnie/sslip.io/releases/download/3.1.0/sslip.io-dns-server-linux-$GOLANG_ARCH \
-      -o sslip.io-dns-server
-    sudo install sslip.io-dns-server /usr/bin
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \
-      -o /etc/systemd/system/sslip.io-dns.service
-    sudo systemctl daemon-reload
-    sudo systemctl enable sslip.io-dns
-    sudo systemctl start sslip.io-dns
-  fi
-}
-
-install_sslip_io_web() {
-  # Fix "conflicting server name "_" on 0.0.0.0:80, ignored"
-  if [ -L /etc/nginx/sites-enabled/default ]; then
-    sudo rm /etc/nginx/sites-enabled/default
-    sudo systemctl enable nginx
-    sudo systemctl start nginx
-    if [ ! -d ~/workspace/sslip.io ]; then
-      git clone https://github.com/cunnie/sslip.io.git ~/workspace/sslip.io
-    fi
-  fi
-  HTML_DIR=/var/nginx/sslip.io
-  if [ ! -d $HTML_DIR ]; then
-    sudo mkdir -p $HTML_DIR
-    sudo rsync -avH ~/workspace/sslip.io/k8s/document_root_sslip.io/ $HTML_DIR/
-    sudo chown -R $USER $HTML_DIR
-    sudo chmod -R g+w $HTML_DIR # so I can write acme certificate information
-    sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/azure/sslip.io-vm/sslip.io.nginx.conf \
-      -o /etc/nginx/conf.d/sslip.io.conf
-    sudo systemctl restart nginx # enable sslip.io HTTP
-    sudo chmod g+rx /var/log/nginx # so I can look at the logs without running sudo
-    sudo chown -R www-data:www-data $HTML_DIR
-  fi
-}
-
 delete_adminuser() {
   if grep -q ^adminuser: /etc/passwd; then
     sudo deluser --remove-home adminuser

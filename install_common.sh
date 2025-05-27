@@ -95,10 +95,10 @@ ubuntu_install_vnc() {
     sudo systemctl daemon-reload
     sudo systemctl enable vncserver@:1
     sudo systemctl restart vncserver@:1
-    printf "---------"
+    printf -- "---------"
     printf "Remember to run 'tigervncpasswd'"
     printf "Remember to run 'sudo passwd $USER'"
-    printf "---------"
+    printf -- "---------"
   fi
 }
 

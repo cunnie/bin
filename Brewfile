@@ -6,6 +6,7 @@ brew "awscli"
 brew "bison"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "boost" # needed for Freedom Studio
+brew "btop" # a prettier htop
 brew "cmake"
 brew "direnv"
 brew "docker" # CLI only

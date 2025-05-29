@@ -14,6 +14,7 @@ ubuntu_install_packages() {
     autoconf \
     automake \
     bat \
+    bison \
     btop \
     build-essential \
     clang \
@@ -22,6 +23,7 @@ ubuntu_install_packages() {
     direnv \
     fasd \
     fd-find \
+    flex \
     git \
     git-lfs \
     golang \

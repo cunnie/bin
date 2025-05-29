@@ -26,10 +26,14 @@ ubuntu_install_packages() {
     git-lfs \
     golang \
     jq \
+    libfmt-dev \
     libftdi1 \
-    libglib2.0-0 \
+    libglib2.0-0t64 \
     libgmp10 \
+    libgpm-dev \
     libhidapi-hidraw0 \
+    libmpc-dev \
+    libmpfr-dev \
     libpixman-1-0 \
     libtool \
     neovim \
@@ -362,4 +366,4 @@ create_user_cunnie() {
     sudo git clone https://github.com/cunnie/bin.git ~cunnie/bin
     sudo chown -R cunnie:cunnie ~cunnie
   fi
-} 
+}

@@ -24,24 +24,30 @@ ubuntu_install_packages() {
     fasd \
     fd-find \
     flex \
+    gdb \
     git \
     git-lfs \
     golang \
     jq \
+    libepoxy-dev \
     libfmt-dev \
     libftdi1 \
     libglib2.0-0t64 \
+    libglib2.0-dev \
     libgmp10 \
     libgpm-dev \
     libhidapi-hidraw0 \
     libmpc-dev \
     libmpfr-dev \
     libpixman-1-0 \
+    libpixman-1-dev \
+    libsdl2-dev \
     libtool \
     neovim \
     nginx \
     ninja-build \
     ntpsec \
+    pkg-config \
     pkg-config \
     python3 \
     python3-dev \
@@ -54,6 +60,7 @@ ubuntu_install_packages() {
     socat \
     swig \
     tcpdump \
+    texinfo \
     tree \
     unzip \
     wget \

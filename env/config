@@ -15,7 +15,7 @@ Host nono.com nono.io
 	ForwardAgent yes
 
 Host arm
-  HostName 192.168.64.4
+  HostName 192.168.64.5
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

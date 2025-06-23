@@ -290,12 +290,16 @@ install_tls() {
     PUBLIC_IPV6=$(dig @ns.sslip.io ip.sslip.io TXT +short -6 | tr -d \")
     PUBLIC_IPV4_DASHES=${PUBLIC_IPV4//./-}
     PUBLIC_IPV6_DASHES=${PUBLIC_IPV6//:/-}
+    PUBLIC_IPV4_HEX=$(echo $PUBLIC_IPV4 | sed 's/\./ /g' | xargs printf '%02x%.2x%.2x%.2x\n')
+    // Don't need PUBLIC_IPV6_HEX; it's unwieldy
     curl -f https://get.acme.sh | sh -s email=brian.cunnie@gmail.com
     ~/.acme.sh/acme.sh \
       --issue \
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
+      -d $PUBLIC_IPV4_HEX.sslip.io \
+      -d $PUBLIC_IPV4_HEX.nip.io \
       --server    https://acme-v02.api.letsencrypt.org/directory \
       --keylength ec-256  \
       --log \
@@ -312,6 +316,8 @@ install_tls() {
       -d $PUBLIC_IPV4.sslip.io \
       -d $PUBLIC_IPV4_DASHES.sslip.io \
       -d $PUBLIC_IPV6_DASHES.sslip.io \
+      -d $PUBLIC_IPV4_HEX.sslip.io \
+      -d $PUBLIC_IPV4_HEX.nip.io \
       --ecc \
       --key-file       $TLS_DIR/private/server.key  \
       --fullchain-file $TLS_DIR/server.crt \

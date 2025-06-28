@@ -8,6 +8,7 @@ install_packages() {
     bind-chroot \
     bind-utils \
     binutils \
+    btop \
     btrfs-progs \
     cmake \
     cronie \
@@ -91,24 +92,6 @@ install_bitwarden() {
   fi
 }
 
-install_govc() {
-  if [ ! -x /usr/local/bin/govc ]; then
-    ARCH=$(uname -m)
-    ARCH=${ARCH/aarch64/arm64}
-    curl -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_${ARCH}.tar.gz" | tar xvzf - govc
-    sudo install govc /usr/local/bin
-  fi
-}
-
-install_credhub_cli() {
-  if [ ! -x /usr/local/bin/credhub ]; then
-    curl -sL https://github.com/cloudfoundry/credhub-cli/releases/download/2.9.5/credhub-linux-2.9.5.tgz -o /tmp/credhub.tgz
-    pushd /tmp/
-    tar xzvf /tmp/credhub.tgz -- ./credhub
-    sudo install /tmp/credhub /usr/local/bin
-  fi
-}
-
 install_chruby() {
   if [ ! -d /usr/local/share/chruby ] ; then
     wget -O ruby-install-0.8.3.tar.gz https://github.com/postmodern/ruby-install/archive/v0.8.3.tar.gz
@@ -146,7 +129,7 @@ install_bin() {
 
 install_fly_cli() {
   if [ ! -x $HOME/bin/fly ]; then
-    curl -s -o $HOME/bin/fly 'https://ci.nono.io/api/v1/cli?arch=amd64&platform=linux'
+    curl -s -o $HOME/bin/fly 'https://ci.majestic-labs.ai/api/v1/cli?arch=amd64&platform=linux'
     sudo chmod +x $HOME/bin/fly
   fi
 }
@@ -156,18 +139,6 @@ install_terraform() {
     curl -o tf.zip -L https://releases.hashicorp.com/terraform/1.6.3/terraform_1.6.3_linux_amd64.zip
     unzip tf.zip
     sudo install terraform /usr/local/bin/
-  fi
-}
-
-install_helm() {
-  if [ ! -x /usr/local/bin/helm ]; then
-    TMP_DIR=/tmp/install-$$
-    mkdir $TMP_DIR
-    curl -o $TMP_DIR/helm.tgz -L https://get.helm.sh/helm-v3.6.1-linux-amd64.tar.gz
-    pushd $TMP_DIR
-    tar xzvf helm.tgz
-    sudo install linux-amd64/helm /usr/local/bin/
-    popd
   fi
 }
 
@@ -203,14 +174,6 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
 EOM
       sudo dnf install -y google-cloud-sdk
     fi
-  fi
-}
-
-install_kubectl() {
-  # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-  if [ ! -f /usr/local/bin/kubectl ]; then
-	  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"
-	  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   fi
 }
 
@@ -392,20 +355,16 @@ install_azure_cli
 install_bin
 install_bitwarden
 install_bosh_cli
-install_credhub_cli
 install_chruby
 install_docker
-install_fly_cli
+# install_fly_cli
 install_gcloud
 install_git_duet
 install_go
-install_helm
-install_kubectl
 install_terraform
 install_vault
 install_yq
 install_zsh_autosuggestions
-install_govc
 use_pacific_time
 disable_firewalld
 configure_bind

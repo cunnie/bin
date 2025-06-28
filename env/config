@@ -165,6 +165,12 @@ Host nuada
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
+Host pve
+	HostName pve.nono.io
+	User root
+	IdentityFile ~/.ssh/nono
+	ForwardAgent yes
+
 Host riscv
 	HostName riscv.majestic-labs.ai
 	User cunnie

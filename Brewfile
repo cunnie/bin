@@ -1,5 +1,6 @@
 tap "homebrew/bundle"
 tap "homebrew/services"
+tap "hashicorp/tap"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
@@ -17,7 +18,7 @@ brew "git"
 brew "git-lfs"
 brew "gnu-sed"
 brew "go"
-brew "govc"
+brew "hashicorp/tap/vault"
 brew "htop"
 brew "hugo"
 brew "iperf3"
@@ -27,11 +28,8 @@ brew "powerlevel10k" # zsh prompt
 brew "python"
 brew "python@3.11" # needed for vLLM
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
-brew "qrencode"
-brew "readline"
 brew "ripgrep"
 brew "ruby-install"
-brew "rust" # needed by Python package tiktoken for evaluation LLM chess models
 brew "terraform"
 brew "tmux"
 brew "tree"
@@ -48,7 +46,6 @@ brew "zsh-syntax-highlighting"
 
 brew "golangci/tap/golangci-lint"
 
-cask "cursor" # VS Code + AI - $20 / month
 cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
 cask "flycut"
@@ -58,7 +55,6 @@ cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"
 cask "google-drive"
-cask "handbrake"
 cask "istat-menus"
 cask "iterm2"
 cask "messenger" # Facebook messenger to sell things on FB Marketplace
@@ -67,5 +63,4 @@ cask "rancher"
 cask "visual-studio-code"
 cask "vuescan"
 cask "whatsapp"
-cask "wireshark"
 cask "zoom"

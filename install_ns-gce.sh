@@ -126,7 +126,7 @@ install_sslip_io_dns() {
     GOLANG_ARCH=$ARCH
     GOLANG_ARCH=${GOLANG_ARCH/aarch64/arm64}
     GOLANG_ARCH=${GOLANG_ARCH/x86_64/amd64}
-    curl -L https://github.com/cunnie/sslip.io/releases/download/4.1.1/sslip.io-dns-server-linux-$GOLANG_ARCH \
+    curl -L https://github.com/cunnie/sslip.io/releases/download/4.2.0/sslip.io-dns-server-linux-$GOLANG_ARCH \
       -o sslip.io-dns-server
     sudo install sslip.io-dns-server /usr/bin
     sudo curl -L https://raw.githubusercontent.com/cunnie/deployments/main/terraform/aws/sslip.io-vm/sslip.io.service \

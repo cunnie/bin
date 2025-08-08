@@ -10,7 +10,7 @@
 
 puts <<~AXFR
   $TTL 3h
-  @ SOA mordor.nono.io. yoyo.nono.io. #{Time.now.to_i} 1d 12h 1w 3h
+  @ SOA avalon.nono.io. yoyo.nono.io. #{Time.now.to_i} 1d 12h 1w 3h
           ; Serial, Refresh, Retry, Expire, Neg. cache TTL
 
           NS      atom.nono.io.

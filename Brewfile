@@ -15,6 +15,7 @@ brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-crede
 brew "fd"
 brew "gh" # GitHub CLI, needed to delete many of my no-longer-needed forked repos
 brew "git"
+brew "git-filter-repo"
 brew "git-lfs"
 brew "gnu-sed"
 brew "go"
@@ -46,19 +47,16 @@ brew "zsh-syntax-highlighting"
 
 brew "golangci/tap/golangci-lint"
 
-cask "disk-inventory-x" # who's using up all my space?
 cask "firefox"
 cask "flycut"
 cask "font-hack-nerd-font"
 cask "font-meslo-for-powerlevel10k" # needed for zsh prompt
-cask "gimp"
 cask "google-chrome"
 cask "google-cloud-sdk"
 cask "google-drive"
 cask "istat-menus"
 cask "iterm2"
 cask "messenger" # Facebook messenger to sell things on FB Marketplace
-cask "postman" # Used for troubleshooting SERC's n8n.io → PDK migration
 cask "rancher"
 cask "visual-studio-code"
 cask "vuescan"

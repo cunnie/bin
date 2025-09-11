@@ -59,6 +59,5 @@ cask "iterm2"
 cask "messenger" # Facebook messenger to sell things on FB Marketplace
 cask "rancher"
 cask "visual-studio-code"
-cask "vuescan"
 cask "whatsapp"
 cask "zoom"

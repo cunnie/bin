@@ -21,6 +21,7 @@ install_packages() {
     git \
     git-lfs \
     gnuplot \
+    golang \
     golang-x-tools-gopls \
     hdf5-devel \
     htop \
@@ -51,7 +52,6 @@ install_packages() {
     socat \
     strace \
     tcpdump \
-    the_silver_searcher \
     tmux \
     util-linux-user \
     wget \
@@ -60,36 +60,6 @@ install_packages() {
     zsh-lovers \
     zsh-syntax-highlighting \
 
-}
-
-install_azure_cli() {
-  if [ ! -x /usr/bin/az ]; then
-    sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-    echo -e "[azure-cli]
-name=Azure CLI
-baseurl=https://packages.microsoft.com/yumrepos/azure-cli
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/azure-cli.repo
-    sudo dnf install -y azure-cli
-  fi
-}
-
-install_bosh_cli() {
-  if [ ! -x /usr/local/bin/bosh ]; then
-    curl -sL https://github.com/cloudfoundry/bosh-cli/releases/download/v7.8.2/bosh-cli-7.8.2-linux-amd64 -o /tmp/bosh
-    sudo install /tmp/bosh /usr/local/bin
-  fi
-}
-
-install_bitwarden() {
-  if [ ! -x /usr/local/bin/bw ]; then
-    pushd /tmp/
-    curl -sL "https://vault.bitwarden.com/download/?app=cli&platform=linux" -o bw.zip
-    unzip -o bw.zip
-    sudo install bw /usr/local/bin
-    popd
-  fi
 }
 
 install_chruby() {
@@ -108,13 +78,6 @@ install_chruby() {
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
 EOF
-  fi
-}
-
-install_go() {
-  if [ ! -d /usr/local/go ]; then
-    curl -L https://go.dev/dl/go1.20.1.linux-amd64.tar.gz -o /tmp/go.tgz
-    sudo tar -C /usr/local -xzvf /tmp/go.tgz
   fi
 }
 
@@ -177,30 +140,10 @@ EOM
   fi
 }
 
-install_yq() {
-  if [ ! -x /usr/local/bin/yq ]; then
-    curl -o yq -L https://github.com/mikefarah/yq/releases/download/v4.14.1/yq_linux_amd64
-    chmod +x yq
-    sudo install yq /usr/local/bin/
-    rm yq
-  fi
-}
-
 install_vault() {
   if [ ! -x /usr/bin/vault ]; then
     sudo dnf-3 config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
     sudo dnf -y install vault
-  fi
-}
-
-install_git_duet() {
-  if [ ! -x /usr/local/bin/git-duet ]; then
-    mkdir -p /tmp/$$/git-duet
-    pushd /tmp/$$
-    curl -o git-duet.tgz -L https://github.com/git-duet/git-duet/releases/download/0.9.0/linux_amd64.tar.gz
-    tar -xzvf git-duet.tgz -C git-duet/
-    sudo install git-duet/* /usr/local/bin
-    popd
   fi
 }
 
@@ -270,43 +213,6 @@ configure_git() {
   git config --global core.editor nvim
 }
 
-configure_tmux() {
-  # https://github.com/luan/tmuxfiles, to clear, `rm -rf ~/.tmux.conf ~/.tmux`
-  if [ ! -f $HOME/.tmux.conf ]; then
-    echo "WARNING: If this scripts fails with \"unknown variable: TMUX_PLUGIN_MANAGER_PATH\""
-    echo "If you don't have an ugly magenta bottom of your tmux screen, if nvim is unusable, then"
-    echo "you may need to run this command to completely install tmux configuration:"
-    echo "zsh -c \"\$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)\""
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/luan/tmuxfiles/master/install)"
-  fi
-}
-
-configure_bind() {
-  if ! sudo grep -q nono.io /etc/named.conf; then
-    sudo sed -i 's/listen-on port 53.*/listen-on port 53 { any; };/;
-      s/listen-on-v6 port 53.*/listen-on-v6 port 53 { any; };/;
-      s/allow-query.*/allow-query     { any; }; allow-query-cache { any; };/' /etc/named.conf
-    sudo tee -a /etc/named.conf << EOF
-zone "9.0.10.in-addr.arpa" {
-	type slave;
-	file "9.0.10.in-addr.arpa";
-	masters {
-		2601:646:100:69f0::a; // atom.nono.io
-	};
-};
-zone "nono.io" {
-	type slave;
-	file "nono.io";
-	masters {
-		2a01:4f8:c17:b8f::2; //shay.nono.io
-	};
-};
-EOF
-    sudo systemctl enable named-chroot
-    sudo systemctl start named-chroot
-  fi
-}
-
 disable_firewalld() {
   # so that BIND can work
   sudo systemctl stop firewalld
@@ -351,26 +257,19 @@ install_packages
 mkdir -p ~/workspace
 configure_zsh          # needs to come before install steps that modify .zshrc
 install_aws_cli
-install_azure_cli
 install_bin
-install_bitwarden
-install_bosh_cli
 install_chruby
 install_docker
-# install_fly_cli
 install_gcloud
 install_git_duet
-install_go
 install_terraform
 install_vault
 install_yq
 install_zsh_autosuggestions
 use_pacific_time
 disable_firewalld
-configure_bind
 configure_direnv
 configure_git
-configure_tmux
 configure_passwordless_sudo
 configure_python_venv
 install_p10k

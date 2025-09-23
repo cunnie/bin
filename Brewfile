@@ -47,12 +47,13 @@ brew "zsh-syntax-highlighting"
 
 brew "golangci/tap/golangci-lint"
 
+cask "container" # macOS Tahoe containerization
 cask "firefox"
 cask "flycut"
 cask "font-hack-nerd-font"
 cask "font-meslo-for-powerlevel10k" # needed for zsh prompt
+cask "gcloud-cli"
 cask "google-chrome"
-cask "google-cloud-sdk"
 cask "google-drive"
 cask "istat-menus"
 cask "iterm2"

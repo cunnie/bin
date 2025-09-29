@@ -25,6 +25,7 @@ brew "hugo"
 brew "iperf3"
 brew "jq"
 brew "neovim"
+brew "postgresql" # kernel performance dashboard
 brew "powerlevel10k" # zsh prompt
 brew "python"
 brew "python@3.11" # needed for vLLM

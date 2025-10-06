@@ -1,6 +1,5 @@
 tap "homebrew/bundle"
 tap "homebrew/services"
-tap "hashicorp/tap"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
@@ -19,16 +18,16 @@ brew "git-filter-repo"
 brew "git-lfs"
 brew "gnu-sed"
 brew "go"
-brew "hashicorp/tap/vault"
 brew "htop"
 brew "hugo"
 brew "iperf3"
 brew "jq"
 brew "neovim"
+brew "openbao"
+brew "opentofu"
 brew "postgresql" # kernel performance dashboard
 brew "powerlevel10k" # zsh prompt
 brew "python"
-brew "python@3.11" # needed for vLLM
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "ripgrep"
 brew "ruby-install"

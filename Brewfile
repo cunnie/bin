@@ -14,6 +14,7 @@ brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-crede
 brew "fd"
 brew "gh" # GitHub CLI, needed to delete many of my no-longer-needed forked repos
 brew "git"
+brew "git-delta" # shows a GitHub-style diff, good for seeing draw.io changes
 brew "git-filter-repo"
 brew "git-lfs"
 brew "gnu-sed"
@@ -31,7 +32,6 @@ brew "python"
 brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "ripgrep"
 brew "ruby-install"
-brew "terraform"
 brew "tmux"
 brew "tree"
 brew "vim"

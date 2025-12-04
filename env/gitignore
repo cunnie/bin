@@ -2,3 +2,5 @@
 .DS_Store
 # Visual Studio Code
 .vscode/
+# Anthropic's Claude
+.claude/

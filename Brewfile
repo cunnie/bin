@@ -47,6 +47,7 @@ brew "zsh-syntax-highlighting"
 
 brew "golangci/tap/golangci-lint"
 
+cask "claude-code"
 cask "container" # macOS Tahoe containerization
 cask "firefox"
 cask "flycut"

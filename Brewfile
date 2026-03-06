@@ -3,6 +3,7 @@ tap "homebrew/services"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
+brew "azcopy" # Azure's version of rsync to copy to blob storage for work-stuff
 brew "bison"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "boost" # needed for Freedom Studio

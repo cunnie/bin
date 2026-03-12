@@ -61,6 +61,7 @@ cask "istat-menus"
 cask "iterm2"
 cask "messenger" # Facebook messenger to sell things on FB Marketplace
 cask "rancher"
+cask "thunderbird" # for offboarding users
 cask "visual-studio-code"
 cask "whatsapp"
 cask "zoom"

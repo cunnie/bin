@@ -15,7 +15,7 @@ puts <<~AXFR
   @ SOA avalon.nono.io. yoyo.nono.io. #{Time.now.to_i} 1d 12h 1w 3h
           ; Serial, Refresh, Retry, Expire, Neg. cache TTL
 
-          NS      atom.nono.io.
+          NS      avalon.nono.io.
 AXFR
 
 # For dumping out IPv6 reverse-lookup files

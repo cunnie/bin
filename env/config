@@ -108,7 +108,7 @@ Host melkor
 Host nas nas.nono.io
 	HostName nas.nono.io
 	User root
-	IdentityFile ~/.ssh/nono
+	IdentityFile ~/.ssh/github
 
 Host noble
 	HostName noble.nono.io

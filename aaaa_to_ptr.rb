@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # typical use:
-# dig @nono.io axfr nono.io. | aaaa_to_ptr.rb | sudo tee /usr/local/etc/namedb/primary/0.0.1.0.6.4.6.0.1.0.6.2.IP6.arpa
+# dig @nono.io axfr nono.io. | aaaa_to_ptr.rb | sudo tee /usr/local/etc/namedb/primary/3.0.1.8.5.4.6.0.1.0.6.2.IP6.arpa
 #
 # Typical axfr output:
 #
@@ -37,7 +37,7 @@ $stdin.read.split("\n").each do |line|
   next unless line.match?(/\tAAAA\t/)
 
   fields = line.split(' ')
-  next unless fields[4].match?(/^2601:646:100:/)
+  next unless fields[4].match?(/^2601:645:8103:/)
 
   fields[0].gsub!(/^\*\./, '') # '*' (wildcards) cause `named` to fail to load zone
   ipv6_hostnames << IPv6Hostname.new(IPAddr.new(fields[4]), fields[0])

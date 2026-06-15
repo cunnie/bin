@@ -39,8 +39,6 @@ brew "yq"
 brew "zsh-autosuggestions"
 brew "zsh-completions"
 
-brew "golangci/tap/golangci-lint"
-
 cask "claude-code"
 cask "container" # macOS Tahoe containerization
 cask "firefox"

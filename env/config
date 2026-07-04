@@ -36,8 +36,8 @@ Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
 
-Host blocked ns-aws
-	HostName blocked.sslip.io
+Host blocked
+	HostName blocked.nip.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes

@@ -43,7 +43,6 @@ cask "claude-code"
 cask "container" # macOS Tahoe containerization
 cask "firefox"
 cask "flycut"
-cask "font-hack-nerd-font"
 cask "gcloud-cli"
 cask "google-chrome"
 cask "google-drive"

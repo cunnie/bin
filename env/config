@@ -41,7 +41,6 @@ Host blocked
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-	UserKnownHostsFile /dev/null
 
 Host centos
   HostName centos.nono.io

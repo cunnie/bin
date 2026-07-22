@@ -1,5 +1,3 @@
-tap "homebrew/bundle"
-tap "homebrew/services"
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
 brew "awscli"
@@ -40,7 +38,6 @@ brew "zsh-autosuggestions"
 brew "zsh-completions"
 
 cask "claude-code"
-cask "container" # macOS Tahoe containerization
 cask "firefox"
 cask "flycut"
 cask "gcloud-cli"

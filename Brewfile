@@ -47,5 +47,6 @@ cask "istat-menus"
 cask "iterm2"
 cask "thunderbird" # for offboarding users
 cask "visual-studio-code"
+cask "vuescan"
 cask "whatsapp"
 cask "zoom"

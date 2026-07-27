@@ -6,8 +6,6 @@ brew "azure-cli"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "btop" # a prettier htop
 brew "cmake"
-brew "docker" # CLI only
-brew "docker-credential-helper" # fixes `docker buildx` → "exec: "docker-credential-osxkeychain": executable file not found in $PATH"
 brew "fd"
 brew "gh" # GitHub CLI, needed to delete many of my no-longer-needed forked repos
 brew "git"
@@ -39,6 +37,7 @@ brew "zsh-autosuggestions"
 brew "zsh-completions"
 
 cask "claude-code"
+cask "dcv-viewer"
 cask "firefox"
 cask "flycut"
 cask "gcloud-cli"

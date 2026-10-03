@@ -1,8 +1,6 @@
 brew "autojump" # replaces "fasd", which has an archived upstream repo
 brew "automake"
-brew "awscli"
 brew "azcopy" # Azure's version of rsync to copy to blob storage for work-stuff
-brew "azure-cli"
 brew "bitwarden-cli" # LastPass is dead, long live Bitwarden!
 brew "btop" # a prettier htop
 brew "cmake"
@@ -23,7 +21,6 @@ brew "openbao"
 brew "opentofu"
 brew "postgresql" # kernel performance dashboard
 brew "python"
-brew "qemu" # so I can convert MS Windows VHDX to a VMDK to run VMware Fusion
 brew "ripgrep"
 brew "ruby-install"
 brew "tmux"
@@ -36,8 +33,8 @@ brew "yq"
 brew "zsh-autosuggestions"
 brew "zsh-completions"
 
+cask "bitwarden"
 cask "claude-code"
-cask "dcv-viewer"
 cask "firefox"
 cask "flycut"
 cask "gcloud-cli"
@@ -45,7 +42,6 @@ cask "google-chrome"
 cask "google-drive"
 cask "istat-menus"
 cask "iterm2"
-cask "thunderbird" # for offboarding users
 cask "visual-studio-code"
 cask "vuescan"
 cask "whatsapp"

@@ -10,6 +10,7 @@ Host 10.* 172.* 192.168.*
 
 # personal
 Host nono.com nono.io
+  HostName shay.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
@@ -26,12 +27,6 @@ Host avalon
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host big-demo
-  HostName demo-google.majestic-labs.ai
-	User cunnie
-	IdentityFile ~/.ssh/github
-	ForwardAgent yes
-
 Host bitbucket.org
 	User git
 	IdentityFile ~/.ssh/github
@@ -42,47 +37,9 @@ Host blocked
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host centos
-  HostName centos.nono.io
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host cunnie
-  HostName cunnie.majestic-labs.ai
-	User cunnie
-	IdentityFile ~/.ssh/github
-	ForwardAgent yes
-
-Host demo
-  HostName demo.majestic-labs.ai
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host esxi-1
-	HostName esxi-1.nono.io
-	User root
-
-Host esxi-2
-	HostName esxi-2.nono.io
-	User root
-
 Host fedora fed
 	HostName fed.nono.io
 	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host fpga
-	HostName fpga.majestic-labs.ai
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-	User ubuntu
-
-# "hamilton", as in Margaret, formerly "einstein"
-Host hamilton einstein
-  HostName hamilton.majestic-labs.ai
-	IdentityFile ~/.ssh/majestic-wide
 	ForwardAgent yes
 
 Host gist.github.com
@@ -101,16 +58,6 @@ Host home
 
 Host melkor
 	HostName melkor.nono.io
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
-Host nas nas.nono.io
-	HostName nas.nono.io
-	User root
-	IdentityFile ~/.ssh/github
-
-Host noble
-	HostName noble.nono.io
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
@@ -149,29 +96,17 @@ Host pve
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host riscv
-	HostName riscv.majestic-labs.ai
-	User cunnie
-	IdentityFile ~/.ssh/nono
-	ForwardAgent yes
-
 Host runner
 	HostName runner.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
 
-Host unifi
-	HostName unifi.nono.io
+Host ui
+	HostName ui.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
-
-Host vcenter-80
-	HostName vcenter-80.nono.io
-	User root
-	PreferredAuthentications password
-	PubkeyAuthentication no
 
 # wildcards at bottom, otherwise they trump
 Host *.nono.io

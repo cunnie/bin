@@ -10,7 +10,7 @@ Host 10.* 172.* 192.168.*
 
 # personal
 Host nono.com nono.io
-  HostName shay.nono.io
+  HostName ns-he.nono.io
 	User cunnie
 	IdentityFile ~/.ssh/nono
 	ForwardAgent yes
